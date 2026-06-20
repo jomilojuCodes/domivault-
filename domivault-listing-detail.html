@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Modern 4-Bed Apartment — Lekki Phase 1 | Domivault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0a1628;
+  --navy-mid: #132040;
+  --navy-light: #1c2f52;
+  --gold: #BA7517;
+  --gold-light: #EF9F27;
+  --cream: #f8f5ee;
+  --stone: #888780;
+  --white: #ffffff;
+  --success: #2ecc71;
+  --error: #e05252;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.25s ease;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--navy);
+  color: var(--white);
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 5%;
+  background: rgba(10,22,40,0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(186,117,23,0.15);
+}
+
+.back-btn {
+  display: flex; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.65); font-size: 0.88rem;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--sans); transition: color var(--transition);
+}
+.back-btn:hover { color: var(--white); }
+.back-btn svg { width: 18px; height: 18px; }
+
+.topbar-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--white);
+  transition: all var(--transition);
+}
+.icon-btn:hover { background: rgba(255,255,255,0.12); }
+.icon-btn.saved { background: rgba(186,117,23,0.2); border-color: rgba(186,117,23,0.4); color: var(--gold); }
+.icon-btn svg { width: 18px; height: 18px; }
+
+/* ── GALLERY ── */
+.gallery {
+  position: relative; height: 300px;
+  background: var(--navy-mid); overflow: hidden;
+}
+
+.gallery-track {
+  display: flex; height: 100%;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.gallery-slide {
+  min-width: 100%; height: 100%; position: relative;
+}
+
+.gallery-slide img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(0.85);
+}
+
+.gallery-prev, .gallery-next {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(10,22,40,0.72); border: none;
+  color: var(--white); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition);
+}
+.gallery-prev:hover, .gallery-next:hover { background: rgba(10,22,40,0.9); }
+.gallery-prev { left: 12px; }
+.gallery-next { right: 12px; }
+.gallery-prev svg, .gallery-next svg { width: 18px; height: 18px; }
+
+.gallery-dots {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px;
+}
+.gallery-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transition: all 0.25s; cursor: pointer;
+}
+.gallery-dot.active { width: 20px; border-radius: 3px; background: var(--gold); }
+
+.gallery-count {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(10,22,40,0.8); color: rgba(255,255,255,0.75);
+  font-size: 11px; padding: 3px 10px; border-radius: 100px;
+  backdrop-filter: blur(4px);
+}
+
+.verified-banner {
+  position: absolute; top: 12px; left: 12px;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(10,22,40,0.88);
+  border: 1px solid rgba(186,117,23,0.5);
+  color: var(--gold-light); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 100px;
+  backdrop-filter: blur(4px);
+}
+.vdot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold-light);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+/* ── CONTENT WRAPPER ── */
+.content { max-width: 860px; margin: 0 auto; padding: 1.5rem 5%; }
+
+/* ── HEADER ── */
+.listing-type { font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.listing-title { font-family: var(--serif); font-size: clamp(1.5rem,4vw,2rem); font-weight: 700; line-height: 1.15; margin-bottom: 6px; }
+.listing-loc { font-size: 13px; color: rgba(255,255,255,0.45); display: flex; align-items: center; gap: 5px; margin-bottom: 1.25rem; }
+.listing-loc svg { width: 14px; height: 14px; color: var(--gold); flex-shrink: 0; }
+
+/* ── PRICE ROW ── */
+.price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-wrap: wrap; gap: 1rem;
+}
+.price { font-family: var(--serif); font-size: 2rem; color: var(--gold); font-weight: 700; }
+.price-note { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.inspected-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3);
+  color: var(--success); font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: 100px;
+}
+.inspected-pill svg { width: 14px; height: 14px; }
+
+/* ── SPECS ── */
+.specs {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 8px; margin-bottom: 1.5rem;
+}
+.spec {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-sm); padding: 0.85rem 0.5rem;
+  text-align: center;
+}
+.spec-icon { font-size: 1.2rem; margin-bottom: 4px; }
+.spec-val { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.spec-label { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 2rem; }
+.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 2rem; }
+.section-title {
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.45);
+  text-transform: uppercase; letter-spacing: 0.09em;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 7px;
+}
+.section-title svg { width: 16px; height: 16px; color: var(--gold); }
+
+/* ── DESCRIPTION ── */
+.desc { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.8; }
+.desc-toggle {
+  background: none; border: none; color: var(--gold);
+  font-size: 13px; cursor: pointer; margin-top: 8px;
+  font-family: var(--sans); padding: 0; display: flex; align-items: center; gap: 4px;
+}
+
+/* ── AMENITIES ── */
+.amenities { display: flex; flex-wrap: wrap; gap: 7px; }
+.amenity {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 5px 12px;
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  display: flex; align-items: center; gap: 6px;
+  transition: border-color var(--transition);
+}
+.amenity:hover { border-color: rgba(186,117,23,0.3); }
+.amenity svg { width: 13px; height: 13px; }
+
+/* ── DETAILS TABLE ── */
+.details-table { width: 100%; border-collapse: collapse; }
+.details-table tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.details-table tr:last-child { border-bottom: none; }
+.details-table td { padding: 0.65rem 0; font-size: 13px; }
+.details-table td:first-child { color: rgba(255,255,255,0.4); }
+.details-table td:last-child { color: rgba(255,255,255,0.8); font-weight: 500; text-align: right; }
+
+/* ── COST BREAKDOWN ── */
+.costs { background: rgba(186,117,23,0.04); border: 1px solid rgba(186,117,23,0.12); border-radius: var(--radius); padding: 1.25rem; }
+.cost-row { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.cost-row:last-child { border-bottom: none; padding-top: 0.85rem; margin-top: 0.25rem; border-top: 1px solid rgba(186,117,23,0.2); }
+.cost-label { color: rgba(255,255,255,0.45); }
+.cost-val { color: rgba(255,255,255,0.8); font-weight: 500; }
+.cost-total-label { font-weight: 600; color: rgba(255,255,255,0.75); }
+.cost-total { font-family: var(--serif); font-size: 1.2rem; color: var(--gold); font-weight: 700; }
+
+/* ── INSPECTION ── */
+.inspection {
+  background: rgba(186,117,23,0.06);
+  border: 1px solid rgba(186,117,23,0.2);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+.insp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.insp-title { font-size: 13px; font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 7px; }
+.insp-title svg { width: 16px; height: 16px; }
+.insp-date { font-size: 11px; color: rgba(255,255,255,0.3); }
+.insp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.insp-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.55); }
+.insp-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(46,204,113,0.15); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.insp-check svg { width: 10px; height: 10px; color: var(--success); }
+.insp-view {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding-top: 1rem; border-top: 1px solid rgba(186,117,23,0.15);
+  font-size: 13px; color: var(--gold-light); cursor: pointer;
+  background: none; border-left: none; border-right: none; border-bottom: none;
+  font-family: var(--sans); width: 100; transition: opacity var(--transition);
+}
+.insp-view:hover { opacity: 0.8; }
+.insp-view svg { width: 14px; height: 14px; }
+
+/* ── MAP ── */
+.map-container {
+  background: var(--navy-mid); border-radius: var(--radius);
+  height: 180px; position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07); margin-bottom: 1rem;
+  cursor: pointer;
+}
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(186,117,23,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186,117,23,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.map-overlay { position: absolute; inset: 0; }
+.map-pin {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -65%);
+  display: flex; flex-direction: column; align-items: center;
+}
+.map-pin-icon {
+  width: 36px; height: 36px; border-radius: 50% 50% 50% 0;
+  background: var(--gold); transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(186,117,23,0.4);
+}
+.map-pin-inner { width: 14px; height: 14px; background: var(--navy); border-radius: 50%; transform: rotate(45deg); }
+.map-label {
+  font-size: 11px; color: rgba(255,255,255,0.7);
+  background: rgba(10,22,40,0.9); padding: 3px 10px;
+  border-radius: 4px; margin-top: 10px; white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+.map-open {
+  position: absolute; bottom: 10px; right: 10px;
+  background: rgba(10,22,40,0.85); color: var(--gold);
+  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+  display: flex; align-items: center; gap: 4px;
+}
+.map-open svg { width: 12px; height: 12px; }
+
+.nearby { display: flex; flex-direction: column; gap: 8px; }
+.nearby-item {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.nearby-item:last-child { border-bottom: none; }
+.nearby-left { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.55); }
+.nearby-icon { width: 28px; height: 28px; border-radius: 7px; background: rgba(186,117,23,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nearby-icon svg { width: 14px; height: 14px; color: var(--gold); }
+.nearby-dist { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+/* ── LANDLORD ── */
+.landlord-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius); padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color var(--transition);
+}
+.landlord-card:hover { border-color: rgba(186,117,23,0.2); }
+.landlord-top { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+.landlord-avatar {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--navy-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 1.2rem; font-weight: 700; color: var(--navy);
+}
+.landlord-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.landlord-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 5px; }
+.landlord-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gold); }
+.landlord-reviews { color: rgba(255,255,255,0.3); font-size: 11px; margin-left: 4px; }
+.landlord-badge {
+  margin-left: auto; flex-shrink: 0;
+  background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.25);
+  color: var(--success); font-size: 10px; font-weight: 600;
+  padding: 3px 10px; border-radius: 100px;
+}
+.landlord-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.landlord-action {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0.65rem; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.6); font-family: var(--sans);
+  transition: all var(--transition);
+}
+.landlord-action:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+.landlord-action svg { width: 15px; height: 15px; }
+
+/* ── REVIEWS ── */
+.reviews-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.reviews-score { display: flex; align-items: center; gap: 8px; }
+.reviews-num { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--gold); }
+.reviews-stars { color: var(--gold); font-size: 14px; }
+.reviews-count { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+.reviews-list { display: flex; flex-direction: column; gap: 1rem; }
+.review-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius); padding: 1rem;
+}
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.review-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+.review-name { font-size: 13px; font-weight: 500; }
+.review-date { font-size: 11px; color: rgba(255,255,255,0.3); margin-left: auto; }
+.review-stars { color: var(--gold); font-size: 12px; margin-bottom: 6px; }
+.review-text { font-size: 13px; color: rgba(255,255,255,0.48); line-height: 1.7; }
+
+/* ── SIMILAR ── */
+.similar-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+.similar-scroll::-webkit-scrollbar { height: 0; }
+.similar-card {
+  min-width: 175px; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(186,117,23,0.15); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; flex-shrink: 0;
+  transition: all var(--transition);
+}
+.similar-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+.similar-img { height: 110px; overflow: hidden; }
+.similar-img img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.88); transition: transform 0.4s; }
+.similar-card:hover .similar-img img { transform: scale(1.05); }
+.similar-info { padding: 0.75rem; }
+.similar-name { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+.similar-loc { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 5px; }
+.similar-price { font-size: 12px; color: var(--gold); font-weight: 600; }
+.similar-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(46,204,113,0.1); color: var(--success); font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 100px; margin-bottom: 4px; }
+
+/* ── REPORT ── */
+.report-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 0.85rem; margin-top: 1rem;
+  font-size: 13px; color: rgba(255,255,255,0.25);
+  cursor: pointer; background: none; border: none;
+  font-family: var(--sans); transition: color var(--transition);
+}
+.report-btn:hover { color: rgba(224,82,82,0.6); }
+.report-btn svg { width: 14px; height: 14px; }
+
+/* ── STICKY CTA ── */
+.sticky-cta {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,22,40,0.97);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(186,117,23,0.18);
+  padding: 1rem 5%;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  max-width: 860px; margin: 0 auto;
+}
+
+.btn-primary {
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--radius-sm);
+  padding: 0.9rem; font-family: var(--sans);
+  font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: background var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary svg { width: 16px; height: 16px; }
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06); color: var(--white);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm); padding: 0.9rem;
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+.btn-secondary svg { width: 16px; height: 16px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .specs { grid-template-columns: repeat(2,1fr); }
+  .insp-grid { grid-template-columns: 1fr; }
+  .sticky-cta { left: 0; right: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="back-btn" onclick="window.location='domivault-homepage.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to listings
+  </button>
+  <div class="topbar-actions">
+    <button class="icon-btn" onclick="window.location='domivault-notifications.html'" aria-label="Notifications" style="position:relative;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-notif-badge" style="position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#BA7517;color:#0a1628;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #0a1628;">3</div>
+    </button>
+    <div onclick="window.location='domivault-tenant-profile.html'" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#BA7517,#1c2f52);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:#0a1628;cursor:pointer;border:2px solid rgba(186,117,23,.3);">J</div>
+    <button class="icon-btn" id="saveBtn" onclick="toggleSave()" aria-label="Save listing">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="icon-btn" onclick="shareListng()" aria-label="Share listing">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery">
+  <div class="gallery-track" id="galleryTrack">
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80" alt="Living room" loading="eager"/></div>
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="Building exterior" loading="lazy"/></div>
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80" alt="Kitchen" loading="lazy"/></div>
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80" alt="Master bedroom" loading="lazy"/></div>
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&q=80" alt="Bathroom" loading="lazy"/></div>
+    <div class="gallery-slide"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=80" alt="Balcony view" loading="lazy"/></div>
+  </div>
+
+  <div class="verified-banner">
+    <div class="vdot"></div>
+    Domivault Verified
+  </div>
+  <div class="gallery-count" id="galleryCount">1 / 6</div>
+
+  <button class="gallery-prev" onclick="slide(-1)" aria-label="Previous photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="gallery-next" onclick="slide(1)" aria-label="Next photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+
+  <div class="gallery-dots" id="galleryDots">
+    <div class="gallery-dot active"></div>
+    <div class="gallery-dot"></div>
+    <div class="gallery-dot"></div>
+    <div class="gallery-dot"></div>
+    <div class="gallery-dot"></div>
+    <div class="gallery-dot"></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- HEADER -->
+  <div class="listing-type">For Rent</div>
+  <div class="listing-title">Modern 4-Bed Apartment</div>
+  <div class="listing-loc">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    14 Admiralty Way, Lekki Phase 1, Lagos
+  </div>
+
+  <!-- PRICE ROW -->
+  <div class="price-row">
+    <div>
+      <div class="price">₦3,500,000</div>
+      <div class="price-note">per year · service charge exclusive</div>
+    </div>
+    <div class="inspected-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Inspected ✓
+    </div>
+  </div>
+
+  <!-- SPECS -->
+  <div class="specs">
+    <div class="spec"><div class="spec-icon">🛏</div><div class="spec-val">4</div><div class="spec-label">Bedrooms</div></div>
+    <div class="spec"><div class="spec-icon">🚿</div><div class="spec-val">3</div><div class="spec-label">Bathrooms</div></div>
+    <div class="spec"><div class="spec-icon">📐</div><div class="spec-val">180m²</div><div class="spec-label">Size</div></div>
+    <div class="spec"><div class="spec-icon">🚗</div><div class="spec-val">2</div><div class="spec-label">Parking</div></div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- DESCRIPTION -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      About this property
+    </div>
+    <div class="desc" id="descText">A beautifully finished 4-bedroom apartment on the 5th floor of a secured estate in Lekki Phase 1. Features a spacious open-plan living area, modern kitchen with fitted cabinets, fitted wardrobes in all rooms, and a balcony with stunning Lagos skyline views.</div>
+    <button class="desc-toggle" onclick="toggleDesc()" id="descBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg>
+      Read more
+    </button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- AMENITIES -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Amenities
+    </div>
+    <div class="amenities">
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>24hr power</div>
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>Running water</div>
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>24hr security</div>
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>Fibre ready</div>
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Air conditioning</div>
+      <div class="amenity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Elevator</div>
+      <div class="amenity">🏊 Swimming pool</div>
+      <div class="amenity">📹 CCTV</div>
+      <div class="amenity">🏋️ Gym</div>
+      <div class="amenity">🐾 Pet friendly</div>
+      <div class="amenity">♻️ Waste management</div>
+      <div class="amenity">🌿 Landscaped gardens</div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- PROPERTY DETAILS -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Property details
+    </div>
+    <table class="details-table">
+      <tr><td>Property type</td><td>Apartment / Flat</td></tr>
+      <tr><td>Floor</td><td>5th floor</td></tr>
+      <tr><td>Furnishing</td><td>Semi-furnished</td></tr>
+      <tr><td>Year built</td><td>2022</td></tr>
+      <tr><td>Facing</td><td>South (balcony view)</td></tr>
+      <tr><td>Service charge</td><td>₦400,000 / yr</td></tr>
+      <tr><td>Available from</td><td>Immediately</td></tr>
+      <tr><td>Minimum tenancy</td><td>1 year</td></tr>
+      <tr><td>Listed on</td><td>Domivault</td></tr>
+    </table>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- MOVE-IN COSTS -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Move-in cost breakdown
+    </div>
+    <div class="costs">
+      <div class="cost-row"><span class="cost-label">Annual rent</span><span class="cost-val">₦3,500,000</span></div>
+      <div class="cost-row"><span class="cost-label">Agency fee (10%)</span><span class="cost-val">₦350,000</span></div>
+      <div class="cost-row"><span class="cost-label">Caution deposit</span><span class="cost-val">₦350,000</span></div>
+      <div class="cost-row"><span class="cost-label">Legal fee</span><span class="cost-val">₦175,000</span></div>
+      <div class="cost-row"><span class="cost-label">Service charge</span><span class="cost-val">₦400,000</span></div>
+      <div class="cost-row">
+        <span class="cost-total-label">Total move-in cost</span>
+        <span class="cost-total">₦4,775,000</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- INSPECTION REPORT -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Inspection report
+    </div>
+    <div class="inspection">
+      <div class="insp-header">
+        <div class="insp-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          All checks passed
+        </div>
+        <div class="insp-date">Inspected 12 Jan 2026</div>
+      </div>
+      <div class="insp-grid">
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Property exists</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Matches description</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Ownership verified</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Photos accurate</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Amenities confirmed</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Price as stated</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>No encumbrances</div>
+        <div class="insp-item"><div class="insp-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>Documents valid</div>
+      </div>
+      <button class="insp-view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        View full inspection report
+      </button>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- MAP -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Location & neighbourhood
+    </div>
+    <div class="map-container">
+      <div class="map-grid"></div>
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" aria-hidden="true">
+        <line x1="0" y1="90" x2="100%" y2="90" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+        <line x1="0" y1="130" x2="100%" y2="130" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+        <line x1="150" y1="0" x2="150" y2="100%" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+        <line x1="320" y1="0" x2="320" y2="100%" stroke="rgba(255,255,255,0.05)" stroke-width="5"/>
+        <text x="160" y="82" fill="rgba(255,255,255,0.2)" font-size="10" font-family="DM Sans,sans-serif">Admiralty Way</text>
+        <text x="20" y="125" fill="rgba(255,255,255,0.15)" font-size="10" font-family="DM Sans,sans-serif">Lekki Expressway</text>
+      </svg>
+      <div class="map-pin">
+        <div class="map-pin-icon"><div class="map-pin-inner"></div></div>
+        <div class="map-label">📍 Lekki Phase 1</div>
+      </div>
+      <div class="map-open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open in Maps
+      </div>
+    </div>
+    <div class="nearby">
+      <div class="nearby-item">
+        <div class="nearby-left">
+          <div class="nearby-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+          Lekki Market
+        </div>
+        <div class="nearby-dist">0.4 km</div>
+      </div>
+      <div class="nearby-item">
+        <div class="nearby-left">
+          <div class="nearby-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          American International School
+        </div>
+        <div class="nearby-dist">1.2 km</div>
+      </div>
+      <div class="nearby-item">
+        <div class="nearby-left">
+          <div class="nearby-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          Lagoon Hospital
+        </div>
+        <div class="nearby-dist">2.1 km</div>
+      </div>
+      <div class="nearby-item">
+        <div class="nearby-left">
+          <div class="nearby-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          Lekki Beach
+        </div>
+        <div class="nearby-dist">3.5 km</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- LANDLORD -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Landlord
+    </div>
+    <div class="landlord-card">
+      <div class="landlord-top">
+        <div class="landlord-avatar">A</div>
+        <div style="flex:1;min-width:0;">
+          <div class="landlord-name">Mr Adeyemi Oluwaseun</div>
+          <div class="landlord-sub">Member since Jan 2026 · 3 verified listings</div>
+          <div class="landlord-rating">
+            ★★★★½
+            <span class="landlord-reviews">4.8 · 12 reviews</span>
+          </div>
+        </div>
+        <div class="landlord-badge">Verified</div>
+      </div>
+      <div class="landlord-actions">
+        <button class="landlord-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.92 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 5.61 5.61l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call landlord
+        </button>
+        <button class="landlord-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          View all listings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- REVIEWS -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Tenant reviews
+    </div>
+    <div class="reviews-header">
+      <div class="reviews-score">
+        <div class="reviews-num">4.8</div>
+        <div>
+          <div class="reviews-stars">★★★★★</div>
+          <div class="reviews-count">Based on 12 reviews</div>
+        </div>
+      </div>
+    </div>
+    <div class="reviews-list">
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div>
+          <div>
+            <div class="review-name">Tunde A.</div>
+          </div>
+          <div class="review-date">Dec 2025</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"The inspection report gave me total confidence before I even visited. The landlord was responsive and honest — property was exactly as described. No surprises whatsoever. This is how renting should work."</div>
+      </div>
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">F</div>
+          <div>
+            <div class="review-name">Funmi O.</div>
+          </div>
+          <div class="review-date">Nov 2025</div>
+        </div>
+        <div class="review-stars">★★★★☆</div>
+        <div class="review-text">"Great apartment and a very straightforward landlord. The Domivault verification process made the whole experience stress-free. Knowing the property had been physically inspected gave me peace of mind."</div>
+      </div>
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
+          <div>
+            <div class="review-name">Kemi B.</div>
+          </div>
+          <div class="review-date">Oct 2025</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"After being scammed on another platform, I was skeptical. But Domivault was completely different. Everything was transparent from day one. Would 100% use again."</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- SIMILAR LISTINGS -->
+  <div class="section">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Similar listings
+    </div>
+    <div class="similar-scroll">
+      <div class="similar-card" onclick="window.location='domivault-listing-detail.html'">
+        <div class="similar-img"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=300&q=70" alt="Ikoyi 3-bed" loading="lazy"/></div>
+        <div class="similar-info">
+          <div class="similar-badge">✓ Verified</div>
+          <div class="similar-name">3-Bed Flat</div>
+          <div class="similar-loc">📍 Ikoyi, Lagos</div>
+          <div class="similar-price">₦5,200,000/yr</div>
+        </div>
+      </div>
+      <div class="similar-card" onclick="window.location='domivault-listing-detail.html'">
+        <div class="similar-img"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=70" alt="VI 2-bed" loading="lazy"/></div>
+        <div class="similar-info">
+          <div class="similar-badge">✓ Verified</div>
+          <div class="similar-name">2-Bed Apartment</div>
+          <div class="similar-loc">📍 Victoria Island</div>
+          <div class="similar-price">₦3,800,000/yr</div>
+        </div>
+      </div>
+      <div class="similar-card" onclick="window.location='domivault-listing-detail.html'">
+        <div class="similar-img"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=300&q=70" alt="Lekki 4-bed terrace" loading="lazy"/></div>
+        <div class="similar-info">
+          <div class="similar-badge">✓ Verified</div>
+          <div class="similar-name">4-Bed Terrace</div>
+          <div class="similar-loc">📍 Lekki Phase 2</div>
+          <div class="similar-price">₦6,500,000/yr</div>
+        </div>
+      </div>
+      <div class="similar-card" onclick="window.location='domivault-listing-detail.html'">
+        <div class="similar-img"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=70" alt="Ajah 5-bed" loading="lazy"/></div>
+        <div class="similar-info">
+          <div class="similar-badge">✓ Verified</div>
+          <div class="similar-name">5-Bed Detached</div>
+          <div class="similar-loc">📍 Ajah, Lagos</div>
+          <div class="similar-price">₦8,000,000/yr</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT -->
+  <button class="report-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+    Report this listing
+  </button>
+
+</div><!-- /content -->
+
+<!-- STICKY CTA -->
+<div class="sticky-cta">
+  <button class="btn-primary" onclick="messageModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Message Landlord
+  </button>
+  <button class="btn-secondary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Schedule Viewing
+  </button>
+</div>
+
+<script>
+  // ── GALLERY ──
+  let currentSlide = 0;
+  const totalSlides = 6;
+
+  function slide(dir) {
+    currentSlide = (currentSlide + dir + totalSlides) % totalSlides;
+    document.getElementById('galleryTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+    document.getElementById('galleryCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+    document.querySelectorAll('.gallery-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+  }
+
+  // Swipe support
+  let touchStartX = 0;
+  const gallery = document.querySelector('.gallery');
+  gallery.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, { passive: true });
+  gallery.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) slide(diff > 0 ? 1 : -1);
+  }, { passive: true });
+
+  // ── SAVE ──
+  let saved = false;
+  function toggleSave() {
+    saved = !saved;
+    document.getElementById('saveBtn').classList.toggle('saved', saved);
+  }
+
+  // ── DESCRIPTION TOGGLE ──
+  let descExpanded = false;
+  const fullDesc = "A beautifully finished 4-bedroom apartment on the 5th floor of a secured estate in Lekki Phase 1. Features a spacious open-plan living area, modern kitchen with fitted cabinets, fitted wardrobes in all rooms, and a balcony with stunning Lagos skyline views. The estate has 24-hour security, backup generator, borehole water supply, swimming pool, and a fully equipped gym. Excellent road access — 5 minutes from the Lekki-Epe Expressway. Ideal for professionals and families looking for a secure, premium home in a prime Lagos location.";
+  const shortDesc = "A beautifully finished 4-bedroom apartment on the 5th floor of a secured estate in Lekki Phase 1. Features a spacious open-plan living area, modern kitchen with fitted cabinets, fitted wardrobes in all rooms, and a balcony with stunning Lagos skyline views.";
+
+  function toggleDesc() {
+    descExpanded = !descExpanded;
+    document.getElementById('descText').textContent = descExpanded ? fullDesc : shortDesc;
+    document.getElementById('descBtn').innerHTML = descExpanded
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="18 15 12 9 6 15"/></svg> Show less'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg> Read more';
+  }
+
+  // ── SHARE ──
+  function shareListng() {
+    if (navigator.share) {
+      navigator.share({ title: 'Modern 4-Bed Apartment — Lekki Phase 1', text: 'Check out this verified listing on Domivault!', url: window.location.href });
+    } else {
+      navigator.clipboard?.writeText(window.location.href);
+      alert('Link copied!');
+    }
+  }
+
+  // ── MESSAGE MODAL (placeholder) ──
+  function messageModal() {
+    window.location = 'domivault-messaging.html';
+  }
+</script>
+</body>
+</html>
