@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Domivault — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0a1628;
+  --navy-mid: #132040;
+  --navy-light: #1c2f52;
+  --gold: #BA7517;
+  --gold-light: #EF9F27;
+  --stone: #888780;
+  --white: #ffffff;
+  --success: #2ecc71;
+  --error: #e05252;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  min-height: 100%;
+  font-family: var(--sans);
+  background: #060e1a;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: auto;
+  padding: 2rem 1rem;
+}
+
+/* ── PHONE FRAME ── */
+.phone-frame {
+  width: 390px;
+  height: 844px;
+  background: var(--navy);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 10px #1a1a1a,
+    0 0 0 12px #2a2a2a,
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 120px rgba(186,117,23,0.08);
+}
+
+/* Scale phone to fit screen height */
+.phone-scale-wrap {
+  transform-origin: top center;
+}
+
+.dynamic-island {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000; border-radius: 20px; z-index: 51;
+}
+
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 50px; z-index: 50;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 28px 10px;
+  font-size: 12px; font-weight: 600; color: var(--white);
+}
+.status-time { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+.status-icons { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--transition), transform var(--transition);
+  transform: translateX(40px);
+}
+.screen.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+.screen.exit   { opacity: 0; transform: translateX(-40px); }
+
+/* ── SCROLL INNER ── */
+.screen-inner {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 60px 24px 28px;
+  overflow-y: auto;
+}
+.screen-inner::-webkit-scrollbar { width: 0; }
+
+/* ── BACK BUTTON ── */
+.back-btn {
+  position: absolute; top: 56px; left: 20px; z-index: 10;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.07); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--white); transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.12); }
+.back-btn svg { width: 18px; height: 18px; }
+
+/* ── PROGRESS DOTS (onboarding) ── */
+.progress-dots {
+  display: flex; gap: 6px; margin-bottom: 1.75rem; padding-top: 0.5rem;
+}
+.dot {
+  height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.12);
+  transition: all 0.35s;
+  flex: 1;
+}
+.dot.active { background: var(--gold); }
+.dot.done   { background: rgba(186,117,23,0.35); }
+
+/* ── PROGRESS BAR (verification) ── */
+.progress-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 1.75rem; padding-top: 0.5rem;
+}
+.progress-bar-wrap {
+  flex: 1; height: 4px;
+  background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; background: var(--gold); border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.progress-label {
+  font-size: 0.72rem; font-weight: 600; color: var(--gold); white-space: nowrap;
+}
+
+/* ── TYPOGRAPHY ── */
+.screen-tag {
+  font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0.5rem;
+}
+.screen-title {
+  font-family: var(--serif);
+  font-size: 1.9rem; font-weight: 700;
+  line-height: 1.15; margin-bottom: 0.5rem;
+}
+.screen-title em { color: var(--gold); font-style: normal; }
+.screen-sub {
+  font-size: 0.85rem; color: rgba(255,255,255,0.42);
+  line-height: 1.65; margin-bottom: 1.5rem;
+}
+
+/* ── TRUST BADGE ── */
+.trust-badge {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: rgba(186,117,23,0.07);
+  border: 1px solid rgba(186,117,23,0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+  font-size: 0.79rem; color: rgba(255,255,255,0.5); line-height: 1.55;
+}
+.trust-badge-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.trust-badge strong { color: var(--gold-light); display: block; font-size: 0.74rem; margin-bottom: 2px; }
+
+/* ── FORM FIELDS ── */
+.field { margin-bottom: 0.9rem; }
+.field-label {
+  font-size: 0.72rem; font-weight: 500;
+  color: rgba(255,255,255,0.45); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 0.45rem; display: block;
+}
+.field-required { color: var(--gold); margin-left: 2px; }
+.field-input {
+  width: 100%; padding: 0.88rem 1rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--white); font-family: var(--sans); font-size: 0.92rem;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-input::placeholder { color: rgba(255,255,255,0.22); }
+.field-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(186,117,23,0.12);
+}
+.field-hint { font-size: 0.71rem; color: rgba(255,255,255,0.28); margin-top: 0.35rem; line-height: 1.5; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%; padding: 1rem;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--sans); font-size: 1rem; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.01em;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 20px rgba(186,117,23,0.25);
+}
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-secondary {
+  width: 100%; padding: 0.9rem;
+  background: transparent; color: rgba(255,255,255,0.45);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--sans); font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; margin-top: 0.75rem;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+
+/* ── SOCIAL BUTTONS ── */
+.social-btns { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.4rem; }
+.social-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 0.88rem; border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  font-family: var(--sans); font-size: 0.9rem; font-weight: 500;
+  color: var(--white); cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.social-btn:hover { background: rgba(255,255,255,0.08); }
+.social-btn svg { width: 20px; height: 20px; }
+
+.divider {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+}
+.divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+.divider-text { font-size: 0.74rem; color: rgba(255,255,255,0.28); white-space: nowrap; }
+
+/* ── TERMS ── */
+.terms {
+  font-size: 0.77rem; color: rgba(255,255,255,0.28);
+  line-height: 1.6; margin-bottom: 1.1rem; margin-top: 0.15rem;
+}
+.terms a { color: var(--gold); text-decoration: none; }
+
+/* ── OTP ── */
+.otp-wrap { display: flex; gap: 8px; margin-bottom: 1.4rem; }
+.otp-input {
+  flex: 1; aspect-ratio: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--white); font-family: var(--serif);
+  font-size: 1.5rem; font-weight: 700;
+  text-align: center; outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.otp-input:focus, .otp-input.filled {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(186,117,23,0.12);
+}
+.verify-email-display {
+  background: rgba(186,117,23,0.07);
+  border: 1px solid rgba(186,117,23,0.18);
+  border-radius: var(--radius-sm); padding: 0.8rem 1rem;
+  font-size: 0.85rem; color: rgba(255,255,255,0.6);
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;
+}
+.verify-email-display span { color: var(--gold); font-weight: 500; }
+.resend-row {
+  text-align: center; margin-bottom: 1.4rem;
+  font-size: 0.81rem; color: rgba(255,255,255,0.3);
+}
+.resend-link {
+  color: var(--gold); cursor: pointer; font-weight: 500;
+  background: none; border: none; font-family: var(--sans); font-size: 0.81rem;
+}
+
+/* ── AVATAR ── */
+.avatar-upload {
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 1.5rem; gap: 0.6rem;
+}
+.avatar-circle {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--navy-light) 100%);
+  border: 2px solid rgba(186,117,23,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 1.9rem; font-weight: 700;
+  color: var(--navy); cursor: pointer; position: relative;
+  transition: transform 0.2s;
+}
+.avatar-circle:hover { transform: scale(1.05); }
+.avatar-edit {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--navy);
+  display: flex; align-items: center; justify-content: center; font-size: 11px;
+}
+.avatar-label { font-size: 0.78rem; color: rgba(255,255,255,0.3); }
+
+/* ── USER TYPE CARDS ── */
+.type-cards { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+.type-card {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius); padding: 1.4rem;
+  cursor: pointer; display: flex; align-items: center; gap: 1.1rem;
+  transition: all var(--transition); position: relative; overflow: hidden;
+}
+.type-card::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(186,117,23,0.08) 0%, transparent 60%);
+  opacity: 0; transition: opacity var(--transition);
+}
+.type-card:hover::before, .type-card.selected::before { opacity: 1; }
+.type-card.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 8px 24px rgba(186,117,23,0.15);
+}
+.type-icon {
+  width: 50px; height: 50px; border-radius: 13px; flex-shrink: 0;
+  background: rgba(186,117,23,0.1);
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+}
+.type-card.selected .type-icon { background: rgba(186,117,23,0.2); }
+.type-name { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; margin-bottom: 2px; }
+.type-desc { font-size: 0.78rem; color: rgba(255,255,255,0.38); line-height: 1.5; }
+.type-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); flex-shrink: 0; margin-left: auto;
+}
+.type-card.selected .type-check { background: var(--gold); border-color: var(--gold); }
+.type-check-inner {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--navy); opacity: 0; transform: scale(0);
+  transition: all var(--transition);
+}
+.type-card.selected .type-check-inner { opacity: 1; transform: scale(1); }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 1.5px dashed rgba(186,117,23,0.32);
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.5rem; cursor: pointer; margin-bottom: 0.9rem;
+  transition: background 0.2s, border-color 0.2s;
+  background: rgba(186,117,23,0.03); text-align: center;
+}
+.upload-zone:hover { background: rgba(186,117,23,0.07); border-color: rgba(186,117,23,0.55); }
+.upload-zone.uploaded { border-style: solid; border-color: var(--success); background: rgba(46,204,113,0.04); }
+.upload-icon { font-size: 1.75rem; }
+.upload-title { font-size: 0.88rem; font-weight: 500; color: rgba(255,255,255,0.7); }
+.upload-sub { font-size: 0.74rem; color: rgba(255,255,255,0.28); line-height: 1.5; }
+.upload-formats { font-size: 0.67rem; color: var(--gold); letter-spacing: 0.04em; }
+.upload-success { display: none; flex-direction: column; align-items: center; gap: 4px; }
+.upload-success-icon { font-size: 1.5rem; }
+.upload-success-name { font-size: 0.79rem; color: var(--success); font-weight: 500; }
+
+/* ── SPLASH ── */
+#splash {
+  background: var(--navy);
+  align-items: center; justify-content: center; overflow: hidden;
+}
+.splash-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(186,117,23,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186,117,23,0.055) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridDrift 16s linear infinite;
+}
+@keyframes gridDrift { 0%{background-position:0 0} 100%{background-position:48px 48px} }
+.splash-glow {
+  position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%);
+  width: 340px; height: 340px;
+  background: radial-gradient(ellipse, rgba(186,117,23,0.18) 0%, transparent 70%);
+  animation: glowBreath 4s ease-in-out infinite;
+}
+@keyframes glowBreath {
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.8}
+  50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}
+}
+.splash-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  animation: splashIn 0.9s ease both;
+}
+@keyframes splashIn { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+.splash-logo { width: 68px; height: 76px; margin-bottom: 1.4rem; }
+.splash-wordmark { font-family: var(--serif); font-size: 2.7rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
+.splash-wordmark span { color: var(--gold); }
+.splash-tagline { font-size: 0.71rem; color: var(--stone); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 3rem; }
+.splash-btn {
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: 100px;
+  padding: 1rem 3rem; font-family: var(--sans);
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 8px 32px rgba(186,117,23,0.28);
+  transition: background 0.2s, transform 0.2s;
+}
+.splash-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+.splash-signin { margin-top: 1.2rem; font-size: 0.84rem; color: rgba(255,255,255,0.38); }
+.splash-signin a { color: var(--gold); text-decoration: none; font-weight: 500; cursor: pointer; }
+
+/* ── VERIFICATION OVERVIEW ── */
+.step-list { display: flex; flex-direction: column; }
+.step-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 0.9rem 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.step-item:last-child { border-bottom: none; }
+.step-num-circle {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; border: 1.5px solid rgba(186,117,23,0.28);
+  background: rgba(186,117,23,0.07);
+}
+.step-item-title { font-size: 0.88rem; font-weight: 500; margin-bottom: 2px; }
+.step-item-sub { font-size: 0.76rem; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+/* ── FACE VERIFICATION ── */
+.camera-frame {
+  width: 200px; height: 250px; border-radius: 110px;
+  margin: 0 auto 1.1rem;
+  border: 2px solid rgba(186,117,23,0.38);
+  background: rgba(255,255,255,0.03);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.5rem; position: relative; overflow: hidden;
+}
+.camera-scan-line {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: scan 2.5s ease-in-out infinite; top: 0;
+}
+@keyframes scan {
+  0%{top:5%;opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{top:95%;opacity:0}
+}
+.camera-corners { position: absolute; inset: 16px; }
+.camera-corners::before, .camera-corners::after {
+  content: ""; position: absolute;
+  width: 26px; height: 26px; border-color: var(--gold); border-style: solid;
+}
+.camera-corners::before { top:0;left:0;border-width:2px 0 0 2px;border-radius:4px 0 0 0; }
+.camera-corners::after  { bottom:0;right:0;border-width:0 2px 2px 0;border-radius:0 0 4px 0; }
+.camera-icon  { font-size: 2.2rem; color: rgba(255,255,255,0.13); }
+.camera-label { font-size: 0.76rem; color: rgba(255,255,255,0.28); }
+.face-tips { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1.1rem; }
+.face-tip  { display: flex; align-items: center; gap: 9px; font-size: 0.8rem; color: rgba(255,255,255,0.42); }
+.face-tip-icon { font-size: 0.95rem; flex-shrink: 0; }
+
+/* ── REVIEW ── */
+.review-list { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.25rem; }
+.review-item {
+  display: flex; align-items: center; gap: 11px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-sm); padding: 0.9rem;
+}
+.review-item.done { border-color: rgba(46,204,113,0.22); }
+.review-icon { font-size: 1.15rem; flex-shrink: 0; }
+.review-name { font-size: 0.86rem; font-weight: 500; flex: 1; }
+.review-status {
+  font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: 100px;
+}
+.review-status.done { background: rgba(46,204,113,0.14); color: var(--success); }
+.review-note {
+  background: rgba(186,117,23,0.06);
+  border: 1px solid rgba(186,117,23,0.16);
+  border-radius: var(--radius-sm); padding: 0.9rem;
+  font-size: 0.8rem; color: rgba(255,255,255,0.45); line-height: 1.65;
+  margin-bottom: 1.1rem;
+}
+
+/* ── PENDING DASHBOARD ── */
+.pending-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem 1.5rem;
+}
+.pending-icon-wrap {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: rgba(186,117,23,0.1); border: 2px solid rgba(186,117,23,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem; font-size: 2.2rem;
+  animation: ringPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes ringPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.pending-title {
+  font-family: var(--serif); font-size: 1.8rem; font-weight: 700;
+  margin-bottom: 0.6rem; line-height: 1.15;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.pending-title em { color: var(--gold); font-style: normal; }
+.pending-sub {
+  font-size: 0.84rem; color: rgba(255,255,255,0.4);
+  line-height: 1.72; margin-bottom: 2rem; max-width: 270px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.pending-timer {
+  background: rgba(186,117,23,0.08); border: 1px solid rgba(186,117,23,0.2);
+  border-radius: var(--radius-sm); padding: 0.75rem 1.5rem;
+  font-size: 0.82rem; color: var(--gold-light); font-weight: 500;
+  margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.4s ease both;
+}
+
+/* ── TENANT SUCCESS ── */
+.success-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+}
+.success-ring {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: rgba(186,117,23,0.1); border: 2px solid rgba(186,117,23,0.32);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.6rem; font-size: 2.3rem;
+  animation: ringPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.success-title {
+  font-family: var(--serif); font-size: 2rem; font-weight: 700;
+  margin-bottom: 0.7rem; line-height: 1.15;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.success-title em { color: var(--gold); font-style: normal; }
+.success-sub {
+  font-size: 0.87rem; color: rgba(255,255,255,0.4);
+  line-height: 1.72; margin-bottom: 2.5rem; max-width: 270px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.success-btn {
+  width: 100%; padding: 1rem;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--sans); font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.success-btn:hover { background: var(--gold-light); }
+
+/* ── DESKTOP WRAPPER ── */
+.desktop-wrapper { display: flex; gap: 3rem; align-items: flex-start; justify-content: center; width: 100%; }
+.flow-guide { width: 210px; flex-shrink: 0; padding-top: 1rem; position: sticky; top: 2rem; max-height: calc(100vh - 4rem); overflow-y: auto; }
+.flow-guide h3 { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.25rem; }
+.flow-guide-sub { font-size: 0.74rem; color: rgba(255,255,255,0.28); margin-bottom: 1.25rem; }
+
+.flow-section-label {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  padding: 0.5rem 0.75rem 0.25rem; margin-top: 0.5rem;
+}
+
+.flow-step-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0.55rem 0.75rem; border-radius: 8px;
+  cursor: pointer; transition: background 0.2s; margin-bottom: 2px;
+}
+.flow-step-item:hover { background: rgba(255,255,255,0.04); }
+.flow-step-item.active { background: rgba(186,117,23,0.1); }
+.flow-step-item.tenant-only { opacity: 0.4; }
+.flow-step-item.landlord-only { opacity: 0.4; }
+
+.flow-step-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.35);
+  transition: all 0.2s;
+}
+.flow-step-item.active .flow-step-num,
+.flow-step-item.done .flow-step-num { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+
+.flow-step-label { font-size: 0.78rem; color: rgba(255,255,255,0.32); transition: color 0.2s; }
+.flow-step-item.active .flow-step-label { color: var(--white); font-weight: 500; }
+.flow-step-item.done .flow-step-label   { color: rgba(255,255,255,0.45); }
+.flow-connector { width: 1px; height: 12px; background: rgba(255,255,255,0.07); margin-left: 20px; }
+
+.guide-note {
+  margin-top: 1.25rem; padding: 0.8rem;
+  background: rgba(186,117,23,0.07); border: 1px solid rgba(186,117,23,0.15);
+  border-radius: 10px;
+}
+.guide-note-title { font-size: 0.65rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+.guide-note-text  { font-size: 0.73rem; color: rgba(255,255,255,0.28); line-height: 1.6; }
+
+@media (max-width: 700px) {
+  .desktop-wrapper { flex-direction: column; align-items: center; padding: 0; }
+  .flow-guide { display: none; }
+  body { padding: 1rem 0.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="desktop-wrapper">
+
+  <!-- ── FLOW GUIDE ── -->
+  <div class="flow-guide">
+    <h3>Domivault Onboarding</h3>
+    <div class="flow-guide-sub">Complete unified flow</div>
+
+    <div class="flow-section-label">All users</div>
+    <div class="flow-step-item active" id="g-splash"  onclick="goTo('splash')">
+      <div class="flow-step-num">①</div><div class="flow-step-label">Splash screen</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-usertype" onclick="goTo('usertype')">
+      <div class="flow-step-num">②</div><div class="flow-step-label">Choose user type</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-signup" onclick="goTo('signup')">
+      <div class="flow-step-num">③</div><div class="flow-step-label">Create account</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-verify" onclick="goTo('verify')">
+      <div class="flow-step-num">④</div><div class="flow-step-label">Verify email</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-profile" onclick="goTo('profile')">
+      <div class="flow-step-num">⑤</div><div class="flow-step-label">Profile setup</div>
+    </div>
+
+    <div class="flow-section-label" style="margin-top:0.75rem;">🏡 Tenant only</div>
+    <div class="flow-step-item tenant-only" id="g-tsuccess" onclick="goTo('tsuccess')">
+      <div class="flow-step-num">✓</div><div class="flow-step-label">Welcome! Dashboard</div>
+    </div>
+
+    <div class="flow-section-label" style="margin-top:0.75rem;">🏗️ Landlord only</div>
+    <div class="flow-step-item landlord-only" id="g-lintro"   onclick="goTo('lintro')">
+      <div class="flow-step-num">A</div><div class="flow-step-label">Verification overview</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item landlord-only" id="g-nin"      onclick="goTo('nin')">
+      <div class="flow-step-num">B</div><div class="flow-step-label">NIN verification</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item landlord-only" id="g-cac"      onclick="goTo('cac')">
+      <div class="flow-step-num">C</div><div class="flow-step-label">CAC registration</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item landlord-only" id="g-face"     onclick="goTo('face')">
+      <div class="flow-step-num">D</div><div class="flow-step-label">Face verification</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item landlord-only" id="g-lreview"  onclick="goTo('lreview')">
+      <div class="flow-step-num">E</div><div class="flow-step-label">Review & submit</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item landlord-only" id="g-pending"  onclick="goTo('pending')">
+      <div class="flow-step-num">✓</div><div class="flow-step-label">Pending approval</div>
+    </div>
+
+    <div class="flow-section-label" style="margin-top:0.75rem;">🔑 Sign in flow</div>
+    <div class="flow-step-item" id="g-signin" onclick="goTo('signin')">
+      <div class="flow-step-num">I</div><div class="flow-step-label">Sign in</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-signin-otp" onclick="goTo('signin-otp')">
+      <div class="flow-step-num">II</div><div class="flow-step-label">Phone OTP</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-forgot" onclick="goTo('forgot')">
+      <div class="flow-step-num">III</div><div class="flow-step-label">Forgot password</div>
+    </div>
+    <div class="flow-connector"></div>
+    <div class="flow-step-item" id="g-reset" onclick="goTo('reset')">
+      <div class="flow-step-num">IV</div><div class="flow-step-label">Reset password</div>
+    </div>
+
+    <div class="guide-note">
+      <div class="guide-note-title">Click any step</div>
+      <div class="guide-note-text">Use buttons inside the phone or click steps here to navigate the full flow.</div>
+    </div>
+  </div>
+
+  <!-- ── PHONE ── -->
+  <div class="phone-scale-wrap" id="phoneScaleWrap">
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <div class="status-time">9:41</div>
+      <div class="status-icons"><span>●●●</span><span>WiFi</span><span>100%</span></div>
+    </div>
+
+    <!-- ════════════════════════════
+         SHARED ONBOARDING SCREENS
+         ════════════════════════════ -->
+
+    <!-- S1: SPLASH -->
+    <div class="screen active" id="splash">
+      <div class="splash-grid"></div>
+      <div class="splash-glow"></div>
+      <div class="splash-content">
+        <svg class="splash-logo" viewBox="0 0 68 76" fill="none">
+          <polygon points="34,2 66,20 66,74 2,74 2,20" fill="white"/>
+          <circle cx="34" cy="49" r="16" fill="none" stroke="#BA7517" stroke-width="3"/>
+          <circle cx="34" cy="49" r="5.5" fill="#BA7517"/>
+          <line x1="34" y1="33" x2="34" y2="40" stroke="#BA7517" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="34" y1="58" x2="34" y2="65" stroke="#BA7517" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="18" y1="49" x2="25" y2="49" stroke="#BA7517" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="43" y1="49" x2="50" y2="49" stroke="#BA7517" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="34" y1="2"  x2="2"  y2="20" stroke="#BA7517" stroke-width="2" stroke-linecap="round"/>
+          <line x1="34" y1="2"  x2="66" y2="20" stroke="#BA7517" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="splash-wordmark">Domi<span>vault</span></div>
+        <div class="splash-tagline">Secure · Verified · Trusted</div>
+        <button class="splash-btn" onclick="goTo('usertype')">Get Started</button>
+        <div class="splash-signin">Have an account? <a onclick="goTo('signin')">Sign in</a></div>
+      </div>
+    </div>
+
+    <!-- S2: USER TYPE -->
+    <div class="screen" id="usertype">
+      <button class="back-btn" onclick="goTo('splash')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-dots">
+          <div class="dot done"></div><div class="dot active"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="screen-tag">Step 1 of 4</div>
+        <div class="screen-title">I am a <em>...</em></div>
+        <div class="screen-sub">Tell us who you are so we can personalise your Domivault experience.</div>
+        <div class="type-cards">
+          <div class="type-card" id="type-tenant" onclick="selectType('tenant')">
+            <div class="type-icon">🏡</div>
+            <div>
+              <div class="type-name">Tenant</div>
+              <div class="type-desc">Looking for a verified rental property in Lagos</div>
+            </div>
+            <div class="type-check"><div class="type-check-inner"></div></div>
+          </div>
+          <div class="type-card" id="type-landlord" onclick="selectType('landlord')">
+            <div class="type-icon">🏗️</div>
+            <div>
+              <div class="type-name">Landlord</div>
+              <div class="type-desc">I want to list my verified property and find tenants</div>
+            </div>
+            <div class="type-check"><div class="type-check-inner"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" id="type-next-btn" onclick="goTo('signup')" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- S3: SIGN UP -->
+    <div class="screen" id="signup">
+      <button class="back-btn" onclick="goTo('usertype')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="screen-tag">Step 2 of 4</div>
+        <div class="screen-title">Create your <em>account</em></div>
+        <div class="screen-sub">Join Domivault — Nigeria's first physically verified rental platform.</div>
+        <div class="social-btns">
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+          <button class="social-btn">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Continue with Apple
+          </button>
+        </div>
+        <div class="divider">
+          <div class="divider-line"></div><div class="divider-text">or sign up with email</div><div class="divider-line"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">First name</label>
+            <input class="field-input" type="text" placeholder="Jomiloju" id="signup-fname" oninput="updateAvatar(this.value)"/>
+          </div>
+          <div class="field">
+            <label class="field-label">Last name</label>
+            <input class="field-input" type="text" placeholder="Adeyemi"/>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Email address</label>
+          <input class="field-input" type="email" placeholder="you@example.com"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Phone number</label>
+          <div style="display:flex;gap:0.5rem;">
+            <select class="field-input" style="width:90px;flex-shrink:0;color:rgba(255,255,255,0.7);">
+              <option>🇳🇬 +234</option>
+              <option>🇬🇧 +44</option>
+              <option>🇺🇸 +1</option>
+              <option>🇨🇦 +1</option>
+              <option>🇬🇭 +233</option>
+            </select>
+            <input class="field-input" type="tel" placeholder="800 000 0000" style="flex:1;" inputmode="numeric"/>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Password</label>
+          <div style="position:relative;">
+            <input class="field-input" type="password" placeholder="Min. 8 characters" id="signup-password" style="padding-right:3rem;"/>
+            <button onclick="togglePassword('signup-password',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,0.35);">👁</button>
+          </div>
+        </div>
+        <div class="terms">By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+        <button class="btn-primary" onclick="goTo('verify')">Create Account</button>
+      </div>
+    </div>
+
+  <!-- S4: VERIFY EMAIL -->
+    <div class="screen" id="verify">
+      <button class="back-btn" onclick="goTo('signup')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+        </div>
+        <div class="screen-tag">Step 3 of 4</div>
+        <div class="screen-title">Check your <em>inbox</em></div>
+        <div class="screen-sub">We sent a 6-digit code to your email. Enter it below to verify your account.</div>
+        <div class="verify-email-display">📧 Sent to <span>you@example.com</span></div>
+        <div class="otp-wrap" id="email-otp-wrap">
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,0,'email-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,1,'email-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,2,'email-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,3,'email-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,4,'email-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,5,'email-otp-wrap')"/>
+        </div>
+        <div class="resend-row">Didn't get it? <button class="resend-link" onclick="this.textContent='Sent!'">Resend code</button></div>
+        <button class="btn-primary" onclick="goTo('profile')">Verify Email →</button>
+      </div>
+    </div>
+
+    <!-- S5: PROFILE SETUP -->
+    <div class="screen" id="profile">
+      <button class="back-btn" onclick="goTo('verify')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-dots">
+          <div class="dot done"></div><div class="dot done"></div>
+          <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+        </div>
+        <div class="screen-tag">Step 4 of 4</div>
+        <div class="screen-title">Set up your <em>profile</em></div>
+        <div class="screen-sub">Almost there — a few last details before you get started.</div>
+        <div class="avatar-upload">
+          <div class="avatar-circle" id="profile-avatar">J<div class="avatar-edit">📷</div></div>
+          <div class="avatar-label">Tap to upload photo</div>
+        </div>
+        <div class="field">
+          <label class="field-label">State of residence</label>
+          <select class="field-input" style="color:rgba(255,255,255,0.55);">
+            <option value="" disabled selected>Select state</option>
+            <option>Lagos</option><option>Abuja</option><option>Rivers</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Area / neighbourhood</label>
+          <input class="field-input" type="text" placeholder="e.g. Lekki, Ikoyi, Yaba"/>
+        </div>
+        <!-- Routing: tenant goes to tsuccess, landlord goes to lintro -->
+        <button class="btn-primary" id="profile-next-btn" onclick="profileNext()">Complete Setup →</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         TENANT FLOW END
+         ════════════════════════════ -->
+
+    <!-- T1: TENANT SUCCESS / DASHBOARD -->
+    <div class="screen" id="tsuccess">
+      <div class="success-wrap">
+        <div class="success-ring">🏠</div>
+        <div class="success-title">Welcome to<br/><em>Domivault!</em></div>
+        <div class="success-sub">Your account is set up and ready. Browse verified listings — every property has been physically inspected by our team.</div>
+        <button class="success-btn" onclick="window.location='domivault-homepage.html'">Browse Listings →</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         LANDLORD VERIFICATION FLOW
+         ════════════════════════════ -->
+
+    <!-- L0: VERIFICATION OVERVIEW -->
+    <div class="screen" id="lintro">
+      <button class="back-btn" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="screen-tag">🏗️ Landlord Verification</div>
+        <div class="screen-title">Verify your <em>identity</em></div>
+        <div class="screen-sub">Before you can list any property, we need to verify who you are and that your business is legitimate. Property documents are handled during listing.</div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">🔒</div>
+          <div><strong>Your data is safe</strong>All documents are encrypted. Used only for verification — never shared with third parties.</div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num-circle">🪪</div>
+            <div><div class="step-item-title">NIN Verification</div><div class="step-item-sub">National ID number + NIN slip upload</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle">🏢</div>
+            <div><div class="step-item-title">CAC Registration</div><div class="step-item-sub">Business registration number + certificate — required for all landlords</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num-circle">🤳</div>
+            <div><div class="step-item-title">Face Verification</div><div class="step-item-sub">A selfie matched against your NIN photo to confirm your identity</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(186,117,23,0.06);border:1px solid rgba(186,117,23,0.15);border-radius:var(--radius-sm);padding:0.85rem 1rem;margin-bottom:1rem;font-size:0.8rem;color:rgba(255,255,255,0.45);line-height:1.6;">
+          📋 <strong style="color:var(--gold-light);">Property documents come later</strong> — once you're approved, you'll upload property-specific documents when you submit a listing for inspection.
+        </div>
+        <button class="btn-primary" onclick="goTo('nin')">Start Verification →</button>
+      </div>
+    </div>
+
+    <!-- L1: NIN -->
+    <div class="screen" id="nin">
+      <button class="back-btn" onclick="goTo('lintro')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-header">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:33%"></div></div>
+          <div class="progress-label">Step 1 of 3</div>
+        </div>
+        <div class="screen-tag">🪪 NIN Verification</div>
+        <div class="screen-title">National ID <em>Number</em></div>
+        <div class="screen-sub">Enter your 11-digit NIN and upload your NIN slip or national ID card.</div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">ℹ️</div>
+          <div><strong>Why we need this</strong>Your NIN confirms your legal identity as a property owner on Domivault.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">NIN Number <span class="field-required">*</span></label>
+          <input class="field-input" type="text" placeholder="11-digit NIN" maxlength="11" inputmode="numeric"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Full name (as on NIN) <span class="field-required">*</span></label>
+          <input class="field-input" type="text" placeholder="e.g. Adeyemi Jomiloju"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Date of birth <span class="field-required">*</span></label>
+          <input class="field-input" type="date"/>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Upload NIN slip / National ID <span class="field-required">*</span></label>
+          <div class="upload-zone" id="nin-upload" onclick="simulateUpload('nin-upload','nin-slip.jpg')">
+            <div class="upload-default"><div class="upload-icon">🪪</div><div class="upload-title">Tap to upload</div><div class="upload-sub">Clear photo or scan of your NIN slip</div><div class="upload-formats">JPG · PNG · PDF — max 5MB</div></div>
+            <div class="upload-success" id="nin-upload-success"><div class="upload-success-icon">✅</div><div class="upload-success-name" id="nin-upload-name"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('cac')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- L2: CAC -->
+    <div class="screen" id="cac">
+      <button class="back-btn" onclick="goTo('nin')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-header">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:66%"></div></div>
+          <div class="progress-label">Step 2 of 3</div>
+        </div>
+        <div class="screen-tag">🏢 CAC Registration</div>
+        <div class="screen-title">Business <em>Registration</em></div>
+        <div class="screen-sub">All landlords on Domivault must provide their CAC registration. This is required — not optional.</div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">⚠️</div>
+          <div><strong>Required for all landlords</strong>CAC confirms you are a legitimate property owner operating legally in Nigeria.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">CAC Registration Number <span class="field-required">*</span></label>
+          <input class="field-input" type="text" placeholder="e.g. RC-1234567"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Registered business name <span class="field-required">*</span></label>
+          <input class="field-input" type="text" placeholder="e.g. Adeyemi Properties Ltd"/>
+        </div>
+        <div class="field">
+          <label class="field-label">Registration type <span class="field-required">*</span></label>
+          <select class="field-input" style="color:rgba(255,255,255,0.55);">
+            <option value="" disabled selected>Select type</option>
+            <option>Business Name (BN)</option>
+            <option>Limited Liability Company (RC)</option>
+            <option>Incorporated Trustee (IT)</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Upload CAC certificate <span class="field-required">*</span></label>
+          <div class="upload-zone" id="cac-upload" onclick="simulateUpload('cac-upload','cac-certificate.pdf')">
+            <div class="upload-default"><div class="upload-icon">🏢</div><div class="upload-title">Upload CAC certificate</div><div class="upload-sub">Official certificate of incorporation or registration</div><div class="upload-formats">JPG · PNG · PDF — max 10MB</div></div>
+            <div class="upload-success" id="cac-upload-success"><div class="upload-success-icon">✅</div><div class="upload-success-name" id="cac-upload-name"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('face')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- L3: PROPERTY DOCUMENT -->
+    <div class="screen" id="propdoc">
+      <button class="back-btn" onclick="goTo('cac')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-header">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:60%"></div></div>
+          <div class="progress-label">Step 3 of 5</div>
+        </div>
+        <div class="screen-tag">📄 Property Document</div>
+        <div class="screen-title">Prove you own <em>the property</em></div>
+        <div class="screen-sub">Upload a valid document proving ownership or right to lease the property you want to list.</div>
+        <div class="field">
+          <label class="field-label">Document type <span class="field-required">*</span></label>
+          <select class="field-input" style="color:rgba(255,255,255,0.55);">
+            <option value="" disabled selected>Select document type</option>
+            <option>Certificate of Occupancy (C of O)</option>
+            <option>Deed of Assignment</option>
+            <option>Governor's Consent</option>
+            <option>Survey Plan</option>
+            <option>Registered Lease Agreement</option>
+            <option>Probate / Letter of Administration</option>
+          </select>
+          <div class="field-hint">Select the document that best proves your ownership or authority to lease.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">Property address <span class="field-required">*</span></label>
+          <input class="field-input" type="text" placeholder="Full property address in Lagos"/>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Upload property document <span class="field-required">*</span></label>
+          <div class="upload-zone" id="prop-upload" onclick="simulateUpload('prop-upload','property-doc.pdf')">
+            <div class="upload-default"><div class="upload-icon">📄</div><div class="upload-title">Upload document</div><div class="upload-sub">All pages must be visible and legible</div><div class="upload-formats">JPG · PNG · PDF — max 20MB</div></div>
+            <div class="upload-success" id="prop-upload-success"><div class="upload-success-icon">✅</div><div class="upload-success-name" id="prop-upload-name"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('utility')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- L4: UTILITY BILL -->
+    <div class="screen" id="utility">
+      <button class="back-btn" onclick="goTo('propdoc')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-header">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:80%"></div></div>
+          <div class="progress-label">Step 4 of 5</div>
+        </div>
+        <div class="screen-tag">💡 Utility Bill</div>
+        <div class="screen-title">Confirm the <em>property address</em></div>
+        <div class="screen-sub">Upload a recent utility bill for the property. This confirms it exists and is active.</div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">📅</div>
+          <div><strong>Must be recent</strong>Utility bill must be dated within the last 3 months to be accepted.</div>
+        </div>
+        <div class="field">
+          <label class="field-label">Utility type <span class="field-required">*</span></label>
+          <select class="field-input" style="color:rgba(255,255,255,0.55);">
+            <option value="" disabled selected>Select utility type</option>
+            <option>NEPA / PHCN electricity bill</option>
+            <option>Lagos Water Corporation bill</option>
+            <option>DSTV / GOtv bill</option>
+            <option>Internet / broadband bill</option>
+            <option>Land use charge receipt</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Bill date <span class="field-required">*</span></label>
+          <input class="field-input" type="month"/>
+          <div class="field-hint">Must be within the last 3 months</div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label class="field-label">Upload utility bill <span class="field-required">*</span></label>
+          <div class="upload-zone" id="util-upload" onclick="simulateUpload('util-upload','utility-bill.jpg')">
+            <div class="upload-default"><div class="upload-icon">💡</div><div class="upload-title">Upload utility bill</div><div class="upload-sub">Address on bill must match the property address</div><div class="upload-formats">JPG · PNG · PDF — max 5MB</div></div>
+            <div class="upload-success" id="util-upload-success"><div class="upload-success-icon">✅</div><div class="upload-success-name" id="util-upload-name"></div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('face')">Continue →</button>
+      </div>
+    </div>
+
+    <!-- L5: FACE VERIFICATION -->
+    <div class="screen" id="face">
+      <button class="back-btn" onclick="goTo('cac')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="progress-header">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+          <div class="progress-label">Step 3 of 3</div>
+        </div>
+        <div class="screen-tag">🤳 Face Verification</div>
+        <div class="screen-title">One quick <em>selfie</em></div>
+        <div class="screen-sub">We'll match your face against your NIN photo to confirm you are who you say you are.</div>
+        <div class="camera-frame">
+          <div class="camera-scan-line"></div>
+          <div class="camera-corners"></div>
+          <div class="camera-icon">👤</div>
+          <div class="camera-label">Position your face here</div>
+        </div>
+        <div class="face-tips">
+          <div class="face-tip"><div class="face-tip-icon">☀️</div>Be in a well-lit area</div>
+          <div class="face-tip"><div class="face-tip-icon">👓</div>Remove glasses or hats if possible</div>
+          <div class="face-tip"><div class="face-tip-icon">📱</div>Hold phone at eye level and stay still</div>
+          <div class="face-tip"><div class="face-tip-icon">😐</div>Look directly at camera — neutral expression</div>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <div style="font-size:.72rem;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem;">Or upload a clear photo of your face</div>
+          <div id="faceUploadZone" onclick="simulateFaceUpload()" style="border:1.5px dashed rgba(186,117,23,.35);border-radius:var(--radius);padding:1.25rem 1rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:pointer;background:rgba(186,117,23,.03);text-align:center;transition:all .2s;">
+            <div style="font-size:1.75rem;">🤳</div>
+            <div style="font-size:.88rem;font-weight:500;color:rgba(255,255,255,.7);">Tap to upload selfie</div>
+            <div style="font-size:.74rem;color:rgba(255,255,255,.28);">JPG or PNG — clear photo of your face</div>
+            <div style="font-size:.67rem;color:var(--gold);" id="faceUploadStatus">Max 5MB</div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="goTo('lreview')">Take Selfie →</button>
+        <button class="btn-secondary" onclick="goTo('lreview')">Continue without selfie</button>
+      </div>
+    </div>
+
+    <!-- L6: REVIEW & SUBMIT -->
+    <div class="screen" id="lreview">
+      <button class="back-btn" onclick="goTo('face')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div class="screen-tag">✅ Final Review</div>
+        <div class="screen-title">Ready to <em>submit?</em></div>
+        <div class="screen-sub">All 3 verification steps are complete. Review before sending to our team.</div>
+        <div class="review-list">
+          <div class="review-item done"><div class="review-icon">🪪</div><div class="review-name">NIN Verification</div><div class="review-status done">✓ Ready</div></div>
+          <div class="review-item done"><div class="review-icon">🏢</div><div class="review-name">CAC Registration</div><div class="review-status done">✓ Ready</div></div>
+          <div class="review-item done"><div class="review-icon">🤳</div><div class="review-name">Face Verification</div><div class="review-status done">✓ Ready</div></div>
+        </div>
+        <div class="review-note">Our team reviews your documents within <strong style="color:var(--gold-light);">24–48 hours</strong>. Once approved you can start listing properties immediately — property-specific documents are handled at the listing stage.</div>
+        <button class="btn-primary" onclick="goTo('pending')">Submit for Verification →</button>
+      </div>
+    </div>
+
+    <!-- L7: PENDING APPROVAL -->
+    <div class="screen" id="pending">
+      <div class="pending-wrap">
+        <div class="pending-icon-wrap">⏳</div>
+        <div class="pending-title">Verification<br/><em>Submitted!</em></div>
+        <div class="pending-sub">Your documents are under review by our team. We'll notify you once you're approved.</div>
+        <div class="pending-timer">⏱ Expected: 24–48 hours</div>
+
+        <!-- What happens next -->
+        <div style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;text-align:left;">
+          <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem;">What happens next</div>
+          <div style="display:flex;flex-direction:column;gap:0.65rem;">
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <div style="width:22px;height:22px;border-radius:50%;background:rgba(186,117,23,0.15);border:1px solid rgba(186,117,23,0.3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--gold);flex-shrink:0;">1</div>
+              <div style="font-size:0.81rem;color:rgba(255,255,255,0.45);line-height:1.5;">Our team reviews your NIN, CAC, property documents, utility bill and selfie</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <div style="width:22px;height:22px;border-radius:50%;background:rgba(186,117,23,0.15);border:1px solid rgba(186,117,23,0.3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--gold);flex-shrink:0;">2</div>
+              <div style="font-size:0.81rem;color:rgba(255,255,255,0.45);line-height:1.5;">You receive a push notification and email once approved or if we need more info</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+              <div style="width:22px;height:22px;border-radius:50%;background:rgba(186,117,23,0.15);border:1px solid rgba(186,117,23,0.3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--gold);flex-shrink:0;">3</div>
+              <div style="font-size:0.81rem;color:rgba(255,255,255,0.45);line-height:1.5;">Once approved, you can immediately start listing properties for inspection</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="success-btn" style="width:100%;padding:1rem;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;animation:fadeUp 0.6s 0.4s ease both;" onclick="window.location='domivault-landlord-dashboard.html'">Go to Dashboard →</button>
+        <div style="font-size:0.77rem;color:rgba(255,255,255,0.22);margin-top:0.75rem;text-align:center;">You can browse but won't be able to list properties until approved.</div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════
+         SIGN IN FLOW
+         ════════════════════════════ -->
+
+    <!-- SI1: SIGN IN -->
+    <div class="screen" id="signin">
+      <button class="back-btn" onclick="goTo('splash')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+
+        <!-- Logo mark -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:2rem;padding-top:0.5rem;">
+          <svg width="28" height="32" viewBox="0 0 34 38" fill="none">
+            <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
+            <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
+            <circle cx="17" cy="25" r="3" fill="#BA7517"/>
+            <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="9"  y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="17" y1="1"  x2="1"  y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="17" y1="1"  x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:var(--serif);font-size:1.3rem;font-weight:700;">Domi<span style="color:var(--gold);">vault</span></span>
+        </div>
+
+        <div class="screen-tag">Welcome back</div>
+        <div class="screen-title">Sign in to your <em>account</em></div>
+        <div class="screen-sub">Your account type is detected automatically — just sign in.</div>
+
+        <!-- Social sign in -->
+        <div class="social-btns">
+          <button class="social-btn" onclick="simulateSignIn('google')">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+          <button class="social-btn" onclick="simulateSignIn('apple')">
+            <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Continue with Apple
+          </button>
+          <button class="social-btn" onclick="goTo('signin-otp')" style="border-color:rgba(186,117,23,0.3);">
+            <span style="font-size:1.1rem;">📱</span>
+            Continue with phone number
+          </button>
+        </div>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-text">or sign in with email</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Email address</label>
+          <input class="field-input" type="email" placeholder="you@example.com" id="signin-email"/>
+        </div>
+
+        <div class="field" style="margin-bottom:0.5rem;">
+          <label class="field-label">Password</label>
+          <div style="position:relative;">
+            <input class="field-input" type="password" placeholder="Your password" id="signin-password" style="padding-right:3rem;"/>
+            <button onclick="togglePassword('signin-password',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,0.35);">👁</button>
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-bottom:1.25rem;">
+          <a onclick="goTo('forgot')" style="font-size:0.8rem;color:var(--gold);cursor:pointer;text-decoration:none;">Forgot password?</a>
+        </div>
+
+        <!-- Error state (hidden by default) -->
+        <div id="signin-error" style="display:none;background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.82rem;color:#e05252;margin-bottom:1rem;line-height:1.5;">
+          ⚠️ Incorrect email or password. Please try again.
+        </div>
+
+        <button class="btn-primary" onclick="handleSignIn()">Sign In</button>
+
+        <div style="text-align:center;margin-top:1.25rem;font-size:0.82rem;color:rgba(255,255,255,0.3);">
+          Don't have an account? <a onclick="goTo('usertype')" style="color:var(--gold);text-decoration:none;font-weight:500;cursor:pointer;">Sign up</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SI2: PHONE OTP SIGN IN -->
+    <div class="screen" id="signin-otp">
+      <button class="back-btn" onclick="goTo('signin')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div style="height:0.5rem;"></div>
+        <div class="screen-tag">📱 Phone sign in</div>
+        <div class="screen-title">Enter your <em>phone number</em></div>
+        <div class="screen-sub">We'll send a one-time code to your number to sign you in securely.</div>
+
+        <div class="field">
+          <label class="field-label">Phone number <span class="field-required">*</span></label>
+          <div style="display:flex;gap:0.5rem;">
+            <select class="field-input" style="width:90px;flex-shrink:0;color:rgba(255,255,255,0.7);">
+              <option>🇳🇬 +234</option>
+              <option>🇬🇧 +44</option>
+              <option>🇺🇸 +1</option>
+              <option>🇨🇦 +1</option>
+              <option>🇬🇭 +233</option>
+            </select>
+            <input class="field-input" type="tel" placeholder="800 000 0000" inputmode="numeric" style="flex:1;"/>
+          </div>
+          <div class="field-hint">Enter the number linked to your Domivault account</div>
+        </div>
+
+        <div class="trust-badge" style="margin-top:0.5rem;">
+          <div class="trust-badge-icon">🔒</div>
+          <div><strong>Secure sign in</strong>Your OTP expires in 5 minutes and can only be used once.</div>
+        </div>
+
+        <button class="btn-primary" onclick="goTo('signin-otp-verify')" style="margin-top:1rem;">Send OTP →</button>
+        <button class="btn-secondary" onclick="goTo('signin')">Sign in with email instead</button>
+      </div>
+    </div>
+
+    <!-- SI3: OTP VERIFY -->
+    <div class="screen" id="signin-otp-verify">
+      <button class="back-btn" onclick="goTo('signin-otp')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div style="height:0.5rem;"></div>
+        <div class="screen-tag">📱 Phone verification</div>
+        <div class="screen-title">Enter the <em>OTP code</em></div>
+        <div class="screen-sub">We sent a 6-digit code to your phone number.</div>
+
+        <div class="verify-email-display">
+          📱 Sent to <span>+234 800 000 0000</span>
+        </div>
+
+        <div class="otp-wrap" id="phone-otp-wrap">
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,0,'phone-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,1,'phone-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,2,'phone-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,3,'phone-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,4,'phone-otp-wrap')"/>
+          <input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,5,'phone-otp-wrap')"/>
+        </div>
+
+        <div class="resend-row">Didn't get it? <button class="resend-link" onclick="this.textContent='Sent!'">Resend OTP</button></div>
+
+        <button class="btn-primary" onclick="simulateSignIn('phone')">Verify & Sign In →</button>
+      </div>
+    </div>
+
+    <!-- SI4: FORGOT PASSWORD -->
+    <div class="screen" id="forgot">
+      <button class="back-btn" onclick="goTo('signin')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div style="height:0.5rem;"></div>
+        <div class="screen-tag">🔑 Password reset</div>
+        <div class="screen-title">Forgot your <em>password?</em></div>
+        <div class="screen-sub">No worries — enter your email and we'll send you a reset link right away.</div>
+
+        <div class="field">
+          <label class="field-label">Email address <span class="field-required">*</span></label>
+          <input class="field-input" type="email" placeholder="you@example.com"/>
+          <div class="field-hint">Must be the email linked to your Domivault account</div>
+        </div>
+
+        <div class="trust-badge" style="margin-top:0.25rem;">
+          <div class="trust-badge-icon">📧</div>
+          <div><strong>Check your inbox</strong>The reset link expires in 15 minutes for security reasons.</div>
+        </div>
+
+        <button class="btn-primary" onclick="goTo('forgot-sent')" style="margin-top:1rem;">Send Reset Link →</button>
+        <button class="btn-secondary" onclick="goTo('signin')">Back to sign in</button>
+      </div>
+    </div>
+
+    <!-- SI5: RESET LINK SENT -->
+    <div class="screen" id="forgot-sent">
+      <div class="success-wrap">
+        <div class="success-ring">📧</div>
+        <div class="success-title">Check your <em>inbox</em></div>
+        <div class="success-sub">We've sent a password reset link to your email. It expires in 15 minutes.</div>
+        <button class="success-btn" onclick="goTo('reset')">I got the link →</button>
+        <div style="margin-top:1rem;font-size:0.8rem;color:rgba(255,255,255,0.28);text-align:center;">
+          Didn't get it? <a onclick="goTo('forgot')" style="color:var(--gold);cursor:pointer;">Resend</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SI6: RESET PASSWORD -->
+    <div class="screen" id="reset">
+      <button class="back-btn" onclick="goTo('forgot')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="screen-inner">
+        <div style="height:0.5rem;"></div>
+        <div class="screen-tag">🔑 New password</div>
+        <div class="screen-title">Reset your <em>password</em></div>
+        <div class="screen-sub">Choose a strong new password for your Domivault account.</div>
+
+        <div class="field">
+          <label class="field-label">New password <span class="field-required">*</span></label>
+          <div style="position:relative;">
+            <input class="field-input" type="password" placeholder="Min. 8 characters" id="new-password" style="padding-right:3rem;"/>
+            <button onclick="togglePassword('new-password',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,0.35);">👁</button>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:1rem;">
+          <label class="field-label">Confirm new password <span class="field-required">*</span></label>
+          <div style="position:relative;">
+            <input class="field-input" type="password" placeholder="Repeat new password" id="confirm-password" style="padding-right:3rem;"/>
+            <button onclick="togglePassword('confirm-password',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:rgba(255,255,255,0.35);">👁</button>
+          </div>
+        </div>
+
+        <!-- Password strength indicator -->
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:0.71rem;color:rgba(255,255,255,0.35);margin-bottom:0.4rem;">Password strength</div>
+          <div style="display:flex;gap:4px;">
+            <div id="str-1" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);transition:background 0.3s;"></div>
+            <div id="str-2" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);transition:background 0.3s;"></div>
+            <div id="str-3" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);transition:background 0.3s;"></div>
+            <div id="str-4" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.1);transition:background 0.3s;"></div>
+          </div>
+          <div id="str-label" style="font-size:0.7rem;color:rgba(255,255,255,0.28);margin-top:0.3rem;">Enter a password</div>
+        </div>
+
+        <button class="btn-primary" onclick="goTo('reset-success')">Reset Password →</button>
+      </div>
+    </div>
+
+    <!-- SI7: RESET SUCCESS -->
+    <div class="screen" id="reset-success">
+      <div class="success-wrap">
+        <div class="success-ring">🔓</div>
+        <div class="success-title">Password <em>updated!</em></div>
+        <div class="success-sub">Your password has been reset successfully. Sign in with your new password.</div>
+        <button class="success-btn" onclick="goTo('signin')">Sign In Now →</button>
+      </div>
+    </div>
+
+  </div><!-- /phone-frame -->
+  </div><!-- /phone-scale-wrap -->
+</div><!-- /desktop-wrapper -->
+
+<script>
+  let currentScreen = 'splash';
+  let selectedType  = null;
+
+  const guideMap = {
+    splash:'g-splash', usertype:'g-usertype', signup:'g-signup',
+    verify:'g-verify', profile:'g-profile', tsuccess:'g-tsuccess',
+    lintro:'g-lintro', nin:'g-nin', cac:'g-cac', propdoc:'g-propdoc',
+    utility:'g-utility', face:'g-face', lreview:'g-lreview', pending:'g-pending',
+    signin:'g-signin', 'signin-otp':'g-signin-otp', 'signin-otp-verify':'g-signin-otp',
+    forgot:'g-forgot', 'forgot-sent':'g-forgot', reset:'g-reset', 'reset-success':'g-reset'
+  };
+
+  // Upload zones to reset when navigating back
+  const uploadZones = ['nin-upload','cac-upload','prop-upload','util-upload'];
+
+  function goTo(id) {
+    if (currentScreen === id) return;
+    const cur  = document.getElementById(currentScreen);
+    const next = document.getElementById(id);
+    if (!next) return;
+
+    cur.classList.add('exit');
+    setTimeout(() => {
+      cur.classList.remove('active','exit');
+      next.classList.add('active');
+    }, 220);
+
+    currentScreen = id;
+    updateGuide(id);
+
+    // Init password strength only when reset screen is entered
+    if (id === 'reset') initPasswordStrength();
+
+    // Fire confetti on success screens
+    if (id === 'tsuccess' || id === 'reset-success') fireConfetti();
+
+    // Unlock tenant/landlord sections in guide
+    if (id === 'tsuccess') {
+      document.querySelectorAll('.tenant-only').forEach(el => el.style.opacity = '1');
+    }
+    if (['lintro','nin','cac','propdoc','utility','face','lreview','pending'].includes(id)) {
+      document.querySelectorAll('.landlord-only').forEach(el => el.style.opacity = '1');
+    }
+
+    // Update guide done states
+    const order = ['splash','usertype','signup','verify','profile','tsuccess','lintro','nin','cac','propdoc','utility','face','lreview','pending'];
+    const idx   = order.indexOf(id);
+    document.querySelectorAll('.flow-step-item').forEach(el => el.classList.remove('done'));
+    order.slice(0, idx).forEach(s => {
+      const g = guideMap[s];
+      if (g) { const el = document.getElementById(g); if (el) el.classList.add('done'); }
+    });
+  }
+
+  function updateGuide(id) {
+    Object.values(guideMap).forEach(gId => {
+      const el = document.getElementById(gId);
+      if (el) el.classList.remove('active');
+    });
+    const target = guideMap[id];
+    if (target) { const el = document.getElementById(target); if (el) el.classList.add('active'); }
+  }
+
+  function selectType(type) {
+    selectedType = type;
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('type-' + type).classList.add('selected');
+    document.getElementById('type-next-btn').disabled = false;
+  }
+
+  function profileNext() {
+    if (selectedType === 'landlord') goTo('lintro');
+    else goTo('tsuccess');
+  }
+
+  // Fix 5: Update avatar initial from first name typed in signup
+  function updateAvatar(val) {
+    const avatar = document.getElementById('profile-avatar');
+    if (!avatar) return;
+    const letter = val.trim().charAt(0).toUpperCase() || 'J';
+    // Replace text node only, preserve the edit button child
+    const editBtn = avatar.querySelector('.avatar-edit');
+    avatar.textContent = letter;
+    if (editBtn) avatar.appendChild(editBtn);
+  }
+
+  // Fix 3: OTP scoped to parent wrap id
+  function otpNext(input, idx, wrapId) {
+    if (input.value) {
+      input.classList.add('filled');
+      const wrap = document.getElementById(wrapId);
+      if (!wrap) return;
+      const inputs = wrap.querySelectorAll('.otp-input');
+      if (idx < 5) inputs[idx + 1].focus();
+    }
+  }
+
+  // Fix 6: Upload reset on navigating back — call resetUpload(zoneId) when needed
+  function resetUpload(zoneId) {
+    const zone = document.getElementById(zoneId);
+    if (!zone) return;
+    zone.classList.remove('uploaded');
+    const def  = zone.querySelector('.upload-default');
+    const suc  = document.getElementById(zoneId + '-success');
+    const name = document.getElementById(zoneId + '-name');
+    if (def)  def.style.display  = '';
+    if (suc)  suc.style.display  = 'none';
+    if (name) name.textContent   = '';
+  }
+
+  function simulateUpload(zoneId, fileName) {
+    const zone = document.getElementById(zoneId);
+    if (!zone) return;
+    zone.classList.add('uploaded');
+    const def  = zone.querySelector('.upload-default');
+    const suc  = document.getElementById(zoneId + '-success');
+    const name = document.getElementById(zoneId + '-name');
+    if (def)  def.style.display  = 'none';
+    if (suc)  suc.style.display  = 'flex';
+    if (name) name.textContent   = fileName + ' — uploaded ✓';
+  }
+
+  // Fix 2: Sign in error clears properly
+  function handleSignIn() {
+    const email = document.getElementById('signin-email')?.value?.trim() || '';
+    const pass  = document.getElementById('signin-password')?.value || '';
+    const errEl = document.getElementById('signin-error');
+    if (!email || !pass) {
+      errEl.style.display = 'block';
+      errEl.textContent   = '⚠️ Please enter your email and password.';
+      return;
+    }
+    errEl.style.display = 'none';
+    if (email.toLowerCase().includes('landlord')) {
+      selectedType = 'landlord'; goTo('pending');
+    } else {
+      selectedType = 'tenant'; goTo('tsuccess');
+    }
+  }
+
+  // Clear error as user types
+  document.getElementById('signin-email')?.addEventListener('input', () => {
+    document.getElementById('signin-error').style.display = 'none';
+  });
+  document.getElementById('signin-password')?.addEventListener('input', () => {
+    document.getElementById('signin-error').style.display = 'none';
+  });
+
+  function simulateSignIn() {
+    selectedType = 'tenant';
+    goTo('tsuccess');
+  }
+
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.type   = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+  }
+
+  // Fix 1: Password strength only initialised when reset screen entered
+  function initPasswordStrength() {
+    const newPwd = document.getElementById('new-password');
+    if (!newPwd || newPwd._strengthInit) return;
+    newPwd._strengthInit = true;
+    newPwd.addEventListener('input', () => {
+      const val    = newPwd.value;
+      const bars   = ['str-1','str-2','str-3','str-4'].map(id => document.getElementById(id));
+      const label  = document.getElementById('str-label');
+      let strength = 0;
+      if (val.length >= 8)          strength++;
+      if (/[A-Z]/.test(val))        strength++;
+      if (/[0-9]/.test(val))        strength++;
+      if (/[^A-Za-z0-9]/.test(val)) strength++;
+      const colors = ['#e05252','#EF9F27','#EF9F27','#2ecc71'];
+      const labels = ['Weak','Fair','Good','Strong'];
+      bars.forEach((b, i) => { if (b) b.style.background = i < strength ? colors[strength-1] : 'rgba(255,255,255,0.1)'; });
+      if (label) {
+        label.textContent = val.length === 0 ? 'Enter a password' : (labels[strength-1] || 'Weak');
+        label.style.color = val.length === 0 ? 'rgba(255,255,255,0.28)' : colors[strength-1];
+      }
+    });
+  }
+
+  // Confetti on success screens
+  function fireConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:99;';
+    const phone = document.querySelector('.phone-frame');
+    phone.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width  = phone.offsetWidth;
+    canvas.height = phone.offsetHeight;
+
+    const pieces = Array.from({length: 60}, () => ({
+      x: Math.random() * canvas.width,
+      y: -10,
+      r: Math.random() * 5 + 3,
+      d: Math.random() * 60 + 20,
+      color: ['#BA7517','#EF9F27','#ffffff','#f8f5ee'][Math.floor(Math.random()*4)],
+      tilt: Math.random() * 10 - 10,
+      tiltAngle: 0,
+      tiltSpeed: Math.random() * 0.1 + 0.05
+    }));
+
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        p.tiltAngle += p.tiltSpeed;
+        p.y += Math.cos(frame/20 + p.d) + 2;
+        p.x += Math.sin(frame/20) * 0.8;
+        p.tilt = Math.sin(p.tiltAngle) * 12;
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+        ctx.stroke();
+      });
+      frame++;
+      if (frame < 160) requestAnimationFrame(draw);
+      else canvas.remove();
+    }
+    draw();
+  }
+
+  // Scale phone frame to fit any screen height
+  function scalePhone() {
+    const wrap  = document.getElementById('phoneScaleWrap');
+    if (!wrap) return;
+    const padding = 64; // top + bottom body padding
+    const availH  = window.innerHeight - padding;
+    const availW  = window.innerWidth;
+    const phoneH  = 844;
+    const phoneW  = 414;
+    const scaleH  = availH / phoneH;
+    const scaleW  = availW < 700 ? (availW - 32) / phoneW : 1;
+    const scale   = Math.min(scaleH, scaleW, 1);
+    wrap.style.transform       = `scale(${scale})`;
+    wrap.style.transformOrigin = 'top center';
+    wrap.style.marginBottom    = `${Math.round((phoneH * scale) - phoneH)}px`;
+  }
+
+  scalePhone();
+  window.addEventListener('resize', scalePhone);
+
+function simulateFaceUpload() {
+  const zone = document.getElementById('faceUploadZone');
+  const status = document.getElementById('faceUploadStatus');
+  zone.style.borderStyle = 'solid';
+  zone.style.borderColor = 'rgba(46,204,113,.4)';
+  zone.style.background = 'rgba(46,204,113,.04)';
+  zone.innerHTML = '<div style="font-size:1.5rem;">✅</div><div style="font-size:.88rem;font-weight:600;color:#2ecc71;">Photo uploaded successfully</div><div style="font-size:.74rem;color:rgba(255,255,255,.35);">selfie-photo.jpg</div>';
+}
+</script>
+</body>
+</html>

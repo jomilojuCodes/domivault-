@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel — Domivault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0a1628;--navy-mid:#132040;--navy-light:#1c2f52;
+  --gold:#BA7517;--gold-light:#EF9F27;
+  --stone:#888780;--white:#fff;--success:#2ecc71;--error:#e05252;
+  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
+  --r:12px;--rs:8px;--t:.25s ease;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-x:hidden;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 5%;background:rgba(10,22,40,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(186,117,23,.15);}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-logo svg{width:26px;height:30px;flex-shrink:0;}
+.tb-wordmark{font-family:var(--serif);font-size:1.25rem;font-weight:700;color:var(--white);}
+.tb-wordmark span{color:var(--gold);}
+.tb-badge{font-size:11px;color:rgba(255,255,255,.4);padding:2px 9px;border-radius:100px;border:1px solid rgba(186,117,23,.3);background:rgba(186,117,23,.08);color:var(--gold-light);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.iBtn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--white);position:relative;}
+.iBtn svg{width:17px;height:17px;}
+.nBadge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+.tb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--navy);cursor:pointer;border:2px solid rgba(186,117,23,.3);}
+
+/* LAYOUT */
+.app-shell{display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:230px;flex-shrink:0;background:var(--navy-mid);border-right:1px solid rgba(186,117,23,.12);padding:1.25rem .85rem;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:.75rem 1rem .4rem;}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:var(--rs);background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-family:var(--sans);font-size:13px;transition:all .2s;text-align:left;width:100%;position:relative;}
+.sb-btn:hover{background:rgba(255,255,255,.05);color:var(--white);}
+.sb-btn.active{background:rgba(186,117,23,.1);color:var(--gold);font-weight:500;}
+.sb-btn svg{width:17px;height:17px;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;}
+.sb-badge.red{background:var(--error);color:white;}
+.sb-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:.75rem 0;}
+
+/* CONTENT */
+.content{flex:1;min-width:0;padding:1.75rem 3%;max-width:1200px;}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;}
+.page-title{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2rem);font-weight:700;margin-bottom:.3rem;}
+.page-sub{font-size:13px;color:rgba(255,255,255,.4);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.75rem;}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:border-color var(--t);}
+.stat-card:hover{border-color:rgba(186,117,23,.3);}
+.stat-card.gold{border-color:rgba(186,117,23,.3);background:rgba(186,117,23,.05);}
+.stat-card.alert{border-color:rgba(224,82,82,.25);background:rgba(224,82,82,.04);}
+.stat-num{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px;}
+.stat-card.alert .stat-num{color:var(--error);}
+.stat-label{font-size:12px;color:rgba(255,255,255,.4);}
+.stat-trend{font-size:11px;color:var(--success);margin-top:4px;}
+
+/* SECTION */
+.section{margin-bottom:2rem;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+.section-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;}
+.section-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin-bottom:2rem;}
+
+/* TABS */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;}
+.tab{font-size:12px;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.06);border:1px solid transparent;color:rgba(255,255,255,.45);cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.tab.active{background:rgba(186,117,23,.15);color:var(--gold-light);border-color:rgba(186,117,23,.3);}
+.tab-badge{background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:.6rem .9rem;max-width:320px;}
+.search-bar svg{width:15px;height:15px;color:rgba(255,255,255,.3);flex-shrink:0;}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--white);font-size:13px;font-family:var(--sans);}
+.search-bar input::placeholder{color:rgba(255,255,255,.25);}
+
+/* QUEUE CARDS */
+.queue-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.25rem;margin-bottom:10px;transition:border-color var(--t);}
+.queue-card:hover{border-color:rgba(186,117,23,.2);}
+.qc-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1rem;}
+.qc-avatar{width:46px;height:46px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--navy);}
+.qc-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.qc-sub{font-size:11px;color:rgba(255,255,255,.35);}
+.qc-time{font-size:11px;color:rgba(255,255,255,.3);margin-left:auto;flex-shrink:0;}
+.qc-status{margin-left:auto;flex-shrink:0;}
+
+.status-pill{font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.status-pending{background:rgba(186,117,23,.12);color:var(--gold-light);border:1px solid rgba(186,117,23,.25);}
+.status-approved{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.status-rejected{background:rgba(224,82,82,.12);color:var(--error);border:1px solid rgba(224,82,82,.25);}
+.status-live{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.status-scheduled{background:rgba(24,95,165,.15);color:#5DA8E8;border:1px solid rgba(24,95,165,.3);}
+.status-active{background:rgba(46,204,113,.1);color:var(--success);border:1px solid rgba(46,204,113,.2);}
+.status-suspended{background:rgba(224,82,82,.1);color:var(--error);border:1px solid rgba(224,82,82,.2);}
+
+/* DOCS GRID */
+.qc-docs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+@media(max-width:600px){.qc-docs{grid-template-columns:1fr;}}
+.qc-doc{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:.65rem .85rem;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;transition:border-color var(--t);}
+.qc-doc:hover{border-color:rgba(186,117,23,.3);}
+.qc-doc-icon{font-size:1.1rem;flex-shrink:0;}
+.qc-doc-name{flex:1;}
+.qc-doc-view{font-size:11px;color:var(--gold);}
+
+/* DETAIL ROWS */
+.qc-details{background:rgba(255,255,255,.02);border-radius:var(--rs);padding:.85rem 1rem;margin-bottom:1rem;}
+.qc-row{display:flex;justify-content:space-between;padding:.4rem 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.qc-row:last-child{border-bottom:none;}
+.qc-row-label{color:rgba(255,255,255,.35);}
+.qc-row-value{color:rgba(255,255,255,.8);font-weight:500;}
+
+/* ACTIONS */
+.qc-actions{display:flex;gap:8px;}
+.qc-btn{padding:.6rem 1.25rem;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all var(--t);border:none;}
+.qc-btn-approve{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.qc-btn-approve:hover{background:rgba(46,204,113,.2);}
+.qc-btn-reject{background:rgba(224,82,82,.1);color:var(--error);border:1px solid rgba(224,82,82,.2);}
+.qc-btn-reject:hover{background:rgba(224,82,82,.18);}
+.qc-btn-view{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
+.qc-btn-view:hover{background:rgba(255,255,255,.1);color:var(--white);}
+.qc-btn-assign{background:rgba(186,117,23,.12);color:var(--gold-light);border:1px solid rgba(186,117,23,.25);}
+.qc-btn-assign:hover{background:rgba(186,117,23,.2);}
+
+/* LISTING PREVIEW */
+.qc-listing-preview{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);padding:.65rem .85rem;margin-bottom:1rem;}
+.qc-listing-img{width:48px;height:48px;border-radius:6px;overflow:hidden;flex-shrink:0;}
+.qc-listing-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);}
+.qc-listing-name{font-size:13px;font-weight:500;margin-bottom:2px;}
+.qc-listing-meta{font-size:11px;color:rgba(255,255,255,.35);}
+.qc-listing-price{font-size:12px;color:var(--gold);font-weight:600;margin-left:auto;}
+
+/* USERS TABLE */
+.users-table-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);overflow:hidden;overflow-x:auto;}
+.users-table{width:100%;border-collapse:collapse;min-width:680px;}
+.users-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.35);padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);}
+.users-table td{padding:.85rem 1rem;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.7);}
+.users-table tr:last-child td{border-bottom:none;}
+.users-table tr:hover td{background:rgba(255,255,255,.02);}
+.user-cell{display:flex;align-items:center;gap:10px;}
+.user-avatar-sm{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);background:linear-gradient(135deg,var(--gold),var(--navy-light));font-family:var(--serif);}
+.user-name{font-weight:500;color:var(--white);font-size:13px;}
+.user-email{font-size:11px;color:rgba(255,255,255,.3);}
+.user-action-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.user-action-btn:hover{background:rgba(255,255,255,.1);color:var(--white);}
+.user-action-btn.danger{color:var(--error);border-color:rgba(224,82,82,.2);}
+.user-action-btn.danger:hover{background:rgba(224,82,82,.1);}
+
+/* INSPECTION CARD */
+.insp-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1rem;margin-bottom:10px;transition:border-color var(--t);}
+.insp-card:hover{border-color:rgba(186,117,23,.2);}
+.insp-thumb{width:50px;height:50px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;}
+.insp-thumb img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);}
+.insp-info{flex:1;min-width:0;}
+.insp-name{font-size:13px;font-weight:500;margin-bottom:2px;}
+.insp-loc{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:4px;}
+.insp-officer{font-size:11px;color:var(--gold-light);}
+.insp-date-box{text-align:center;flex-shrink:0;padding:0 .5rem;}
+.insp-date-day{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1;}
+.insp-date-month{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;}
+
+/* CHART */
+.chart-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.25rem;}
+.chart-wrap{position:relative;height:240px;}
+.chart-row{display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem;}
+@media(max-width:900px){.chart-row{grid-template-columns:1fr;}}
+
+/* AREA STATS LIST */
+.area-stat{display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.area-stat:last-child{border-bottom:none;}
+.area-stat-name{color:rgba(255,255,255,.6);}
+.area-stat-bar-wrap{flex:1;margin:0 1rem;}
+.area-stat-bar-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.area-stat-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;}
+.area-stat-num{color:var(--gold);font-weight:600;min-width:32px;text-align:right;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.75);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--navy-mid);border:1px solid rgba(186,117,23,.25);border-radius:var(--r);padding:1.5rem;max-width:420px;width:100%;}
+.modal-title{font-family:var(--serif);font-size:1.3rem;font-weight:700;margin-bottom:.5rem;}
+.modal-sub{font-size:13px;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:1.25rem;}
+.modal-textarea{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);color:var(--white);font-family:var(--sans);font-size:.9rem;outline:none;resize:vertical;min-height:90px;margin-bottom:1.25rem;}
+.modal-textarea:focus{border-color:var(--gold);}
+.modal-actions{display:flex;gap:.75rem;}
+.modal-btn{flex:1;padding:.8rem;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);border:none;transition:all .2s;}
+.modal-btn-cancel{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
+.modal-btn-cancel:hover{background:rgba(255,255,255,.1);}
+.modal-btn-confirm{background:var(--error);color:white;}
+.modal-btn-confirm:hover{background:#c75050;}
+
+.page{display:none;}
+.page.active{display:block;}
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .content{padding:1.5rem 5%;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">
+      <svg viewBox="0 0 34 38" fill="none">
+        <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
+        <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
+        <circle cx="17" cy="25" r="3" fill="#BA7517"/>
+        <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="9" y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="1" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="tb-wordmark">Domi<span>vault</span></div>
+    <div class="tb-badge">Admin</div>
+  </div>
+  <div class="tb-right">
+    <button class="iBtn" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nBadge">7</div>
+    </button>
+    <div class="tb-avatar">D</div>
+  </div>
+</nav>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section-label">Main</div>
+    <button class="sb-btn active" onclick="setPage(this,'overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+
+    <div class="sb-section-label">Review queues</div>
+    <button class="sb-btn" onclick="setPage(this,'verifications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Verifications
+      <span class="sb-badge red">3</span>
+    </button>
+    <button class="sb-btn" onclick="setPage(this,'listings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Listings
+      <span class="sb-badge">2</span>
+    </button>
+    <button class="sb-btn" onclick="setPage(this,'inspections')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Inspections
+      <span class="sb-badge">4</span>
+    </button>
+
+    <div class="sb-section-label">Platform</div>
+    <button class="sb-btn" onclick="setPage(this,'users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </button>
+    <button class="sb-btn" onclick="setPage(this,'reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports & analytics
+    </button>
+
+    <hr class="sb-divider"/>
+    <button class="sb-btn" onclick="window.location='domivault-with-images.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Exit admin
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- ═══════════ OVERVIEW ═══════════ -->
+    <div class="page active" id="page-overview">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Overview</div>
+          <div class="page-sub">Welcome back — here's what needs your attention today</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card alert" onclick="setPage(null,'verifications')">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Pending verifications</div>
+        </div>
+        <div class="stat-card alert" onclick="setPage(null,'listings')">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Listings awaiting approval</div>
+        </div>
+        <div class="stat-card gold" onclick="setPage(null,'inspections')">
+          <div class="stat-num">4</div>
+          <div class="stat-label">Inspections scheduled</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">128</div>
+          <div class="stat-label">Total active users</div>
+          <div class="stat-trend">↑ 12 this week</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num">47</div>
+          <div class="stat-label">Live verified listings</div>
+          <div class="stat-trend">↑ 5 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">86</div>
+          <div class="stat-label">Tenants</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">42</div>
+          <div class="stat-label">Landlords</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">4.8</div>
+          <div class="stat-label">Avg. platform rating</div>
+          <div class="stat-trend">★★★★★</div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <!-- ACTION REQUIRED -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Needs your attention</div>
+        </div>
+
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar">T</div>
+            <div>
+              <div class="qc-name">Mr Tunde Bakare</div>
+              <div class="qc-sub">Landlord verification · Submitted 3 hours ago</div>
+            </div>
+            <div class="qc-status"><span class="status-pill status-pending">⏳ Pending</span></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-view" onclick="setPage(null,'verifications')">Review →</button>
+          </div>
+        </div>
+
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">
+              <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=100&q=70" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
+            </div>
+            <div>
+              <div class="qc-name">3-Bed Semi-Detached, Lekki Phase 2</div>
+              <div class="qc-sub">New listing submission · Mr Adeyemi · 1 day ago</div>
+            </div>
+            <div class="qc-status"><span class="status-pill status-pending">⏳ Pending</span></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-view" onclick="setPage(null,'listings')">Review →</button>
+          </div>
+        </div>
+
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">
+              <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=100&q=70" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>
+            </div>
+            <div>
+              <div class="qc-name">Luxury 5-Bed Detached, Ikoyi</div>
+              <div class="qc-sub">Inspection scheduled · Tomorrow, 10:00 AM · Officer: Chidi O.</div>
+            </div>
+            <div class="qc-status"><span class="status-pill status-scheduled">📅 Scheduled</span></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-view" onclick="setPage(null,'inspections')">View details →</button>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <!-- LISTINGS BY AREA -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Live listings by area</div>
+        </div>
+        <div class="chart-card">
+          <div class="area-stat">
+            <div class="area-stat-name">Lekki</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:85%;"></div></div></div>
+            <div class="area-stat-num">17</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Ikoyi</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:55%;"></div></div></div>
+            <div class="area-stat-num">11</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Victoria Island</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:45%;"></div></div></div>
+            <div class="area-stat-num">9</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Ajah</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:30%;"></div></div></div>
+            <div class="area-stat-num">6</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Yaba</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:20%;"></div></div></div>
+            <div class="area-stat-num">4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ VERIFICATIONS ═══════════ -->
+    <div class="page" id="page-verifications">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Landlord verifications</div>
+          <div class="page-sub">Review NIN, CAC, and face verification submissions</div>
+        </div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search by name..."/>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="tabs">
+            <button class="tab active">Pending <span class="tab-badge">3</span></button>
+            <button class="tab">Approved</button>
+            <button class="tab">Rejected</button>
+          </div>
+        </div>
+
+        <!-- VERIFICATION 1 -->
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar">T</div>
+            <div>
+              <div class="qc-name">Mr Tunde Bakare</div>
+              <div class="qc-sub">tunde.bakare@email.com · +234 803 123 4567</div>
+            </div>
+            <div class="qc-time">Submitted 3 hours ago</div>
+          </div>
+          <div class="qc-details">
+            <div class="qc-row"><span class="qc-row-label">NIN</span><span class="qc-row-value">12345678901</span></div>
+            <div class="qc-row"><span class="qc-row-label">CAC registration</span><span class="qc-row-value">RC-2456789 (Bakare Properties Ltd)</span></div>
+            <div class="qc-row"><span class="qc-row-label">Face verification</span><span class="qc-row-value">✅ Match — 97% confidence</span></div>
+          </div>
+          <div class="qc-docs">
+            <div class="qc-doc"><div class="qc-doc-icon">🪪</div><div class="qc-doc-name">NIN slip</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🏢</div><div class="qc-doc-name">CAC certificate</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🤳</div><div class="qc-doc-name">Selfie verification</div><div class="qc-doc-view">View →</div></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-approve" onclick="approveItem(this)">✓ Approve</button>
+            <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification')">✕ Reject</button>
+          </div>
+        </div>
+
+        <!-- VERIFICATION 2 -->
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">N</div>
+            <div>
+              <div class="qc-name">Mrs Ngozi Eze</div>
+              <div class="qc-sub">ngozi.eze@email.com · +234 805 987 6543</div>
+            </div>
+            <div class="qc-time">Submitted 6 hours ago</div>
+          </div>
+          <div class="qc-details">
+            <div class="qc-row"><span class="qc-row-label">NIN</span><span class="qc-row-value">98765432109</span></div>
+            <div class="qc-row"><span class="qc-row-label">CAC registration</span><span class="qc-row-value">BN-1122334 (Eze Realty)</span></div>
+            <div class="qc-row"><span class="qc-row-label">Face verification</span><span class="qc-row-value">✅ Match — 94% confidence</span></div>
+          </div>
+          <div class="qc-docs">
+            <div class="qc-doc"><div class="qc-doc-icon">🪪</div><div class="qc-doc-name">NIN slip</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🏢</div><div class="qc-doc-name">CAC certificate</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🤳</div><div class="qc-doc-name">Selfie verification</div><div class="qc-doc-view">View →</div></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-approve" onclick="approveItem(this)">✓ Approve</button>
+            <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification')">✕ Reject</button>
+          </div>
+        </div>
+
+        <!-- VERIFICATION 3 -->
+        <div class="queue-card">
+          <div class="qc-header">
+            <div class="qc-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
+            <div>
+              <div class="qc-name">Mr Kunle Saliu</div>
+              <div class="qc-sub">kunle.saliu@email.com · +234 701 222 3344</div>
+            </div>
+            <div class="qc-time">Submitted 1 day ago</div>
+          </div>
+          <div class="qc-details">
+            <div class="qc-row"><span class="qc-row-label">NIN</span><span class="qc-row-value">45678912303</span></div>
+            <div class="qc-row"><span class="qc-row-label">CAC registration</span><span class="qc-row-value">RC-3398211 (Saliu Homes & Estates)</span></div>
+            <div class="qc-row"><span class="qc-row-label">Face verification</span><span class="qc-row-value" style="color:var(--gold-light);">⚠ Low confidence — 71%, manual review needed</span></div>
+          </div>
+          <div class="qc-docs">
+            <div class="qc-doc"><div class="qc-doc-icon">🪪</div><div class="qc-doc-name">NIN slip</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🏢</div><div class="qc-doc-name">CAC certificate</div><div class="qc-doc-view">View →</div></div>
+            <div class="qc-doc"><div class="qc-doc-icon">🤳</div><div class="qc-doc-name">Selfie verification</div><div class="qc-doc-view">View →</div></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-approve" onclick="approveItem(this)">✓ Approve</button>
+            <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification')">✕ Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ LISTINGS ═══════════ -->
+    <div class="page" id="page-listings">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Listing approvals</div>
+          <div class="page-sub">Review submitted listings before inspection scheduling</div>
+        </div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search listings..."/>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="tabs">
+            <button class="tab active">Pending review <span class="tab-badge">2</span></button>
+            <button class="tab">Awaiting inspection</button>
+            <button class="tab">Live</button>
+            <button class="tab">Rejected</button>
+          </div>
+        </div>
+
+        <!-- LISTING 1 -->
+        <div class="queue-card">
+          <div class="qc-listing-preview">
+            <div class="qc-listing-img"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi"/></div>
+            <div>
+              <div class="qc-listing-name">3-Bed Semi-Detached</div>
+              <div class="qc-listing-meta">📍 Lekki Phase 2, Lagos · Mr Adeyemi</div>
+            </div>
+            <div class="qc-listing-price">₦6,500,000/yr</div>
+          </div>
+          <div class="qc-details">
+            <div class="qc-row"><span class="qc-row-label">Property type</span><span class="qc-row-value">Semi-Detached · 3 bed / 3 bath · 175m²</span></div>
+            <div class="qc-row"><span class="qc-row-label">Documents</span><span class="qc-row-value">✅ C of O · ✅ Utility bill</span></div>
+            <div class="qc-row"><span class="qc-row-label">Photos</span><span class="qc-row-value">8 photos uploaded</span></div>
+            <div class="qc-row"><span class="qc-row-label">Submitted</span><span class="qc-row-value">1 day ago</span></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-view">View full listing →</button>
+            <button class="qc-btn qc-btn-approve" onclick="approveListing(this)">✓ Approve & schedule inspection</button>
+            <button class="qc-btn qc-btn-reject" onclick="openRejectModal('listing')">✕ Reject</button>
+          </div>
+        </div>
+
+        <!-- LISTING 2 -->
+        <div class="queue-card">
+          <div class="qc-listing-preview">
+            <div class="qc-listing-img"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&q=70" alt="Yaba apartment"/></div>
+            <div>
+              <div class="qc-listing-name">2-Bed Apartment</div>
+              <div class="qc-listing-meta">📍 Yaba, Lagos · Mrs Ngozi Eze</div>
+            </div>
+            <div class="qc-listing-price">₦2,400,000/yr</div>
+          </div>
+          <div class="qc-details">
+            <div class="qc-row"><span class="qc-row-label">Property type</span><span class="qc-row-value">Apartment · 2 bed / 2 bath · 95m²</span></div>
+            <div class="qc-row"><span class="qc-row-label">Documents</span><span class="qc-row-value" style="color:var(--gold-light);">⚠ Missing utility bill</span></div>
+            <div class="qc-row"><span class="qc-row-label">Photos</span><span class="qc-row-value">5 photos uploaded</span></div>
+            <div class="qc-row"><span class="qc-row-label">Submitted</span><span class="qc-row-value">2 days ago</span></div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-view">View full listing →</button>
+            <button class="qc-btn qc-btn-approve" onclick="approveListing(this)">✓ Approve & schedule inspection</button>
+            <button class="qc-btn qc-btn-reject" onclick="openRejectModal('listing')">✕ Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ INSPECTIONS ═══════════ -->
+    <div class="page" id="page-inspections">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Inspection management</div>
+          <div class="page-sub">Track scheduled and completed property inspections</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card gold">
+          <div class="stat-num">4</div>
+          <div class="stat-label">Scheduled this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Awaiting scheduling</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Completed this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Active inspectors</div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Upcoming inspections</div>
+        </div>
+
+        <div class="insp-card">
+          <div class="insp-date-box"><div class="insp-date-day">16</div><div class="insp-date-month">Jan</div></div>
+          <div class="insp-thumb"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=150&q=70" alt="Lekki semi"/></div>
+          <div class="insp-info">
+            <div class="insp-name">3-Bed Semi-Detached, Lekki Phase 2</div>
+            <div class="insp-loc">📍 Mr Adeyemi · 10:00 AM</div>
+            <div class="insp-officer">Officer: Chidi Okonkwo</div>
+          </div>
+          <div class="qc-status"><span class="status-pill status-scheduled">📅 Scheduled</span></div>
+        </div>
+
+        <div class="insp-card">
+          <div class="insp-date-box"><div class="insp-date-day">17</div><div class="insp-date-month">Jan</div></div>
+          <div class="insp-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=150&q=70" alt="Ikoyi house"/></div>
+          <div class="insp-info">
+            <div class="insp-name">Luxury 5-Bed Detached, Ikoyi</div>
+            <div class="insp-loc">📍 Mrs Okafor · 2:00 PM</div>
+            <div class="insp-officer">Officer: Chidi Okonkwo</div>
+          </div>
+          <div class="qc-status"><span class="status-pill status-scheduled">📅 Scheduled</span></div>
+        </div>
+
+        <div class="insp-card">
+          <div class="insp-date-box"><div class="insp-date-day">18</div><div class="insp-date-month">Jan</div></div>
+          <div class="insp-thumb"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=150&q=70" alt="Yaba apartment"/></div>
+          <div class="insp-info">
+            <div class="insp-name">2-Bed Apartment, Yaba</div>
+            <div class="insp-loc">📍 Mrs Eze · 11:00 AM</div>
+            <div class="insp-officer">Officer: Amaka Nwosu</div>
+          </div>
+          <div class="qc-status"><span class="status-pill status-scheduled">📅 Scheduled</span></div>
+        </div>
+
+        <div class="insp-card">
+          <div class="insp-date-box"><div class="insp-date-day">19</div><div class="insp-date-month">Jan</div></div>
+          <div class="insp-thumb"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=150&q=70" alt="VI flat"/></div>
+          <div class="insp-info">
+            <div class="insp-name">3-Bed Flat, Victoria Island</div>
+            <div class="insp-loc">📍 Mr Bello · 9:00 AM</div>
+            <div class="insp-officer">Officer: Amaka Nwosu</div>
+          </div>
+          <div class="qc-status"><span class="status-pill status-scheduled">📅 Scheduled</span></div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Awaiting scheduling</div>
+        </div>
+
+        <div class="queue-card">
+          <div class="qc-listing-preview" style="margin-bottom:1rem;">
+            <div class="qc-listing-img"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi"/></div>
+            <div>
+              <div class="qc-listing-name">3-Bed Semi-Detached</div>
+              <div class="qc-listing-meta">📍 Lekki Phase 2, Lagos · Approved 2 hours ago</div>
+            </div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-assign">📅 Assign officer & schedule</button>
+          </div>
+        </div>
+
+        <div class="queue-card">
+          <div class="qc-listing-preview" style="margin-bottom:1rem;">
+            <div class="qc-listing-img"><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&q=70" alt="Yaba apartment"/></div>
+            <div>
+              <div class="qc-listing-name">2-Bed Apartment</div>
+              <div class="qc-listing-meta">📍 Yaba, Lagos · Approved yesterday</div>
+            </div>
+          </div>
+          <div class="qc-actions">
+            <button class="qc-btn qc-btn-assign">📅 Assign officer & schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ USERS ═══════════ -->
+    <div class="page" id="page-users">
+      <div class="page-head">
+        <div>
+          <div class="page-title">User management</div>
+          <div class="page-sub">Search and manage tenant and landlord accounts</div>
+        </div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search by name or email..."/>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="tabs">
+            <button class="tab active">All users <span class="tab-badge">128</span></button>
+            <button class="tab">Tenants</button>
+            <button class="tab">Landlords</button>
+            <button class="tab">Suspended</button>
+          </div>
+        </div>
+
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Activity</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm">J</div>
+                    <div><div class="user-name">Jomiloju Adeyemi</div><div class="user-email">jomiloju@example.com</div></div>
+                  </div>
+                </td>
+                <td>Tenant</td>
+                <td>Jan 2026</td>
+                <td><span class="status-pill status-active">Active</span></td>
+                <td>6 saved · 3 viewings</td>
+                <td><button class="user-action-btn">View</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:linear-gradient(135deg,#BA7517,#132040);">A</div>
+                    <div><div class="user-name">Mr Adeyemi Oluwaseun</div><div class="user-email">adeyemi.o@email.com</div></div>
+                  </div>
+                </td>
+                <td>Landlord</td>
+                <td>Jan 2026</td>
+                <td><span class="status-pill status-active">Active</span></td>
+                <td>3 listings · 4.8★</td>
+                <td><button class="user-action-btn">View</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:linear-gradient(135deg,#0F6E56,#132040);">O</div>
+                    <div><div class="user-name">Mrs Okafor</div><div class="user-email">okafor.ng@email.com</div></div>
+                  </div>
+                </td>
+                <td>Landlord</td>
+                <td>Dec 2025</td>
+                <td><span class="status-pill status-active">Active</span></td>
+                <td>2 listings · 4.9★</td>
+                <td><button class="user-action-btn">View</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:linear-gradient(135deg,#185FA5,#132040);">B</div>
+                    <div><div class="user-name">Mr Bello</div><div class="user-email">bello.lekki@email.com</div></div>
+                  </div>
+                </td>
+                <td>Landlord</td>
+                <td>Dec 2025</td>
+                <td><span class="status-pill status-active">Active</span></td>
+                <td>1 listing · 4.7★</td>
+                <td><button class="user-action-btn">View</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:linear-gradient(135deg,#854F0B,#132040);">T</div>
+                    <div><div class="user-name">Tunde Adeyemi</div><div class="user-email">tunde.a@email.com</div></div>
+                  </div>
+                </td>
+                <td>Tenant</td>
+                <td>Nov 2025</td>
+                <td><span class="status-pill status-active">Active</span></td>
+                <td>4 saved · 2 reviews</td>
+                <td><button class="user-action-btn">View</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm" style="background:linear-gradient(135deg,#e05252,#132040);">R</div>
+                    <div><div class="user-name">Remi Okeke</div><div class="user-email">remi.okeke@email.com</div></div>
+                  </div>
+                </td>
+                <td>Tenant</td>
+                <td>Oct 2025</td>
+                <td><span class="status-pill status-suspended">Suspended</span></td>
+                <td>Reported · spam messages</td>
+                <td><button class="user-action-btn">Reinstate</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ REPORTS ═══════════ -->
+    <div class="page" id="page-reports">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Reports & analytics</div>
+          <div class="page-sub">Platform-wide performance and growth metrics</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card gold">
+          <div class="stat-num">128</div>
+          <div class="stat-label">Total users</div>
+          <div class="stat-trend">↑ 12 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">47</div>
+          <div class="stat-label">Live listings</div>
+          <div class="stat-trend">↑ 5 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">312</div>
+          <div class="stat-label">Total enquiries</div>
+          <div class="stat-trend">↑ 38 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">18</div>
+          <div class="stat-label">Inspections completed</div>
+          <div class="stat-trend">↑ 4 this week</div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <div class="chart-row">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-label">User growth — last 8 weeks</div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-wrap"><canvas id="growthChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-label">User breakdown</div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-wrap"><canvas id="userPieChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-label">Listings by area</div>
+        </div>
+        <div class="chart-card">
+          <div class="area-stat">
+            <div class="area-stat-name">Lekki</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:85%;"></div></div></div>
+            <div class="area-stat-num">17</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Ikoyi</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:55%;"></div></div></div>
+            <div class="area-stat-num">11</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Victoria Island</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:45%;"></div></div></div>
+            <div class="area-stat-num">9</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Ajah</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:30%;"></div></div></div>
+            <div class="area-stat-num">6</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Yaba</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:20%;"></div></div></div>
+            <div class="area-stat-num">4</div>
+          </div>
+          <div class="area-stat">
+            <div class="area-stat-name">Surulere</div>
+            <div class="area-stat-bar-wrap"><div class="area-stat-bar-track"><div class="area-stat-bar-fill" style="width:10%;"></div></div></div>
+            <div class="area-stat-num">2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <div class="modal-title">Reject submission</div>
+    <div class="modal-sub">Provide a reason for rejection. This will be shared with the user so they can resubmit with corrections.</div>
+    <textarea class="modal-textarea" id="rejectReason" placeholder="e.g. NIN slip image is unclear, please re-upload a higher quality scan..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeRejectModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function setPage(btn, page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('.sb-btn').forEach(b => {
+      if (b.textContent.trim().toLowerCase().startsWith(page)) b.classList.add('active');
+    });
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  if (page === 'reports') setTimeout(buildReportCharts, 50);
+}
+
+function approveItem(btn) {
+  const card = btn.closest('.queue-card');
+  card.style.transition = 'opacity .3s, transform .3s';
+  card.style.opacity = '0';
+  card.style.transform = 'translateX(20px)';
+  setTimeout(() => card.remove(), 300);
+}
+
+function approveListing(btn) {
+  approveItem(btn);
+}
+
+let rejectTarget = null;
+function openRejectModal(type) {
+  rejectTarget = type;
+  document.getElementById('rejectModal').classList.add('active');
+}
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.remove('active');
+  document.getElementById('rejectReason').value = '';
+}
+function confirmReject() {
+  closeRejectModal();
+}
+
+let chartsBuilt = false;
+function buildReportCharts() {
+  if (chartsBuilt) return;
+  chartsBuilt = true;
+
+  new Chart(document.getElementById('growthChart'), {
+    type: 'line',
+    data: {
+      labels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'],
+      datasets: [{
+        label: 'Total users',
+        data: [42,55,68,79,91,103,116,128],
+        borderColor: '#BA7517',
+        backgroundColor: 'rgba(186,117,23,0.08)',
+        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517',
+        fill: true, borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('userPieChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Tenants','Landlords'],
+      datasets: [{
+        data: [86,42],
+        backgroundColor: ['#BA7517','#185FA5'],
+        borderColor: '#0a1628',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } },
+        tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
