@@ -546,7 +546,7 @@ aside.sidebar { display: none; }
 
     <!-- HERO -->
     <div class="hero">
-      <div class="greeting">Good morning, <span>Jomiloju 👋</span></div>
+      <div class="greeting">Good morning, <span id="greetingName">Jomiloju 👋</span></div>
       <div class="hero-title">Find your next<br/><em>verified home.</em></div>
 
       <!-- SEARCH -->
@@ -677,9 +677,22 @@ aside.sidebar { display: none; }
 const API_URL = 'https://domivault-backend-production.up.railway.app';
 let LISTINGS = [];
 
+function applyLoggedInUser() {
+  try {
+    const user = JSON.parse(localStorage.getItem('domivaultUser') || 'null');
+    const name = user?.firstName || user?.name?.split(' ')[0] || user?.email?.split('@')[0];
+    if (name) document.getElementById('greetingName').textContent = `${name} 👋`;
+  } catch (_) {}
+}
+
+applyLoggedInUser();
+
 async function fetchListings() {
   try {
-    const res = await fetch(API_URL + '/api/properties');
+    const token = localStorage.getItem('domivaultToken');
+    const res = await fetch(API_URL + '/api/properties', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    });
     const data = await res.json();
 
     LISTINGS = data.map(function(p) {
