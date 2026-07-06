@@ -672,29 +672,31 @@ let LISTINGS = [];
 
 async function fetchListings() {
   try {
-    const res = await fetch(`${API_URL}/api/properties`);
+    const res = await fetch(API_URL + '/api/properties');
     const data = await res.json();
 
-    LISTINGS = data.map(p => ({
-      id: p._id,
-      type: 'For Rent',
-      name: p.title,
-      location: `${p.location.area}, Lagos`,
-      area: p.location.area,
-      price: `₦${p.price.toLocaleString('en-NG')}/yr`,
-      priceVal: p.price,
-      img: p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75',
-      beds: p.bedrooms,
-      baths: p.bathrooms,
-      size: p.size ? `${p.size}m²` : 'N/A',
-      verified: true,
-      inspected: p.isInspected,
-      distance: '',
-      landlord: p.landlord ? p.landlord.name : 'Landlord',
-      landlordInit: p.landlord ? p.landlord.name.charAt(0) : 'L',
-      rating: '5.0 ★',
-      new: false,
-    }));
+    LISTINGS = data.map(function(p) {
+      return {
+        id: p._id,
+        type: 'For Rent',
+        name: p.title,
+        location: p.location.area + ', Lagos',
+        area: p.location.area,
+        price: '\u20a6' + p.price.toLocaleString('en-NG') + '/yr',
+        priceVal: p.price,
+        img: p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75',
+        beds: p.bedrooms,
+        baths: p.bathrooms,
+        size: p.size ? p.size + 'm\u00b2' : 'N/A',
+        verified: true,
+        inspected: p.isInspected,
+        distance: '',
+        landlord: p.landlord ? p.landlord.name : 'Landlord',
+        landlordInit: p.landlord ? p.landlord.name.charAt(0) : 'L',
+        rating: '5.0 ★',
+        new: false
+      };
+    });
 
     renderListings();
   } catch (error) {
@@ -704,7 +706,6 @@ async function fetchListings() {
 }
 
 fetchListings();
-      ...
 
 let savedIds = new Set();
 let activeArea = 'All areas';
