@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -452,7 +453,7 @@ aside.sidebar { display: none; }
 
 <!-- TOP NAV -->
 <nav class="topnav">
-  <a class="nav-logo" href="domivault-with-images.html">
+  <a class="nav-logo" href="domivault-homepage.html">
     <svg viewBox="0 0 34 38" fill="none">
       <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
       <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
@@ -669,6 +670,7 @@ aside.sidebar { display: none; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
   </button>
+</nav>
 
 <script>
 // ── DATA ──
@@ -752,7 +754,7 @@ function renderListings() {
       <div class="card-img">
         <img src="${l.img}" alt="${l.name}" loading="lazy"/>
         <div class="verified-badge"><div class="vdot"></div> Verified</div>
-        <button class="save-btn ${savedIds.has(l.id) ? 'saved' : ''}" onclick="toggleSave(event,${l.id})" aria-label="Save listing">
+        <button class="save-btn ${savedIds.has(l.id) ? 'saved' : ''}" onclick="toggleSave(event,'${l.id}')" aria-label="Save listing">
           ${savedIds.has(l.id) ? '❤️' : '🤍'}
         </button>
         ${l.inspected ? '<div class="dv-seal-br"><svg width="52" height="52" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 2px 10px rgba(186,117,23,0.55));"><circle cx="60" cy="60" r="57" fill="rgba(10,22,40,0.93)" stroke="#BA7517" stroke-width="2.5"/><circle cx="60" cy="60" r="50" fill="none" stroke="#BA7517" stroke-width="1"/><circle cx="60" cy="60" r="53.5" fill="none" stroke="rgba(186,117,23,0.4)" stroke-width="0.8" stroke-dasharray="3 2.5"/><text x="60" y="70" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="36" font-weight="700" fill="#BA7517">DV</text><path id="tph" d="M 14,60 A 46,46 0 0,1 106,60" fill="none"/><text font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#EF9F27" letter-spacing="3"><textPath href="#tph" startOffset="50%" text-anchor="middle">DOMIVAULT</textPath></text><path id="bph" d="M 14,60 A 46,46 0 0,0 106,60" fill="none"/><text font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#EF9F27" letter-spacing="3"><textPath href="#bph" startOffset="50%" text-anchor="middle">INSPECTED</textPath></text><circle cx="14" cy="60" r="2.5" fill="#BA7517"/><circle cx="106" cy="60" r="2.5" fill="#BA7517"/></svg></div>' : ''}
