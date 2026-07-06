@@ -36,6 +36,26 @@ html, body {
   padding: 2rem 1rem;
 }
 
+/* On mobile — go full screen, no phone frame border */
+@media (max-width: 480px) {
+  body {
+    padding: 0;
+    background: var(--navy);
+    display: block;
+  }
+  .phone-scale-wrap {
+    transform: none !important;
+  }
+  .phone-frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .dynamic-island { display: none; }
+  .status-bar { display: none; }
+}
+
 /* ── PHONE FRAME ── */
 .phone-frame {
   width: 390px;
