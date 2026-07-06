@@ -667,14 +667,44 @@ body {
 
 <script>
 // ── DATA ──
-const LISTINGS = [
-  { id:1, type:'For Rent', name:'Modern 4-Bed Apartment', location:'Lekki Phase 1, Lagos', area:'Lekki', price:'₦3,500,000/yr', priceVal:3500000, img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75', beds:4, baths:3, size:'180m²', verified:true, inspected:true, distance:'0.8 km', landlord:'Mr Adeyemi', landlordInit:'A', rating:'4.8 ★', new:false },
-  { id:2, type:'For Rent', name:'Luxury 5-Bed Detached', location:'Ikoyi, Lagos', area:'Ikoyi', price:'₦12,000,000/yr', priceVal:12000000, img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=75', beds:5, baths:4, size:'320m²', verified:true, inspected:true, distance:'5.2 km', landlord:'Mrs Okafor', landlordInit:'O', rating:'4.9 ★', new:false },
-  { id:3, type:'For Rent', name:'Contemporary 3-Bed Flat', location:'Victoria Island, Lagos', area:'Victoria Island', price:'₦5,200,000/yr', priceVal:5200000, img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=75', beds:3, baths:2, size:'145m²', verified:true, inspected:true, distance:'7.1 km', landlord:'Mr Bello', landlordInit:'B', rating:'4.7 ★', new:true },
-  { id:4, type:'For Rent', name:'Spacious 5-Bed House', location:'Ajah, Lagos', area:'Ajah', price:'₦8,000,000/yr', priceVal:8000000, img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=75', beds:5, baths:4, size:'250m²', verified:true, inspected:false, distance:'12.4 km', landlord:'Mrs Ibrahim', landlordInit:'I', rating:'4.6 ★', new:true },
-  { id:5, type:'For Rent', name:'Cosy 1-Bed Studio', location:'Yaba, Lagos', area:'Yaba', price:'₦1,200,000/yr', priceVal:1200000, img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=75', beds:1, baths:1, size:'45m²', verified:true, inspected:true, distance:'18.3 km', landlord:'Mr Chukwu', landlordInit:'C', rating:'4.5 ★', new:false },
-  { id:6, type:'For Rent', name:'Modern 3-Bed Semi-Detached', location:'Lekki Phase 2, Lagos', area:'Lekki', price:'₦6,500,000/yr', priceVal:6500000, img:'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&q=75', beds:3, baths:3, size:'175m²', verified:true, inspected:true, distance:'3.2 km', landlord:'Mrs Adeleke', landlordInit:'A', rating:'5.0 ★', new:true },
-];
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+let LISTINGS = [];
+
+async function fetchListings() {
+  try {
+    const res = await fetch(`${API_URL}/api/properties`);
+    const data = await res.json();
+
+    LISTINGS = data.map(p => ({
+      id: p._id,
+      type: 'For Rent',
+      name: p.title,
+      location: `${p.location.area}, Lagos`,
+      area: p.location.area,
+      price: `₦${p.price.toLocaleString('en-NG')}/yr`,
+      priceVal: p.price,
+      img: p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&q=75',
+      beds: p.bedrooms,
+      baths: p.bathrooms,
+      size: p.size ? `${p.size}m²` : 'N/A',
+      verified: true,
+      inspected: p.isInspected,
+      distance: '',
+      landlord: p.landlord ? p.landlord.name : 'Landlord',
+      landlordInit: p.landlord ? p.landlord.name.charAt(0) : 'L',
+      rating: '5.0 ★',
+      new: false,
+    }));
+
+    renderListings();
+  } catch (error) {
+    console.error('Failed to fetch listings:', error);
+    renderListings();
+  }
+}
+
+fetchListings();
+      ...
 
 let savedIds = new Set();
 let activeArea = 'All areas';
