@@ -610,12 +610,12 @@ body {
       Move-in cost breakdown
     </div>
     <div class="costs">
-      <div class="cost-row"><span class="cost-label">Annual rent</span><span class="cost-val">₦3,850,000</span></div>
-      <div class="cost-row"><span class="cost-label">Caution deposit (10%)</span><span class="cost-val">₦385,000</span></div>
-      <div class="cost-row"><span class="cost-label">Legal fee (15%)</span><span class="cost-val">₦577,500</span></div>
+      <div class="cost-row"><span class="cost-label">Annual rent</span><span class="cost-val" id="costRent">₦3,850,000</span></div>
+      <div class="cost-row"><span class="cost-label">Caution deposit (10%)</span><span class="cost-val" id="costCaution">₦385,000</span></div>
+      <div class="cost-row"><span class="cost-label">Legal fee (15%)</span><span class="cost-val" id="costLegal">₦577,500</span></div>
       <div class="cost-row">
         <span class="cost-total-label">Total move-in cost</span>
-        <span class="cost-total">₦4,812,500</span>
+        <span class="cost-total" id="costTotal">₦4,812,500</span>
       </div>
     </div>
   </div>
@@ -923,6 +923,71 @@ body {
   function messageModal() {
     window.location = 'domivault-messaging.html';
   }
+</script>
+
+<script>
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+
+async function loadListing() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) return;
+
+  try {
+    const res = await fetch(API_URL + '/api/properties/' + id);
+    const p = await res.json();
+
+    const fmt = function(n) { return '₦' + n.toLocaleString('en-NG'); };
+
+    // Title
+    const titleEl = document.querySelector('.listing-title');
+    if (titleEl) titleEl.textContent = p.title;
+
+    // Price
+    const priceEl = document.querySelector('.price');
+    if (priceEl) priceEl.textContent = fmt(p.price);
+
+    // Description
+    const descEl = document.querySelector('.listing-description');
+    if (descEl) descEl.textContent = p.description;
+
+    // Landlord name
+    if (p.landlord) {
+      const llName = document.querySelector('.landlord-name');
+      if (llName) llName.textContent = p.landlord.name;
+    }
+
+    // Gallery images
+    if (p.images && p.images.length > 0) {
+      const slides = document.querySelectorAll('.gallery-slide img');
+      p.images.forEach(function(imgUrl, i) {
+        if (slides[i]) slides[i].src = imgUrl;
+      });
+    }
+
+    // Move-in cost
+    const caution = p.price * ((p.cautionDeposit || 10) / 100);
+    const legal = p.price * ((p.legalFee || 15) / 100);
+    const total = p.price + caution + legal;
+
+    const rentEl = document.getElementById('costRent');
+    if (rentEl) rentEl.textContent = fmt(p.price);
+    const cautionEl = document.getElementById('costCaution');
+    if (cautionEl) cautionEl.textContent = fmt(caution);
+    const legalEl = document.getElementById('costLegal');
+    if (legalEl) legalEl.textContent = fmt(legal);
+    const totalEl = document.getElementById('costTotal');
+    if (totalEl) totalEl.textContent = fmt(total);
+
+    // Page title
+    document.title = p.title + ' — Domivault';
+
+  } catch (err) {
+    console.error('Failed to load listing:', err);
+  }
+}
+
+loadListing();
 </script>
 </body>
 </html>
