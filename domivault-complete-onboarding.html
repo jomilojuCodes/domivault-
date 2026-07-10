@@ -841,7 +841,8 @@ html, body {
           </div>
         </div>
         <div class="terms">By creating an account you agree to our <a href="domivault-terms-of-service.html" target="_blank">Terms of Service</a> and <a href="domivault-privacy-policy.html" target="_blank">Privacy Policy</a>.</div>
-        <button class="btn-primary" onclick="goTo('verify')">Create Account</button>
+        <div id="signup-error" style="display:none;background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.82rem;color:#e05252;margin-bottom:1rem;line-height:1.5;"></div>
+<button class="btn-primary" onclick="handleSignUp()">Create Account</button>
       </div>
     </div>
 
@@ -1708,11 +1709,144 @@ html, body {
 
 function simulateFaceUpload() {
   const zone = document.getElementById('faceUploadZone');
-  const status = document.getElementById('faceUploadStatus');
+  if (!zone) return;
   zone.style.borderStyle = 'solid';
   zone.style.borderColor = 'rgba(46,204,113,.4)';
   zone.style.background = 'rgba(46,204,113,.04)';
   zone.innerHTML = '<div style="font-size:1.5rem;">✅</div><div style="font-size:.88rem;font-weight:600;color:#2ecc71;">Photo uploaded successfully</div><div style="font-size:.74rem;color:rgba(255,255,255,.35);">selfie-photo.jpg</div>';
+}
+
+// ── BACKEND API CONNECTION ──
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+
+// Store token and user in localStorage
+function saveAuth(token, user) {
+  localStorage.setItem('dv_token', token);
+  localStorage.setItem('dv_user', JSON.stringify(user));
+}
+
+function getToken() {
+  return localStorage.getItem('dv_token');
+}
+
+function getUser() {
+  const u = localStorage.getItem('dv_user');
+  return u ? JSON.parse(u) : null;
+}
+
+// Show error message
+function showError(elementId, message) {
+  const el = document.getElementById(elementId);
+  if (el) { el.textContent = message; el.style.display = 'block'; }
+}
+
+function hideError(elementId) {
+  const el = document.getElementById(elementId);
+  if (el) el.style.display = 'none';
+}
+
+// ── SIGN UP ──
+async function handleSignUp() {
+  const fname = document.getElementById('signup-fname')?.value?.trim() || '';
+  const lname = document.querySelector('#signup .field-input[placeholder="Adeyemi"]')?.value?.trim() || '';
+  const email = document.querySelector('#signup input[type="email"]')?.value?.trim() || '';
+  const phone = document.querySelector('#signup input[type="tel"]')?.value?.trim() || '';
+  const password = document.getElementById('signup-password')?.value || '';
+
+  if (!fname || !email || !password) {
+    showError('signup-error', 'Please fill in all required fields.');
+    return;
+  }
+
+  const btn = document.querySelector('#signup .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
+
+  try {
+    const res = await fetch(API_URL + '/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: fname + ' ' + lname,
+        email,
+        password,
+        phone,
+        role: selectedType || 'tenant',
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError('signup-error', data.message || 'Registration failed. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+      return;
+    }
+
+    saveAuth(data.token, data);
+    hideError('signup-error');
+    goTo('verify');
+
+  } catch (err) {
+    showError('signup-error', 'Network error. Please check your connection.');
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
+}
+
+// ── SIGN IN ──
+async function handleSignIn() {
+  const email = document.getElementById('signin-email')?.value?.trim() || '';
+  const password = document.getElementById('signin-password')?.value || '';
+  const errEl = document.getElementById('signin-error');
+
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  errEl.style.display = 'none';
+
+  const btn = document.querySelector('#signin .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  try {
+    const res = await fetch(API_URL + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.message || 'Incorrect email or password.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      return;
+    }
+
+    saveAuth(data.token, data);
+
+    // Redirect based on role
+    if (data.role === 'landlord') {
+      window.location = 'domivault-landlord-dashboard.html';
+    } else if (data.role === 'admin') {
+      window.location = 'domivault-admin-panel.html';
+    } else {
+      window.location = 'domivault-homepage.html';
+    }
+
+  } catch (err) {
+    errEl.textContent = 'Network error. Please check your connection.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
 }
 </script>
 </body>
