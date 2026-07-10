@@ -713,6 +713,31 @@ async function fetchListings() {
 fetchListings();
 
 let savedIds = new Set();
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+
+function getToken() {
+  return localStorage.getItem('dv_token');
+}
+
+// Load saved listings on page load
+async function loadSavedIds() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/saved', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      data.forEach(s => savedIds.add(s.property._id));
+      renderListings();
+    }
+  } catch (err) {
+    console.error('Failed to load saved listings:', err);
+  }
+}
+
+loadSavedIds();
 let activeArea = 'All areas';
 let activeBeds = 'Any';
 let activePrice = 'Any';
@@ -793,11 +818,33 @@ function renderListings() {
   `).join('');
 }
 
-function toggleSave(e, id) {
+async function toggleSave(e, id) {
   e.stopPropagation();
-  if (savedIds.has(id)) savedIds.delete(id);
-  else savedIds.add(id);
-  renderListings();
+  const token = getToken();
+  if (!token) {
+    window.location = 'domivault-complete-onboarding.html';
+    return;
+  }
+  try {
+    if (savedIds.has(id)) {
+      // Unsave
+      await fetch(API_URL + '/api/saved/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      savedIds.delete(id);
+    } else {
+      // Save
+      await fetch(API_URL + '/api/saved/' + id, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      savedIds.add(id);
+    }
+    renderListings();
+  } catch (err) {
+    console.error('Failed to toggle save:', err);
+  }
 }
 
 function handleSearch(input) {
