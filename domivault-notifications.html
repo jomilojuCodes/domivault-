@@ -171,101 +171,138 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
 </nav>
 
 <script>
-const NOTIFICATIONS = [
-  // TODAY
-  {
-    id:1, tab:'messages', unread:true, date:'Today',
-    icon:'💬', iconClass:'ni-msg',
-    title:'New message from Mr Adeyemi',
-    desc:'Is the apartment still available? I would like to schedule a viewing for this week.',
-    prop:'Modern 4-Bed Apartment · Lekki Phase 1',
-    propImg:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=100&q=60',
-    propPrice:'₦3,500,000/yr',
-    time:'2 minutes ago',
-    actions:[{label:'Reply',cls:'na-primary',fn:"window.location='domivault-messaging.html'"},{label:'Dismiss',cls:'na-secondary',fn:'dismissNotif(1)'}]
-  },
-  {
-    id:2, tab:'listings', unread:true, date:'Today',
-    icon:'🏠', iconClass:'ni-listing',
-    title:'New listing matches your search',
-    desc:'A new 3-bedroom apartment in Lekki Phase 1 matching your saved search just went live — physically inspected and verified.',
-    prop:'3-Bed Apartment · Lekki Phase 1',
-    propImg:'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=100&q=60',
-    propPrice:'₦4,200,000/yr',
-    time:'1 hour ago',
-    actions:[{label:'View listing',cls:'na-primary',fn:"window.location='domivault-listing-detail.html'"},{label:'Dismiss',cls:'na-secondary',fn:'dismissNotif(2)'}]
-  },
-  {
-    id:3, tab:'viewings', unread:true, date:'Today',
-    icon:'📅', iconClass:'ni-viewing',
-    title:'Viewing reminder — tomorrow at 10:00 AM',
-    desc:'Your viewing of Modern 4-Bed Apartment, 14 Admiralty Way Lekki Phase 1 is scheduled for tomorrow morning.',
-    prop:'Modern 4-Bed Apartment · Lekki Phase 1',
-    propImg:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=100&q=60',
-    propPrice:'₦3,500,000/yr',
-    time:'3 hours ago',
-    actions:[{label:'View details',cls:'na-primary',fn:"window.location='domivault-listing-detail.html'"},{label:'Cancel viewing',cls:'na-secondary',fn:'dismissNotif(3)'}]
-  },
-  // YESTERDAY
-  {
-    id:4, tab:'messages', unread:false, date:'Yesterday',
-    icon:'💬', iconClass:'ni-msg',
-    title:'New message from Mrs Okafor',
-    desc:'The property is available from the 1st of February. Let me know if that works for you and we can arrange a viewing.',
-    prop:'Luxury 5-Bed Detached · Ikoyi',
-    propImg:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=100&q=60',
-    propPrice:'₦12,000,000/yr',
-    time:'Yesterday, 4:32 PM',
-    actions:[{label:'Reply',cls:'na-primary',fn:"window.location='domivault-messaging.html'"}]
-  },
-  {
-    id:5, tab:'listings', unread:false, date:'Yesterday',
-    icon:'💰', iconClass:'ni-price',
-    title:'Price drop on saved listing',
-    desc:'2-Bed Apartment on Victoria Island dropped from ₦4,200,000 to ₦3,800,000 per year. Act fast before it goes.',
-    prop:'2-Bed Apartment · Victoria Island',
-    propImg:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=100&q=60',
-    propPrice:'₦3,800,000/yr',
-    time:'Yesterday, 11:15 AM',
-    actions:[{label:'View listing',cls:'na-primary',fn:"window.location='domivault-listing-detail.html'"}]
-  },
-  {
-    id:6, tab:'viewings', unread:false, date:'Yesterday',
-    icon:'✅', iconClass:'ni-check',
-    title:'Viewing completed',
-    desc:'Your viewing of Contemporary 3-Bed Flat on Victoria Island is now marked as completed. Leave a review for Mr Bello.',
-    prop:'3-Bed Flat · Victoria Island',
-    propImg:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=100&q=60',
-    propPrice:'₦5,200,000/yr',
-    time:'Yesterday, 2:00 PM',
-    actions:[{label:'Leave a review',cls:'na-primary',fn:"window.location='domivault-listing-detail.html'"}]
-  },
-  // THIS WEEK
-  {
-    id:7, tab:'system', unread:false, date:'This week',
-    icon:'🎁', iconClass:'ni-referral',
-    title:'Your referral earned a reward',
-    desc:'A friend signed up using your referral code JOMI2026. Keep sharing to earn more rewards.',
-    time:'Mon, 9:45 AM',
-    actions:[{label:'Share code',cls:'na-primary',fn:"window.location='domivault-tenant-profile.html'"}]
-  },
-  {
-    id:8, tab:'system', unread:false, date:'This week',
-    icon:'🔒', iconClass:'ni-system',
-    title:'New sign in detected',
-    desc:'A new sign in to your Domivault account was detected from Chrome on Windows. If this wasn\'t you, change your password immediately.',
-    time:'Sun, 7:12 PM',
-    actions:[{label:'It was me',cls:'na-primary',fn:'dismissNotif(8)'},{label:'Secure account',cls:'na-secondary',fn:"window.location='domivault-tenant-profile.html'"}]
-  },
-  {
-    id:9, tab:'system', unread:false, date:'This week',
-    icon:'⭐', iconClass:'ni-check',
-    title:'Welcome to Domivault!',
-    desc:'Your account is fully set up. Start browsing verified listings in Lagos — every property has been physically inspected by our team.',
-    time:'Mon, 9:00 AM',
-    actions:[{label:'Browse listings',cls:'na-primary',fn:"window.location='domivault-homepage.html'"}]
-  },
-];
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+let NOTIFICATIONS = [];
+
+function getToken() {
+  return localStorage.getItem('dv_token');
+}
+
+async function fetchNotifications() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/notifications', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      NOTIFICATIONS = data.map(function(n) {
+        return {
+          id: n._id,
+          tab: n.type.includes('message') ? 'messages' : 
+               n.type.includes('listing') || n.type.includes('price') ? 'listings' :
+               n.type.includes('viewing') || n.type.includes('inspection') ? 'viewings' : 'system',
+          unread: !n.read,
+          date: getDateLabel(n.createdAt),
+          icon: getIcon(n.type),
+          iconClass: getIconClass(n.type),
+          title: n.title,
+          desc: n.message,
+          prop: n.property ? n.property.title : null,
+          propImg: n.property && n.property.images && n.property.images.length > 0 ? n.property.images[0] : null,
+          propPrice: null,
+          time: getTimeAgo(n.createdAt),
+          actions: getActions(n),
+        };
+      });
+    }
+  } catch (err) {
+    console.error('Failed to fetch notifications:', err);
+  }
+  renderNotifs();
+}
+
+function getDateLabel(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff <= 7) return 'This week';
+  return 'Earlier';
+}
+
+function getTimeAgo(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + ' minutes ago';
+  if (diff < 86400) return Math.floor(diff/3600) + ' hours ago';
+  return Math.floor(diff/86400) + ' days ago';
+}
+
+function getIcon(type) {
+  const icons = {
+    'new_message': '💬',
+    'new_enquiry': '💬',
+    'listing_approved': '✅',
+    'listing_live': '🏠',
+    'listing_rejected': '❌',
+    'inspection_scheduled': '📅',
+    'viewing_request': '📅',
+    'viewing_confirmed': '✅',
+    'price_drop': '💰',
+    'system': '🔔',
+  };
+  return icons[type] || '🔔';
+}
+
+function getIconClass(type) {
+  if (type.includes('message') || type.includes('enquiry')) return 'ni-msg';
+  if (type.includes('listing') || type.includes('price')) return 'ni-listing';
+  if (type.includes('viewing') || type.includes('inspection')) return 'ni-viewing';
+  if (type.includes('approved') || type.includes('live')) return 'ni-check';
+  return 'ni-system';
+}
+
+function getActions(n) {
+  if (n.type === 'new_message' || n.type === 'new_enquiry') {
+    return [{label:'Reply', cls:'na-primary', fn:"window.location='domivault-messaging.html'"}, {label:'Dismiss', cls:'na-secondary', fn:"markRead('" + n._id + "')"}];
+  }
+  if (n.type === 'listing_live' || n.type === 'listing_approved') {
+    return [{label:'View listing', cls:'na-primary', fn:"window.location='domivault-landlord-dashboard.html'"}];
+  }
+  return [{label:'Dismiss', cls:'na-secondary', fn:"markRead('" + n._id + "')"}];
+}
+
+async function markRead(id) {
+  const token = getToken();
+  if (!token) return;
+  try {
+    await fetch(API_URL + '/api/notifications/' + id + '/read', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    NOTIFICATIONS = NOTIFICATIONS.map(function(n) {
+      if (n.id === id) n.unread = false;
+      return n;
+    });
+    renderNotifs();
+  } catch (err) {
+    console.error('Failed to mark as read:', err);
+  }
+}
+
+async function markAllRead() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    await fetch(API_URL + '/api/notifications/read-all', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    NOTIFICATIONS.forEach(function(n) { n.unread = false; });
+    document.getElementById('allBadge').style.display = 'none';
+    document.getElementById('msgBadge').style.display = 'none';
+    renderNotifs();
+  } catch (err) {
+    console.error('Failed to mark all as read:', err);
+  }
+}
+
+fetchNotifications();
 
 let activeTab = 'all';
 let dismissed = new Set();
@@ -277,16 +314,10 @@ function setTab(btn, tab) {
   renderNotifs();
 }
 
-function markAllRead() {
-  NOTIFICATIONS.forEach(n => n.unread = false);
-  document.getElementById('allBadge').style.display = 'none';
-  document.getElementById('msgBadge').style.display = 'none';
-  renderNotifs();
-}
+// markAllRead handled by API version above
 
 function dismissNotif(id) {
-  dismissed.add(id);
-  renderNotifs();
+  markRead(id);
 }
 
 function renderNotifs() {
