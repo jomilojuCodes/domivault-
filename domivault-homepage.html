@@ -452,7 +452,7 @@ aside.sidebar { display: none; }
 
 <!-- TOP NAV -->
 <nav class="topnav">
-  <a class="nav-logo" href="domivault-with-images.html">
+  <a class="nav-logo" href="domivault-homepage.html">
     <svg viewBox="0 0 34 38" fill="none">
       <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
       <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
@@ -583,7 +583,7 @@ aside.sidebar { display: none; }
     </div>
 
     <div class="featured-scroll">
-      <div class="featured-card">
+      <div class="featured-card" onclick="window.location='domivault-listing-detail.html'">
         <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&q=75" alt="Modern apartment Lekki" loading="lazy"/>
         <div class="featured-verified"><div class="vdot"></div> Verified</div>
         <div class="featured-overlay">
@@ -592,7 +592,7 @@ aside.sidebar { display: none; }
           <div class="featured-price">₦3,500,000/yr</div>
         </div>
       </div>
-      <div class="featured-card">
+      <div class="featured-card" onclick="window.location='domivault-listing-detail.html'">
         <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=400&q=75" alt="Semi detached Lekki" loading="lazy"/>
         <div class="featured-verified"><div class="vdot"></div> Verified</div>
         <div class="featured-overlay">
@@ -601,7 +601,7 @@ aside.sidebar { display: none; }
           <div class="featured-price">₦6,500,000/yr</div>
         </div>
       </div>
-      <div class="featured-card">
+      <div class="featured-card" onclick="window.location='domivault-listing-detail.html'">
         <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=75" alt="Studio Lekki" loading="lazy"/>
         <div class="featured-verified"><div class="vdot"></div> Verified</div>
         <div class="featured-overlay">
@@ -610,7 +610,7 @@ aside.sidebar { display: none; }
           <div class="featured-price">₦1,200,000/yr</div>
         </div>
       </div>
-      <div class="featured-card">
+      <div class="featured-card" onclick="window.location='domivault-listing-detail.html'">
         <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=75" alt="Luxury detached Ikoyi" loading="lazy"/>
         <div class="featured-verified"><div class="vdot"></div> Verified</div>
         <div class="featured-overlay">
@@ -652,7 +652,7 @@ aside.sidebar { display: none; }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Home</span>
   </button>
-  <button class="bottom-nav-btn">
+  <button class="bottom-nav-btn" onclick="document.getElementById('searchInput').focus();document.getElementById('searchInput').scrollIntoView({behavior:'smooth'})">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <span>Search</span>
   </button>
@@ -713,7 +713,6 @@ async function fetchListings() {
 fetchListings();
 
 let savedIds = new Set();
-const API_URL = 'https://domivault-backend-production.up.railway.app';
 
 function getToken() {
   return localStorage.getItem('dv_token');
@@ -777,7 +776,7 @@ function renderListings() {
       <div class="card-img">
         <img src="${l.img}" alt="${l.name}" loading="lazy"/>
         <div class="verified-badge"><div class="vdot"></div> Verified</div>
-        <button class="save-btn ${savedIds.has(l.id) ? 'saved' : ''}" onclick="toggleSave(event,${l.id})" aria-label="Save listing">
+        <button class="save-btn ${savedIds.has(l.id) ? 'saved' : ''}" onclick="toggleSave(event,'${l.id}')" aria-label="Save listing">
           ${savedIds.has(l.id) ? '❤️' : '🤍'}
         </button>
         ${l.inspected ? '<div class="dv-seal-br"><svg width="52" height="52" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 2px 10px rgba(186,117,23,0.55));"><circle cx="60" cy="60" r="57" fill="rgba(10,22,40,0.93)" stroke="#BA7517" stroke-width="2.5"/><circle cx="60" cy="60" r="50" fill="none" stroke="#BA7517" stroke-width="1"/><circle cx="60" cy="60" r="53.5" fill="none" stroke="rgba(186,117,23,0.4)" stroke-width="0.8" stroke-dasharray="3 2.5"/><text x="60" y="70" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="36" font-weight="700" fill="#BA7517">DV</text><path id="tph" d="M 14,60 A 46,46 0 0,1 106,60" fill="none"/><text font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#EF9F27" letter-spacing="3"><textPath href="#tph" startOffset="50%" text-anchor="middle">DOMIVAULT</textPath></text><path id="bph" d="M 14,60 A 46,46 0 0,0 106,60" fill="none"/><text font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#EF9F27" letter-spacing="3"><textPath href="#bph" startOffset="50%" text-anchor="middle">INSPECTED</textPath></text><circle cx="14" cy="60" r="2.5" fill="#BA7517"/><circle cx="106" cy="60" r="2.5" fill="#BA7517"/></svg></div>' : ''}
