@@ -268,7 +268,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
       </button>
-      <button class="sb-btn" style="color:rgba(224,82,82,.6);" onclick="if(confirm('Are you sure you want to log out?')) window.location='domivault-with-images.html'">
+      <button class="sb-btn" style="color:rgba(224,82,82,.6);" onclick="handleLogout()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Log out
       </button>
@@ -745,7 +745,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       </div>
 
       <div class="settings-group">
-        <div class="settings-item" onclick="if(confirm('Are you sure you want to log out?')) window.location='domivault-with-images.html'">
+        <div class="settings-item" onclick="handleLogout()">
           <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
           <div><div class="si-label">Log out</div><div class="si-sub">Sign out of your account</div></div>
           <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
@@ -794,6 +794,77 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
 function toggleNotif(btn) {
   btn.classList.toggle('on');
 }
+</script>
+
+<script>
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+
+function getToken() {
+  return localStorage.getItem('dv_token');
+}
+
+function getUser() {
+  const u = localStorage.getItem('dv_user');
+  return u ? JSON.parse(u) : null;
+}
+
+async function loadProfile() {
+  const token = getToken();
+  if (!token) {
+    window.location = 'domivault-complete-onboarding.html';
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL + '/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const user = await res.json();
+
+    if (!res.ok) {
+      window.location = 'domivault-complete-onboarding.html';
+      return;
+    }
+
+    // Update avatar initial
+    const avatar = document.getElementById('profileAvatar');
+    if (avatar) avatar.textContent = user.name.charAt(0).toUpperCase();
+
+    // Update nav avatar
+    const navAvatar = document.querySelector('.navAvatar');
+    if (navAvatar) navAvatar.textContent = user.name.charAt(0).toUpperCase();
+
+    // Update name
+    const nameEls = document.querySelectorAll('.ph-name');
+    nameEls.forEach(el => el.textContent = user.name);
+
+    // Update email
+    const emailEls = document.querySelectorAll('.ph-email');
+    emailEls.forEach(el => el.textContent = user.email);
+
+    // Update info section
+    const infoValues = document.querySelectorAll('.info-value');
+    if (infoValues[0]) infoValues[0].textContent = user.name;
+    if (infoValues[1]) infoValues[1].textContent = user.email;
+    if (infoValues[2]) infoValues[2].textContent = user.phone || 'Not set';
+
+    // Save to localStorage
+    localStorage.setItem('dv_user', JSON.stringify(user));
+
+  } catch (err) {
+    console.error('Failed to load profile:', err);
+  }
+}
+
+function handleLogout() {
+  if (confirm('Are you sure you want to log out?')) {
+    localStorage.removeItem('dv_token');
+    localStorage.removeItem('dv_user');
+    window.location = 'domivault-with-images.html';
+  }
+}
+
+loadProfile();
 </script>
 </body>
 </html>
