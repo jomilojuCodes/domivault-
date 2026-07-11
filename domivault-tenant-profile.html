@@ -293,7 +293,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               Verified Tenant
             </div>
-            <div class="ph-badge member">⭐ Member since Jan 2026</div>
+            <div class="ph-badge member" id="memberSince">⭐ Member since Jan 2026</div>
           </div>
           <div class="ph-stats">
             <div><div class="ph-stat-num">6</div><div class="ph-stat-lbl">Saved listings</div></div>
@@ -847,6 +847,15 @@ async function loadProfile() {
     if (infoValues[0]) infoValues[0].textContent = user.name;
     if (infoValues[1]) infoValues[1].textContent = user.email;
     if (infoValues[2]) infoValues[2].textContent = user.phone || 'Not set';
+
+    // Update member since
+    const memberSince = document.getElementById('memberSince');
+    if (memberSince && user.createdAt) {
+      const date = new Date(user.createdAt);
+      const month = date.toLocaleString('en-US', { month: 'short' });
+      const year = date.getFullYear();
+      memberSince.textContent = '⭐ Member since ' + month + ' ' + year;
+    }
 
     // Save to localStorage
     localStorage.setItem('dv_user', JSON.stringify(user));
