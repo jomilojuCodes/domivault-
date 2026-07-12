@@ -3,274 +3,436 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Profile — Domivault</title>
+<title>Dashboard — Domivault Landlord</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --navy:#0a1628;--navy-mid:#132040;--navy-light:#1c2f52;
-  --gold:#BA7517;--gold-light:#EF9F27;--cream:#f8f5ee;
-  --stone:#888780;--white:#fff;--success:#2ecc71;--error:#e05252;
-  --serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;
-  --r:12px;--rs:8px;--t:.25s ease;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0a1628;
+  --navy-mid: #132040;
+  --navy-light: #1c2f52;
+  --gold: #BA7517;
+  --gold-light: #EF9F27;
+  --stone: #888780;
+  --white: #ffffff;
+  --success: #2ecc71;
+  --error: #e05252;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.25s ease;
 }
-html{scroll-behavior:smooth;}
-body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-x:hidden;padding-bottom:80px;}
 
-/* ── NAV ── */
-.topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(10,22,40,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(186,117,23,.15);}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.nav-logo svg{width:28px;height:32px;flex-shrink:0;}
-.nav-wordmark{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--white);}
-.nav-wordmark span{color:var(--gold);}
-.nav-right{display:flex;align-items:center;gap:10px;}
-.iBtn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--white);position:relative;}
-.iBtn svg{width:17px;height:17px;}
-.nBadge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+html { scroll-behavior: smooth; }
 
-/* ── LAYOUT ── */
-.main-layout{display:flex;max-width:1100px;margin:0 auto;}
-.sidebar{display:none;width:240px;flex-shrink:0;background:var(--navy-mid);border-right:1px solid rgba(186,117,23,.12);padding:1.5rem 1rem;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
-.sidebar::-webkit-scrollbar{width:0;}
-.sb-btn{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:var(--rs);background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-family:var(--sans);font-size:13px;transition:all .2s;text-align:left;width:100%;}
-.sb-btn:hover{background:rgba(255,255,255,.05);color:var(--white);}
-.sb-btn.active{background:rgba(186,117,23,.1);color:var(--gold);font-weight:500;}
-.sb-btn svg{width:17px;height:17px;flex-shrink:0;}
-.sb-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:.75rem 0;}
-.content{flex:1;min-width:0;padding:2rem 5%;}
+body {
+  font-family: var(--sans);
+  background: var(--navy);
+  color: var(--white);
+  overflow-x: hidden;
+  padding-bottom: 72px;
+}
 
-/* ── PROFILE HEADER ── */
-.profile-header{background:linear-gradient(135deg,var(--navy-mid) 0%,var(--navy-light) 100%);border:1px solid rgba(186,117,23,.18);border-radius:var(--r);padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
-.profile-header::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(186,117,23,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(186,117,23,.04) 1px,transparent 1px);background-size:32px 32px;}
-.ph-inner{position:relative;z-index:1;display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;}
-.ph-avatar-wrap{position:relative;flex-shrink:0;}
-.ph-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--navy-light));border:3px solid rgba(186,117,23,.4);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.2rem;font-weight:700;color:var(--navy);cursor:pointer;}
-.ph-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--gold);border:2px solid var(--navy);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;}
-.ph-info{flex:1;min-width:200px;}
-.ph-name{font-family:var(--serif);font-size:1.8rem;font-weight:700;margin-bottom:4px;}
-.ph-email{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:.75rem;}
-.ph-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
-.ph-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;}
-.ph-badge.verified{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:var(--success);}
-.ph-badge.member{background:rgba(186,117,23,.1);border:1px solid rgba(186,117,23,.25);color:var(--gold-light);}
-.ph-badge svg{width:12px;height:12px;}
-.ph-stats{display:flex;gap:1.5rem;flex-wrap:wrap;}
-.ph-stat-num{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--gold);}
-.ph-stat-lbl{font-size:11px;color:rgba(255,255,255,.35);}
+/* ── TOP NAV ── */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 5%;
+  background: rgba(10,22,40,0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(186,117,23,0.15);
+}
 
-/* ── PROFILE COMPLETION ── */
-.completion-card{background:rgba(186,117,23,.06);border:1px solid rgba(186,117,23,.18);border-radius:var(--r);padding:1.25rem;margin-bottom:1.5rem;}
-.completion-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;}
-.completion-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.7);}
-.completion-pct{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold);}
-.completion-bar-track{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:.85rem;}
-.completion-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width 1s ease;}
-.completion-items{display:flex;flex-direction:column;gap:6px;}
-.completion-item{display:flex;align-items:center;gap:8px;font-size:12px;}
-.ci-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;}
-.ci-dot.done{background:rgba(46,204,113,.2);color:var(--success);}
-.ci-dot.todo{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3);}
-.ci-label{flex:1;}
-.ci-label.done{color:rgba(255,255,255,.5);}
-.ci-label.todo{color:rgba(255,255,255,.35);}
-.ci-action{font-size:11px;color:var(--gold);cursor:pointer;background:none;border:none;font-family:var(--sans);}
+.nav-left { display: flex; align-items: center; gap: 10px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo svg { width: 28px; height: 32px; flex-shrink: 0; }
+.nav-wordmark { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--white); }
+.nav-wordmark span { color: var(--gold); }
+.nav-role { font-size: 11px; color: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.1); }
 
-/* ── SECTIONS ── */
-.section{margin-bottom:2rem;}
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-.section-title{font-family:var(--serif);font-size:1.1rem;font-weight:700;}
-.section-edit{font-size:12px;color:var(--gold);cursor:pointer;background:none;border:none;font-family:var(--sans);display:flex;align-items:center;gap:4px;}
-.section-edit svg{width:13px;height:13px;}
-.sdiv{border:none;border-top:1px solid rgba(255,255,255,.07);margin-bottom:2rem;}
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--white); position: relative;
+  transition: background var(--transition);
+}
+.nav-icon-btn:hover { background: rgba(255,255,255,0.12); }
+.nav-icon-btn svg { width: 17px; height: 17px; }
+.nav-notif-badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--gold); color: var(--navy);
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--navy);
+}
+.nav-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--navy-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 1rem; font-weight: 700;
+  color: var(--navy); cursor: pointer; border: 2px solid rgba(186,117,23,0.3);
+}
 
-/* ── INFO CARD ── */
-.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.25rem;}
-.info-row{display:flex;align-items:center;gap:12px;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
-.info-row:last-child{border-bottom:none;}
-.info-icon{width:34px;height:34px;border-radius:var(--rs);background:rgba(186,117,23,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.info-icon svg{width:16px;height:16px;color:var(--gold);}
-.info-label{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:2px;}
-.info-value{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;}
-.info-value.unset{color:rgba(255,255,255,.28);font-style:italic;}
+/* ── MAIN LAYOUT ── */
+.main-layout { display: flex; }
+/* ── DESKTOP SIDEBAR ── */
+.sidebar {
+  display: none;
+  width: 240px; flex-shrink: 0;
+  background: var(--navy-mid);
+  border-right: 1px solid rgba(186,117,23,0.12);
+  padding: 1.5rem 1rem;
+  position: sticky; top: 65px;
+  height: calc(100vh - 65px);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 0; }
 
-/* ── ACTIVITY CARDS ── */
-.activity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem;}
-.activity-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.1rem;text-align:center;cursor:pointer;transition:all var(--t);}
-.activity-card:hover{border-color:rgba(186,117,23,.3);transform:translateY(-3px);}
-.ac-icon{font-size:1.6rem;margin-bottom:.5rem;}
-.ac-num{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--gold);margin-bottom:2px;}
-.ac-label{font-size:11px;color:rgba(255,255,255,.35);}
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; margin-bottom: 2rem; }
+.sidebar-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+  background: none; border: none; color: rgba(255,255,255,0.45);
+  cursor: pointer; font-family: var(--sans); font-size: 13px;
+  transition: all 0.2s; text-align: left; width: 100%;
+}
+.sidebar-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.sidebar-btn.active { background: rgba(186,117,23,0.1); color: var(--gold); font-weight: 500; }
+.sidebar-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.sidebar-badge { margin-left: auto; background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 100px; }
 
-/* ── SAVED LISTINGS ── */
-.saved-scroll{display:flex;gap:1rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;}
-.saved-scroll::-webkit-scrollbar{display:none;}
-.saved-card{min-width:200px;background:rgba(255,255,255,.04);border:1px solid rgba(186,117,23,.15);border-radius:var(--r);overflow:hidden;cursor:pointer;flex-shrink:0;transition:all var(--t);}
-.saved-card:hover{border-color:var(--gold);transform:translateY(-3px);}
-.saved-img{height:120px;overflow:hidden;position:relative;}
-.saved-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);}
-.saved-vbadge{position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:4px;background:rgba(10,22,40,.85);border:1px solid rgba(186,117,23,.5);color:var(--gold-light);font-size:9px;font-weight:600;padding:2px 7px;border-radius:100px;}
-.saved-vdot{width:5px;height:5px;border-radius:50%;background:var(--gold-light);}
-.saved-unsave{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(10,22,40,.8);border:none;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.saved-info{padding:.75rem;}
-.saved-name{font-family:var(--serif);font-size:.95rem;font-weight:700;margin-bottom:3px;}
-.saved-loc{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:5px;}
-.saved-price{font-size:12px;color:var(--gold);font-weight:600;}
+.sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1rem 0; }
+.sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.2); padding: 0.5rem 1rem 0.4rem; }
 
-/* ── VIEWINGS ── */
-.viewing-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1rem;margin-bottom:10px;transition:border-color var(--t);}
-.viewing-item:hover{border-color:rgba(186,117,23,.25);}
-.viewing-date-box{width:48px;height:52px;border-radius:var(--rs);background:rgba(186,117,23,.1);border:1px solid rgba(186,117,23,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
-.vd-day{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1;}
-.vd-month{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;}
-.viewing-info{flex:1;min-width:0;}
-.viewing-name{font-size:13px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.viewing-loc{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;}
-.viewing-time{font-size:11px;color:var(--gold-light);font-weight:500;}
-.viewing-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;flex-shrink:0;}
-.vs-upcoming{background:rgba(186,117,23,.12);color:var(--gold-light);border:1px solid rgba(186,117,23,.25);}
-.vs-done{background:rgba(255,255,255,.06);color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.1);}
-.vs-cancelled{background:rgba(224,82,82,.1);color:var(--error);border:1px solid rgba(224,82,82,.2);}
+/* ── CONTENT ── */
+.content { flex: 1; min-width: 0; padding: 1.75rem 5%; max-width: 860px; margin: 0 auto; }
+
+/* ── HEADER ── */
+.page-greeting { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+.page-greeting span { color: var(--gold); font-weight: 500; }
+.page-title { font-family: var(--serif); font-size: clamp(1.5rem,4vw,2rem); font-weight: 700; margin-bottom: 1rem; }
+.verified-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.25);
+  color: var(--success); font-size: 11px; font-weight: 600;
+  padding: 4px 12px; border-radius: 100px; margin-bottom: 1.5rem;
+}
+.verified-pill svg { width: 13px; height: 13px; }
+
+/* ── STATS GRID ── */
+.stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 1.5rem; }
+.stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius); padding: 1.1rem;
+}
+.stat-card.gold { border-color: rgba(186,117,23,0.3); background: rgba(186,117,23,0.05); }
+.stat-num { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: rgba(255,255,255,0.4); }
+.stat-trend { font-size: 11px; color: var(--success); margin-top: 4px; }
+
+/* ── ADD LISTING BTN ── */
+.add-listing-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--radius-sm);
+  padding: 0.75rem 1.5rem; font-family: var(--sans);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  margin-bottom: 1.75rem; transition: background var(--transition);
+}
+.add-listing-btn:hover { background: var(--gold-light); }
+.add-listing-btn svg { width: 16px; height: 16px; }
+/* ── SECTION ── */
+.section { margin-bottom: 2rem; }
+.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 2rem; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.section-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; }
+.see-all { font-size: 12px; color: var(--gold); background: none; border: none; cursor: pointer; font-family: var(--sans); display: flex; align-items: center; gap: 4px; }
+.see-all svg { width: 13px; height: 13px; }
+
+/* ── ANALYTICS CHART ── */
+.chart-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
+.chart-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+.chart-tabs { display: flex; gap: 5px; }
+.chart-tab {
+  font-size: 11px; padding: 4px 10px; border-radius: 100px;
+  background: rgba(255,255,255,0.06); border: 1px solid transparent;
+  color: rgba(255,255,255,0.4); cursor: pointer; font-family: var(--sans);
+  transition: all 0.2s;
+}
+.chart-tab.active { background: rgba(186,117,23,0.15); color: var(--gold-light); border-color: rgba(186,117,23,0.3); }
+.chart-wrap { position: relative; height: 200px; }
+.chart-legend { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+.chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.4); }
+.chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── LISTING PERFORMANCE ── */
+.perf-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius); padding: 1.1rem;
+  margin-bottom: 10px; transition: border-color var(--transition);
+}
+.perf-card:hover { border-color: rgba(186,117,23,0.2); }
+.perf-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.perf-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
+.perf-thumb img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
+.perf-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.perf-loc { font-size: 11px; color: rgba(255,255,255,0.35); }
+.perf-status { margin-left: auto; flex-shrink: 0; }
+.perf-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 0.85rem; }
+.perf-metric { background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); padding: 0.6rem; text-align: center; }
+.perf-metric-num { font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 2px; }
+.perf-metric-label { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.05em; }
+.perf-bar-wrap {}
+.perf-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 5px; }
+.perf-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.perf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width 1s ease; }
+
+/* ── STATUS PILLS ── */
+.status-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 100px; }
+.status-live { background: rgba(46,204,113,0.12); color: var(--success); border: 1px solid rgba(46,204,113,0.25); }
+.status-pending { background: rgba(186,117,23,0.12); color: var(--gold-light); border: 1px solid rgba(186,117,23,0.25); }
+.status-rejected { background: rgba(224,82,82,0.12); color: var(--error); border: 1px solid rgba(224,82,82,0.25); }
+.status-draft { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
+/* ── REVIEWS ── */
+.review-summary {
+  display: flex; align-items: center; gap: 1.25rem;
+  background: rgba(186,117,23,0.05);
+  border: 1px solid rgba(186,117,23,0.15);
+  border-radius: var(--radius); padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.review-big-num { font-family: var(--serif); font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
+.review-big-stars { color: var(--gold); font-size: 14px; margin-top: 4px; }
+.review-big-label { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+.review-bars { flex: 1; }
+.review-bar-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.review-bar-star { font-size: 10px; color: rgba(255,255,255,0.35); width: 14px; text-align: right; }
+.review-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.review-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; }
+
+.review-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius); padding: 1rem;
+  margin-bottom: 10px;
+}
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.review-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.review-name { font-size: 13px; font-weight: 500; }
+.review-date { font-size: 11px; color: rgba(255,255,255,0.28); margin-left: auto; }
+.review-stars { color: var(--gold); font-size: 12px; margin-bottom: 4px; }
+.review-prop { font-size: 10px; color: var(--gold); margin-bottom: 6px; }
+.review-text { font-size: 13px; color: rgba(255,255,255,0.48); line-height: 1.7; }
+
+/* ── LISTINGS ── */
+.listing-item {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius); padding: 1rem;
+  margin-bottom: 10px; cursor: pointer;
+  transition: border-color var(--transition);
+}
+.listing-item:hover { border-color: rgba(186,117,23,0.3); }
+.listing-thumb { width: 54px; height: 54px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
+.listing-thumb img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
+.listing-info { flex: 1; min-width: 0; }
+.listing-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.listing-loc { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+.listing-meta { display: flex; align-items: center; gap: 7px; }
+.listing-price { font-size: 11px; color: var(--gold); font-weight: 500; }
+.listing-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.listing-action-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: rgba(255,255,255,0.06); border: none;
+  color: rgba(255,255,255,0.5); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.listing-action-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+.listing-action-btn svg { width: 14px; height: 14px; }
+/* ── INSPECTION ── */
+.insp-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(186,117,23,0.05);
+  border: 1px solid rgba(186,117,23,0.15);
+  border-radius: var(--radius); padding: 1rem;
+  margin-bottom: 10px;
+}
+.insp-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-sm); flex-shrink: 0;
+  background: rgba(186,117,23,0.12);
+  display: flex; align-items: center; justify-content: center;
+}
+.insp-icon svg { width: 20px; height: 20px; color: var(--gold); }
+.insp-prop { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.insp-date { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.insp-status { font-size: 11px; color: var(--gold-light); font-weight: 600; }
 
 /* ── ENQUIRIES ── */
-.enq-item{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1rem;margin-bottom:10px;cursor:pointer;transition:border-color var(--t);}
-.enq-item:hover{border-color:rgba(186,117,23,.25);}
-.enq-thumb{width:44px;height:44px;border-radius:var(--rs);overflow:hidden;flex-shrink:0;}
-.enq-thumb img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);}
-.enq-prop{font-size:13px;font-weight:500;margin-bottom:2px;}
-.enq-ll{font-size:11px;color:var(--gold);margin-bottom:3px;}
-.enq-msg{font-size:12px;color:rgba(255,255,255,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;}
-.enq-time{font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;}
-.enq-unread{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;}
+.enquiry-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius); padding: 1rem;
+  margin-bottom: 10px; cursor: pointer; position: relative;
+  transition: border-color var(--transition);
+}
+.enquiry-item:hover { border-color: rgba(186,117,23,0.3); }
+.enquiry-item.unread { border-color: rgba(186,117,23,0.2); background: rgba(186,117,23,0.04); }
+.enquiry-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); border-radius: 12px 0 0 12px; }
+.enquiry-unread-dot { position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.enquiry-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+.enquiry-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.enquiry-prop { font-size: 11px; color: var(--gold); margin-bottom: 4px; }
+.enquiry-msg { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+.enquiry-time { font-size: 10px; color: rgba(255,255,255,0.25); }
+.enquiry-reply {
+  margin-left: auto; flex-shrink: 0;
+  background: rgba(186,117,23,0.12); color: var(--gold-light);
+  border: 1px solid rgba(186,117,23,0.25); border-radius: 6px;
+  padding: 5px 12px; font-size: 11px; font-weight: 500;
+  cursor: pointer; font-family: var(--sans); transition: all var(--transition);
+}
+.enquiry-reply:hover { background: rgba(186,117,23,0.2); }
 
-/* ── PREFERENCES ── */
-.pref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
-.pref-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:1rem;}
-.pref-label{font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem;}
-.pref-value{font-size:14px;font-weight:500;color:var(--white);}
-.pref-value.unset{color:rgba(255,255,255,.28);font-style:italic;font-size:13px;}
-.pref-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:.5rem;}
-.pref-tag{background:rgba(186,117,23,.1);border:1px solid rgba(186,117,23,.2);color:var(--gold-light);font-size:11px;padding:3px 8px;border-radius:100px;}
-
-/* ── REVIEWS GIVEN ── */
-.review-given{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1rem;margin-bottom:10px;}
-.rg-header{display:flex;align-items:center;gap:10px;margin-bottom:.5rem;}
-.rg-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:.95rem;font-weight:700;color:var(--navy);}
-.rg-landlord{font-size:13px;font-weight:500;}
-.rg-prop{font-size:11px;color:rgba(255,255,255,.35);}
-.rg-date{font-size:10px;color:rgba(255,255,255,.25);margin-left:auto;}
-.rg-stars{color:var(--gold);font-size:13px;margin-bottom:.4rem;}
-.rg-text{font-size:13px;color:rgba(255,255,255,.5);line-height:1.65;}
-
-/* ── SETTINGS ── */
-.settings-group{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);overflow:hidden;margin-bottom:1rem;}
-.settings-item{display:flex;align-items:center;gap:12px;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background var(--t);}
-.settings-item:last-child{border-bottom:none;}
-.settings-item:hover{background:rgba(255,255,255,.03);}
-.settings-item.danger:hover{background:rgba(224,82,82,.04);}
-.si-icon{width:34px;height:34px;border-radius:var(--rs);background:rgba(186,117,23,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.si-icon svg{width:16px;height:16px;color:var(--gold);}
-.si-icon.danger-icon{background:rgba(224,82,82,.08);}
-.si-icon.danger-icon svg{color:var(--error);}
-.si-label{font-size:14px;font-weight:500;flex:1;}
-.si-label.danger{color:var(--error);}
-.si-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:1px;}
-.si-arrow{color:rgba(255,255,255,.25);}
-.si-arrow svg{width:16px;height:16px;}
-.si-toggle{width:42px;height:24px;border-radius:100px;background:rgba(186,117,23,.3);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
-.si-toggle.on{background:var(--gold);}
-.si-toggle-dot{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;transition:transform .2s;}
-.si-toggle.on .si-toggle-dot{transform:translateX(18px);}
-.referral-card{background:linear-gradient(135deg,rgba(186,117,23,.12) 0%,rgba(186,117,23,.04) 100%);border:1px solid rgba(186,117,23,.25);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
-.ref-icon{font-size:2rem;flex-shrink:0;}
-.ref-title{font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:2px;}
-.ref-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:.75rem;}
-.ref-code{display:flex;align-items:center;gap:8px;}
-.ref-code-box{background:rgba(255,255,255,.06);border:1px solid rgba(186,117,23,.3);border-radius:var(--rs);padding:6px 14px;font-size:13px;font-weight:600;color:var(--gold-light);letter-spacing:.08em;}
-.ref-copy{background:var(--gold);color:var(--navy);border:none;border-radius:var(--rs);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);}
-
+/* ── QUICK ACTIONS ── */
+.quick-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 2rem; }
+.quick-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius); padding: 1rem;
+  color: rgba(255,255,255,0.6); font-family: var(--sans);
+  font-size: 13px; cursor: pointer; transition: all var(--transition);
+  text-align: left;
+}
+.quick-btn:hover { border-color: rgba(186,117,23,0.3); color: var(--white); }
+.quick-btn svg { width: 20px; height: 20px; color: var(--gold); flex-shrink: 0; }
 /* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-around;padding:.7rem 0 1rem;background:rgba(10,22,40,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(186,117,23,.15);}
-.bnav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:rgba(255,255,255,.3);font-family:var(--sans);transition:color .2s;position:relative;}
-.bnav-btn.active{color:var(--gold);}
-.bnav-btn svg{width:20px;height:20px;}
-.bnav-btn span{font-size:10px;font-weight:500;}
-.bnav-badge{position:absolute;top:-3px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-around;
+  padding: 0.7rem 0 1rem;
+  background: rgba(10,22,40,0.97);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(186,117,23,0.15);
+}
+.bottom-nav-btn {
+  background: none; border: none;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; color: rgba(255,255,255,0.3);
+  font-family: var(--sans); transition: color 0.2s;
+}
+.bottom-nav-btn.active { color: var(--gold); }
+.bottom-nav-btn svg { width: 20px; height: 20px; }
+.bottom-nav-btn span { font-size: 10px; font-weight: 500; }
+.bottom-notif-badge {
+  position: absolute; top: -3px; right: -4px;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--gold); color: var(--navy);
+  font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--navy);
+}
 
 /* ── RESPONSIVE ── */
-@media(min-width:860px){
-  body{padding-bottom:0;}
-  .bottom-nav{display:none;}
-  .sidebar{display:block;}
-  .content{padding:2rem 3%;}
+@media (min-width: 860px) {
+  body { padding-bottom: 0; }
+  .bottom-nav { display: none; }
+  .sidebar { display: block; }
+  .content { padding: 2rem 3%; }
+  .stats-grid { grid-template-columns: repeat(4,1fr); }
+  .quick-grid { grid-template-columns: repeat(4,1fr); }
 }
-@media(max-width:500px){
-  .activity-grid{grid-template-columns:repeat(2,1fr);}
-  .pref-grid{grid-template-columns:1fr;}
-  .ph-stats{gap:1rem;}
+
+@media (max-width: 500px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .perf-metrics { grid-template-columns: repeat(3,1fr); }
+  .enquiry-msg { max-width: 160px; }
 }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- TOP NAV -->
 <nav class="topnav">
-  <a class="nav-logo" href="domivault-homepage.html">
-    <svg viewBox="0 0 34 38" fill="none">
-      <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
-      <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
-      <circle cx="17" cy="25" r="3" fill="#BA7517"/>
-      <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="9" y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="17" y1="1" x2="1" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
-      <line x1="17" y1="1" x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
-    </svg>
-    <div class="nav-wordmark">Domi<span>vault</span></div>
-  </a>
+  <div class="nav-left">
+    <a class="nav-logo" href="domivault-landlord-dashboard.html">
+      <svg viewBox="0 0 34 38" fill="none">
+        <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
+        <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
+        <circle cx="17" cy="25" r="3" fill="#BA7517"/>
+        <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="9" y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="1" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <div class="nav-wordmark">Domi<span>vault</span></div>
+    </a>
+    <span class="nav-role">Landlord</span>
+  </div>
   <div class="nav-right">
-    <button class="iBtn" aria-label="Notifications" onclick="window.location='domivault-notifications.html'">
+    <button class="nav-icon-btn" aria-label="Notifications" onclick="window.location='domivault-notifications.html'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="nBadge">3</div>
+      <div class="nav-notif-badge">3</div>
     </button>
+    <div class="nav-avatar" id="navAvatarInitial">A</div>
   </div>
 </nav>
 
 <div class="main-layout">
-
-  <!-- SIDEBAR -->
+ <!-- DESKTOP SIDEBAR -->
   <aside class="sidebar">
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <button class="sb-btn" onclick="window.location='domivault-homepage.html'">
+    <div class="sidebar-nav">
+      <button class="sidebar-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="sidebar-btn" onclick="document.getElementById('myListingsSection').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        Home
+        My Listings
       </button>
-      <button class="sb-btn" onclick="window.location='domivault-listing-detail.html'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Search
-      </button>
-      <button class="sb-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        Saved
-      </button>
-      <button class="sb-btn">
+      <button class="sidebar-btn" onclick="window.location='domivault-landlord-messaging.html'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Messages
+        <span class="sidebar-badge">2</span>
       </button>
-      <button class="sb-btn active">
+      <button class="sidebar-btn" onclick="document.getElementById('reviewsSection').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Reviews
+      </button>
+      <button class="sidebar-btn" onclick="document.getElementById('analyticsSection').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </button>
+    </div>
+    <hr class="sidebar-divider"/>
+    <div class="sidebar-section-label">Account</div>
+    <div class="sidebar-nav">
+      <button class="sidebar-btn" onclick="document.getElementById('profileSection').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Profile
       </button>
-    </div>
-    <hr class="sb-divider"/>
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <button class="sb-btn" onclick="document.getElementById('settingsSection').scrollIntoView({behavior:'smooth'})">
+      <button class="sidebar-btn" onclick="document.getElementById('settingsSectionD').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
-      </button>
-      <button class="sb-btn" style="color:rgba(224,82,82,.6);" onclick="handleLogout()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Log out
       </button>
     </div>
   </aside>
@@ -278,602 +440,581 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
   <!-- MAIN CONTENT -->
   <main class="content">
 
-    <!-- PROFILE HEADER -->
-    <div class="profile-header">
-      <div class="ph-inner">
-        <div class="ph-avatar-wrap">
-          <div class="ph-avatar" id="profileAvatar">J</div>
-          <div class="ph-edit">📷</div>
-        </div>
-        <div class="ph-info">
-          <div class="ph-name">Jomiloju Adeyemi</div>
-          <div class="ph-email">jomiloju@example.com</div>
-          <div class="ph-badges">
-            <div class="ph-badge verified">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Verified Tenant
-            </div>
-            <div class="ph-badge member" id="memberSince">⭐ Member since Jan 2026</div>
-          </div>
-          <div class="ph-stats">
-            <div><div class="ph-stat-num">6</div><div class="ph-stat-lbl">Saved listings</div></div>
-            <div><div class="ph-stat-num">3</div><div class="ph-stat-lbl">Viewings</div></div>
-            <div><div class="ph-stat-num">2</div><div class="ph-stat-lbl">Reviews given</div></div>
-            <div><div class="ph-stat-num">8</div><div class="ph-stat-lbl">Enquiries</div></div>
-          </div>
-        </div>
+    <!-- HEADER -->
+    <div class="page-greeting" id="profileSection">Good morning, <span id="greetingName">Landlord</span> 👋</div>
+    <div class="page-title">Your dashboard</div>
+    <div class="verified-pill">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Verified landlord · Active
+    </div>
+<!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card gold">
+        <div class="stat-num" id="statTotalListings">—</div>
+        <div class="stat-label">Total listings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statLiveActive">—</div>
+        <div class="stat-label">Live & active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTotalEnquiries">14</div>
+        <div class="stat-label">Total enquiries</div>
+        <div class="stat-trend">↑ 4 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statAvgRating">4.8</div>
+        <div class="stat-label">Average rating</div>
+        <div class="stat-trend">★★★★★</div>
       </div>
     </div>
 
-    <!-- PROFILE COMPLETION -->
-    <div class="completion-card">
-      <div class="completion-header">
-        <div class="completion-title">Profile completion</div>
-        <div class="completion-pct">75%</div>
-      </div>
-      <div class="completion-bar-track">
-        <div class="completion-bar-fill" style="width:75%;"></div>
-      </div>
-      <div class="completion-items">
-        <div class="completion-item"><div class="ci-dot done">✓</div><div class="ci-label done">Profile photo added</div></div>
-        <div class="completion-item"><div class="ci-dot done">✓</div><div class="ci-label done">Email verified</div></div>
-        <div class="completion-item"><div class="ci-dot done">✓</div><div class="ci-label done">Phone number added</div></div>
-        <div class="completion-item"><div class="ci-dot todo">○</div><div class="ci-label todo">Add rental preferences</div><button class="ci-action">Add →</button></div>
-        <div class="completion-item"><div class="ci-dot todo">○</div><div class="ci-label todo">Verify your ID</div><button class="ci-action">Verify →</button></div>
-      </div>
-    </div>
+    <button class="add-listing-btn" onclick="window.location='domivault-property-submission.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Submit new listing
+    </button>
 
-    <hr class="sdiv"/>
+    <hr class="section-divider"/>
 
-    <!-- PERSONAL INFO -->
+    <!-- ANALYTICS CHART -->
     <div class="section">
-      <div class="section-head">
-        <div class="section-title">Personal information</div>
-        <button class="section-edit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit
+      <div class="section-head" id="analyticsSection">
+        <div class="section-label">Analytics</div>
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="setChartTab(this,'views')">Views</button>
+          <button class="chart-tab" onclick="setChartTab(this,'enquiries')">Enquiries</button>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title" id="chartTitle">Total listing views — last 7 
+days</div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="analyticsChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#BA7517;"></div>Lekki 4-Bed Apartment</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5;"></div>Ikoyi 5-Bed Detached</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider"/>
+
+    <!-- LISTING PERFORMANCE -->
+    <div class="section">
+      <div class="section-head" id="myListingsSection">
+        <div class="section-label">Listing performance</div>
+        <button class="see-all">
+          See all
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-      <div class="info-card">
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <div><div class="info-label">Full name</div><div class="info-value">Jomiloju Adeyemi</div></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-          <div><div class="info-label">Email address</div><div class="info-value">jomiloju@example.com</div></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.92 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 5.61 5.61l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-          <div><div class="info-label">Phone number</div><div class="info-value">+234 800 000 0000</div></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-          <div><div class="info-label">Location</div><div class="info-value">Lekki, Lagos</div></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <div><div class="info-label">Date of birth</div><div class="info-value">12 March 2003</div></div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div><div class="info-label">Nationality</div><div class="info-value">Nigerian 🇳🇬</div></div>
+
+      <div id="listingPerfList">
+        <div class="perf-card">
+          <div class="perf-header">
+            <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
+            <div style="flex:1;min-width:0;">
+              <div class="perf-name">Modern 4-Bed Apartment</div>
+              <div class="perf-loc">📍 Lekki Phase 1, Lagos</div>
+            </div>
+            <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
+          </div>
+          <div class="perf-metrics">
+            <div class="perf-metric"><div class="perf-metric-num">247</div><div class="perf-metric-label">Views</div></div>
+            <div class="perf-metric"><div class="perf-metric-num">8</div><div class="perf-metric-label">Enquiries</div></div>
+            <div class="perf-metric"><div class="perf-metric-num">3.2%</div><div class="perf-metric-label">Conv. rate</div></div>
+          </div>
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-label"><span>Views this week</span><span>247 / 300 target</span></div>
+            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:82%;"></div></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <hr class="sdiv"/>
+    <hr class="section-divider"/>
 
-    <!-- ACTIVITY -->
+    <!-- RECENT REVIEWS -->
+    <div class="section">
+      <div class="section-head" id="reviewsSection">
+        <div class="section-label">Recent reviews</div>
+        <button class="see-all">
+          See all
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="review-summary">
+        <div>
+          <div class="review-big-num" id="reviewBigNum">4.8</div>
+          <div class="review-big-stars" id="reviewBigStars">★★★★★</div>
+          <div class="review-big-label" id="reviewBigLabel">12 reviews</div>
+        </div>
+        <div class="review-bars">
+          <div class="review-bar-row"><div class="review-bar-star">5</div><div class="review-bar-track"><div class="review-bar-fill" style="width:75%;"></div></div></div>
+          <div class="review-bar-row"><div class="review-bar-star">4</div><div class="review-bar-track"><div class="review-bar-fill" style="width:17%;"></div></div></div>
+          <div class="review-bar-row"><div class="review-bar-star">3</div><div class="review-bar-track"><div class="review-bar-fill" style="width:8%;"></div></div></div>
+          <div class="review-bar-row"><div class="review-bar-star">2</div><div class="review-bar-track"><div class="review-bar-fill" style="width:0%;"></div></div></div>
+          <div class="review-bar-row"><div class="review-bar-star">1</div><div class="review-bar-track"><div class="review-bar-fill" style="width:0%;"></div></div></div>
+        </div>
+      </div>
+
+<div id="reviewsList">
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div>
+          <div><div class="review-name">Tunde A.</div></div>
+          <div class="review-date">Dec 2025</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
+        <div class="review-text">"Very responsive landlord. Property was exactly as described. The Domivault inspection gave me confidence before I even visited. Highly recommend."</div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">F</div>
+          <div><div class="review-name">Funmi O.</div></div>
+          <div class="review-date">Nov 2025</div>
+        </div>
+        <div class="review-stars">★★★★☆</div>
+        <div class="review-prop">Luxury 5-Bed Detached · Ikoyi</div>
+        <div class="review-text">"Great experience overall. Landlord was professional and transparent about all fees. Would rent again without hesitation."</div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
+          <div><div class="review-name">Kemi B.</div></div>
+          <div class="review-date">Oct 2025</div>
+        </div>
+        <div class="review-stars">★★★★★</div>
+        <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
+        <div class="review-text">"After being scammed elsewhere, Domivault was a breath of fresh air. Landlord was honest and the process was completely transparent."</div>
+      </div>
+</div>
+    </div>
+
+    <hr class="section-divider"/>
+
+    <!-- INSPECTION TRACKER -->
     <div class="section">
       <div class="section-head">
-        <div class="section-title">My activity</div>
+        <div class="section-label">Inspection tracker</div>
       </div>
-      <div class="activity-grid">
-        <div class="activity-card" onclick="window.location='domivault-saved-listings.html'">
-          <div class="ac-icon">❤️</div>
-          <div class="ac-num">6</div>
-          <div class="ac-label">Saved listings</div>
+      <div class="insp-item">
+        <div class="insp-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
-        <div class="activity-card">
-          <div class="ac-icon">📅</div>
-          <div class="ac-num">3</div>
-          <div class="ac-label">Viewings</div>
-        </div>
-        <div class="activity-card">
-          <div class="ac-icon">💬</div>
-          <div class="ac-num">8</div>
-          <div class="ac-label">Enquiries</div>
-        </div>
-        <div class="activity-card" onclick="window.location='domivault-homepage.html'">
-          <div class="ac-icon">🕐</div>
-          <div class="ac-num">12</div>
-          <div class="ac-label">Recently viewed</div>
-        </div>
-        <div class="activity-card">
-          <div class="ac-icon">⭐</div>
-          <div class="ac-num">2</div>
-          <div class="ac-label">Reviews given</div>
-        </div>
-        <div class="activity-card">
-          <div class="ac-icon">🔍</div>
-          <div class="ac-num">5</div>
-          <div class="ac-label">Saved searches</div>
+        <div>
+          <div class="insp-prop">3-Bed Semi-Detached, Lekki Phase 2</div>
+          <div class="insp-date">📅 Thursday 16 Jan 2026, 10:00 AM</div>
+          <div class="insp-status">Officer assigned · Awaiting visit</div>
         </div>
       </div>
     </div>
 
-    <hr class="sdiv"/>
-
-    <!-- SAVED LISTINGS -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">Saved listings</div>
-        <button class="section-edit" onclick="window.location='domivault-saved-listings.html'">See all →</button>
-      </div>
-      <div class="saved-scroll">
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=300&q=70" alt="Lekki apartment" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-            <button class="saved-unsave" onclick="event.stopPropagation()">❤️</button>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">4-Bed Apartment</div>
-            <div class="saved-loc">📍 Lekki Phase 1</div>
-            <div class="saved-price">₦3,500,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=300&q=70" alt="Ikoyi house" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-            <button class="saved-unsave" onclick="event.stopPropagation()">❤️</button>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">5-Bed Detached</div>
-            <div class="saved-loc">📍 Ikoyi, Lagos</div>
-            <div class="saved-price">₦12,000,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=70" alt="VI flat" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-            <button class="saved-unsave" onclick="event.stopPropagation()">❤️</button>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">3-Bed Flat</div>
-            <div class="saved-loc">📍 Victoria Island</div>
-            <div class="saved-price">₦5,200,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=300&q=70" alt="Lekki semi" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-            <button class="saved-unsave" onclick="event.stopPropagation()">❤️</button>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">3-Bed Semi-Detached</div>
-            <div class="saved-loc">📍 Lekki Phase 2</div>
-            <div class="saved-price">₦6,500,000/yr</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="sdiv"/>
-
-    <!-- UPCOMING VIEWINGS -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">My viewings</div>
-        <button class="section-edit">See all →</button>
-      </div>
-      <div class="viewing-item">
-        <div class="viewing-date-box"><div class="vd-day">16</div><div class="vd-month">Jan</div></div>
-        <div class="viewing-info">
-          <div class="viewing-name">Modern 4-Bed Apartment</div>
-          <div class="viewing-loc">📍 14 Admiralty Way, Lekki Phase 1</div>
-          <div class="viewing-time">10:00 AM · Mr Adeyemi</div>
-        </div>
-        <div class="viewing-status vs-upcoming">Upcoming</div>
-      </div>
-      <div class="viewing-item">
-        <div class="viewing-date-box"><div class="vd-day">10</div><div class="vd-month">Jan</div></div>
-        <div class="viewing-info">
-          <div class="viewing-name">Luxury 5-Bed Detached</div>
-          <div class="viewing-loc">📍 Bourdillon Road, Ikoyi</div>
-          <div class="viewing-time">2:00 PM · Mrs Okafor</div>
-        </div>
-        <div class="viewing-status vs-done">Completed</div>
-      </div>
-      <div class="viewing-item">
-        <div class="viewing-date-box"><div class="vd-day">5</div><div class="vd-month">Jan</div></div>
-        <div class="viewing-info">
-          <div class="viewing-name">Contemporary 3-Bed Flat</div>
-          <div class="viewing-loc">📍 Victoria Island, Lagos</div>
-          <div class="viewing-time">11:00 AM · Mr Bello</div>
-        </div>
-        <div class="viewing-status vs-cancelled">Cancelled</div>
-      </div>
-    </div>
-
-    <hr class="sdiv"/>
+    <hr class="section-divider"/>
 
     <!-- RECENT ENQUIRIES -->
     <div class="section">
       <div class="section-head">
-        <div class="section-title">Recent enquiries</div>
-        <button class="section-edit">See all →</button>
-      </div>
-      <div class="enq-item">
-        <div class="enq-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
-        <div style="flex:1;min-width:0;">
-          <div class="enq-prop">Modern 4-Bed Apartment · Lekki</div>
-          <div class="enq-ll">Mr Adeyemi</div>
-          <div class="enq-msg">"Hello, yes the apartment is still available. When would you like to..."</div>
-          <div class="enq-time">2 mins ago</div>
-        </div>
-        <div class="enq-unread"></div>
-      </div>
-      <div class="enq-item">
-        <div class="enq-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70" alt="Ikoyi house" loading="lazy"/></div>
-        <div style="flex:1;min-width:0;">
-          <div class="enq-prop">Luxury 5-Bed Detached · Ikoyi</div>
-          <div class="enq-ll">Mrs Okafor</div>
-          <div class="enq-msg">"The property is available from the 1st of next month..."</div>
-          <div class="enq-time">Yesterday, 4:32 PM</div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="sdiv"/>
-
-    <!-- RECENTLY VIEWED -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">Recently viewed</div>
-        <button class="section-edit" onclick="window.location='domivault-homepage.html'">See all →</button>
-      </div>
-      <div class="saved-scroll">
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=70" alt="Yaba studio" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">1-Bed Studio</div>
-            <div class="saved-loc">📍 Yaba, Lagos</div>
-            <div class="saved-price">₦1,200,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&q=70" alt="Ajah house" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">5-Bed Detached</div>
-            <div class="saved-loc">📍 Ajah, Lagos</div>
-            <div class="saved-price">₦8,000,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=70" alt="VI flat" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">3-Bed Flat</div>
-            <div class="saved-loc">📍 Victoria Island</div>
-            <div class="saved-price">₦5,200,000/yr</div>
-          </div>
-        </div>
-        <div class="saved-card" onclick="window.location='domivault-listing-detail.html'">
-          <div class="saved-img">
-            <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=300&q=70" alt="Lekki semi" loading="lazy"/>
-            <div class="saved-vbadge"><div class="saved-vdot"></div> Verified</div>
-          </div>
-          <div class="saved-info">
-            <div class="saved-name">3-Bed Semi-Detached</div>
-            <div class="saved-loc">📍 Lekki Phase 2</div>
-            <div class="saved-price">₦6,500,000/yr</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="sdiv"/>
-
-    <!-- RENTAL PREFERENCES -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-title">Rental preferences</div>
-        <button class="section-edit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit
+        <div class="section-label">Recent enquiries</div>
+        <button class="see-all">
+          See all
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-      <div class="pref-grid">
-        <div class="pref-card">
-          <div class="pref-label">Preferred areas</div>
-          <div class="pref-tags">
-            <span class="pref-tag">Lekki</span>
-            <span class="pref-tag">Ikoyi</span>
-            <span class="pref-tag">Victoria Island</span>
-          </div>
+
+      <div class="enquiry-item unread">
+        <div class="enquiry-unread-dot"></div>
+        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">T</div>
+        <div style="flex:1;min-width:0;">
+          <div class="enquiry-name">Tunde Adeyemi</div>
+          <div class="enquiry-prop">Modern 4-Bed Apartment · Lekki</div>
+          <div class="enquiry-msg">"Hello, is the apartment still available? I would like to schedule a viewing..."</div>
+          <div class="enquiry-time">2 minutes ago</div>
         </div>
-        <div class="pref-card">
-          <div class="pref-label">Budget range</div>
-          <div class="pref-value">₦2M — ₦6M/yr</div>
+        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
+      </div>
+ <div class="enquiry-item unread">
+        <div class="enquiry-unread-dot"></div>
+        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">F</div>
+        <div style="flex:1;min-width:0;">
+          <div class="enquiry-name">Funmi Okafor</div>
+          <div class="enquiry-prop">Luxury 5-Bed Detached · Ikoyi</div>
+          <div class="enquiry-msg">"When can we schedule a viewing? I am very interested in the property..."</div>
+          <div class="enquiry-time">1 hour ago</div>
         </div>
-        <div class="pref-card">
-          <div class="pref-label">Bedrooms</div>
-          <div class="pref-value">3 — 4 bedrooms</div>
+        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
+      </div>
+
+      <div class="enquiry-item">
+        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
+        <div style="flex:1;min-width:0;">
+          <div class="enquiry-name">Kemi Balogun</div>
+          <div class="enquiry-prop">Modern 4-Bed Apartment · Lekki</div>
+          <div class="enquiry-msg">"Thank you for the quick response. I will confirm by end of week..."</div>
+          <div class="enquiry-time">Yesterday, 4:32 PM</div>
         </div>
-        <div class="pref-card">
-          <div class="pref-label">Property type</div>
-          <div class="pref-tags">
-            <span class="pref-tag">Apartment</span>
-            <span class="pref-tag">Flat</span>
-          </div>
-        </div>
-        <div class="pref-card">
-          <div class="pref-label">Move-in date</div>
-          <div class="pref-value">Feb 2026</div>
-        </div>
-        <div class="pref-card">
-          <div class="pref-label">Furnishing</div>
-          <div class="pref-value">Semi-furnished</div>
-        </div>
+        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
       </div>
     </div>
 
-    <hr class="sdiv"/>
+    <hr class="section-divider"/>
 
-    <!-- REVIEWS GIVEN -->
+    <!-- MY LISTINGS -->
     <div class="section">
       <div class="section-head">
-        <div class="section-title">Reviews I've given</div>
-        <button class="section-edit">See all →</button>
+        <div class="section-label">My listings</div>
+        <button class="see-all">
+          See all
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
       </div>
-      <div class="review-given">
-        <div class="rg-header">
-          <div class="rg-avatar">A</div>
-          <div>
-            <div class="rg-landlord">Mr Adeyemi Oluwaseun</div>
-            <div class="rg-prop">Modern 4-Bed Apartment · Lekki</div>
+
+      <div id="myListingsList">
+        <div class="listing-item">
+          <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
+          <div class="listing-info">
+            <div class="listing-name">Modern 4-Bed Apartment</div>
+            <div class="listing-loc">📍 Lekki Phase 1, Lagos</div>
+            <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦3,500,000/yr</span></div>
           </div>
-          <div class="rg-date">Dec 2025</div>
-        </div>
-        <div class="rg-stars">★★★★★</div>
-        <div class="rg-text">"Very responsive landlord. Property was exactly as described. The Domivault inspection gave me complete confidence before I even visited."</div>
-      </div>
-      <div class="review-given">
-        <div class="rg-header">
-          <div class="rg-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">O</div>
-          <div>
-            <div class="rg-landlord">Mrs Okafor</div>
-            <div class="rg-prop">Luxury 5-Bed Detached · Ikoyi</div>
+          <div class="listing-actions">
+            <button class="listing-action-btn" aria-label="Edit listing">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="listing-action-btn" aria-label="More options">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
           </div>
-          <div class="rg-date">Nov 2025</div>
         </div>
-        <div class="rg-stars">★★★★☆</div>
-        <div class="rg-text">"Great experience overall. Landlord was professional and transparent. Would rent again without hesitation."</div>
       </div>
     </div>
 
-    <hr class="sdiv"/>
+    <hr class="section-divider"/>
 
-    <!-- REFERRAL -->
+    <!-- QUICK ACTIONS -->
     <div class="section">
-      <div class="referral-card">
-        <div class="ref-icon">🎁</div>
-        <div>
-          <div class="ref-title">Invite friends to Domivault</div>
-          <div class="ref-sub">Share your referral code and earn rewards when they sign up</div>
-          <div class="ref-code">
-            <div class="ref-code-box">JOMI2026</div>
-            <button class="ref-copy" onclick="navigator.clipboard?.writeText('JOMI2026');this.textContent='Copied!'">Copy</button>
-          </div>
-        </div>
+      <div class="section-head" id="settingsSectionD">
+        <div class="section-label">Quick actions</div>
+      </div>
+      <div class="quick-grid">
+        <button class="quick-btn" onclick="window.location='domivault-property-submission.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Submit listing
+        </button>
+        <button class="quick-btn" onclick="window.location='domivault-landlord-messaging.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          All messages
+        </button>
+        <button class="quick-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Edit profile
+        </button>
+        <button class="quick-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+      </div>
+      <div style="display:flex;gap:1.25rem;justify-content:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;">
+        <a href="domivault-terms-of-service.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Terms of Service</a>
+        <a href="domivault-privacy-policy.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Privacy Policy</a>
       </div>
     </div>
-
-    <hr class="sdiv"/>
-
-    <!-- ACCOUNT SETTINGS -->
-    <div class="section" id="settingsSection">
-      <div class="section-head">
-        <div class="section-title">Account settings</div>
-      </div>
-
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-          <div><div class="si-label">Change password</div><div class="si-sub">Update your account password</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <div><div class="si-label">Verify ID</div><div class="si-sub">Add your NIN to become a verified tenant</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 2H3v16h5l3 3 3-3h5V2z"/></svg></div>
-          <div><div class="si-label">Linked accounts</div><div class="si-sub">Google · Apple</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-      </div>
-
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-          <div><div class="si-label">Push notifications</div><div class="si-sub">New listings, messages, viewings</div></div>
-          <button class="si-toggle on" id="notifToggle" onclick="toggleNotif(this)"><div class="si-toggle-dot"></div></button>
-        </div>
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-          <div><div class="si-label">Email notifications</div><div class="si-sub">Weekly digest and alerts</div></div>
-          <button class="si-toggle on" id="emailToggle" onclick="toggleNotif(this)"><div class="si-toggle-dot"></div></button>
-        </div>
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-          <div><div class="si-label">Location services</div><div class="si-sub">For nearby listings</div></div>
-          <button class="si-toggle" id="locToggle" onclick="toggleNotif(this)"><div class="si-toggle-dot"></div></button>
-        </div>
-      </div>
-
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          <div><div class="si-label">Help & support</div><div class="si-sub">FAQs, contact us, report issue</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-        <div class="settings-item" onclick="window.location='domivault-privacy-policy.html'">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div><div class="si-label">Privacy policy</div><div class="si-sub">How we handle your data</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-        <div class="settings-item" onclick="window.location='domivault-terms-of-service.html'">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div><div class="si-label">Terms of service</div><div class="si-sub">Our terms and conditions</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-      </div>
-
-      <div class="settings-group">
-        <div class="settings-item" onclick="handleLogout()">
-          <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
-          <div><div class="si-label">Log out</div><div class="si-sub">Sign out of your account</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-        <div class="settings-item danger">
-          <div class="si-icon danger-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
-          <div><div class="si-label danger">Delete account</div><div class="si-sub">Permanently delete your Domivault account</div></div>
-          <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
-        </div>
-      </div>
-
-      <div style="text-align:center;padding:1rem 0;font-size:11px;color:rgba(255,255,255,.2);">
-        Domivault v1.0 · domivault.ng · Lagos, Nigeria 🇳🇬
-      </div>
-    </div>
-
-  </main>
+</main>
 </div>
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="bnav-btn" onclick="window.location='domivault-homepage.html'">
+  <button class="bottom-nav-btn active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button class="bottom-nav-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-    <span>Home</span>
+    <span>Listings</span>
   </button>
-  <button class="bnav-btn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <span>Search</span>
-  </button>
-  <button class="bnav-btn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    <span>Saved</span>
-  </button>
-  <button class="bnav-btn" style="position:relative;" onclick="window.location='domivault-messaging.html'">
+  <button class="bottom-nav-btn" style="position:relative;" onclick="window.location='domivault-landlord-messaging.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <div class="bnav-badge">2</div>
+    <div class="bottom-notif-badge">2</div>
     <span>Messages</span>
   </button>
-  <button class="bnav-btn active">
+  <button class="bottom-nav-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
   </button>
 </nav>
 
 <script>
-function toggleNotif(btn) {
-  btn.classList.toggle('on');
-}
-</script>
-
-<script>
+// ── AUTH / IDENTITY ──
 const API_URL = 'https://domivault-backend-production.up.railway.app';
 
 function getToken() {
   return localStorage.getItem('dv_token');
 }
 
-function getUser() {
-  const u = localStorage.getItem('dv_user');
-  return u ? JSON.parse(u) : null;
+// Decodes the JWT payload client-side (no network call) to get the landlord's
+// id/name immediately. ASSUMPTION: payload has `id`/`_id` and `name` — adjust
+// the fallback chains below if your token shape differs.
+function decodeToken(token) {
+  try {
+    const payload = token.split('.')[1];
+    const json = decodeURIComponent(
+      atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(json);
+  } catch (err) {
+    console.error('Failed to decode token:', err);
+    return null;
+  }
 }
 
-async function loadProfile() {
+let MY_LISTINGS = [];
+
+async function initDashboard() {
   const token = getToken();
   if (!token) {
     window.location = 'domivault-complete-onboarding.html';
     return;
   }
 
+  const decoded = decodeToken(token) || {};
+  const landlordId = decoded.id || decoded._id || decoded.userId || decoded.sub;
+  const landlordName = decoded.name || decoded.fullName || 'Landlord';
+
+  document.getElementById('greetingName').textContent = landlordName.split(' ')[0] || landlordName;
+  document.getElementById('navAvatarInitial').textContent = landlordName.charAt(0).toUpperCase();
+
+  await fetchMyListings(landlordId);
+  fetchReviews(token, landlordId); // best-effort — see note in fetchReviews
+}
+
+function statusInfo(p) {
+  if (p.status === 'rejected') return { cls: 'status-rejected', label: '✕ Rejected' };
+  if (p.isInspected) return { cls: 'status-live', label: '● Live' };
+  return { cls: 'status-pending', label: '⏳ Pending' };
+}
+
+async function fetchMyListings(landlordId) {
   try {
-    const res = await fetch(API_URL + '/api/auth/me', {
+    // Reuses the same /api/properties endpoint the homepage already uses
+    // successfully, then filters to this landlord client-side — avoids
+    // guessing at a separate "my listings" route that might not exist.
+    const res = await fetch(API_URL + '/api/properties');
+    const data = await res.json();
+
+    MY_LISTINGS = data.filter(p => {
+      const lid = p.landlord && (p.landlord._id || p.landlord.id || p.landlord);
+      return String(lid) === String(landlordId);
+    });
+
+    renderStats();
+    renderListings();
+    renderPerformance();
+  } catch (err) {
+    console.error('Failed to load listings:', err);
+  }
+}
+
+function renderStats() {
+  document.getElementById('statTotalListings').textContent = MY_LISTINGS.length;
+  document.getElementById('statLiveActive').textContent = MY_LISTINGS.filter(p => p.isInspected).length;
+  // NOTE: "Total enquiries" and "Average rating" stat cards are still static —
+  // they depend on the enquiries/reviews endpoints, not yet confirmed.
+}
+
+function renderListings() {
+  const wrap = document.getElementById('myListingsList');
+  if (!wrap) return;
+
+  if (MY_LISTINGS.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.35);font-size:13px;">No listings yet. Submit your first property to get started.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = MY_LISTINGS.map(p => {
+    const s = statusInfo(p);
+    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
+    const price = '\u20a6' + (p.price || 0).toLocaleString('en-NG') + '/yr';
+    return `
+    <div class="listing-item" onclick="window.location='domivault-listing-detail.html?id=${p._id}'">
+      <div class="listing-thumb"><img src="${img}" alt="${p.title}" loading="lazy"/></div>
+      <div class="listing-info">
+        <div class="listing-name">${p.title}</div>
+        <div class="listing-loc">📍 ${p.location ? p.location.area + ', Lagos' : ''}</div>
+        <div class="listing-meta">
+          <span class="status-pill ${s.cls}">${s.label}</span>
+          ${p.isInspected ? `<span class="listing-price">${price}</span>` : ''}
+        </div>
+      </div>
+      <div class="listing-actions">
+        <button class="listing-action-btn" aria-label="Edit listing" onclick="event.stopPropagation();window.location='domivault-property-submission.html?id=${p._id}'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="listing-action-btn" aria-label="More options" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPerformance() {
+  const wrap = document.getElementById('listingPerfList');
+  if (!wrap) return;
+
+  if (MY_LISTINGS.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.35);font-size:13px;">Performance stats will appear once you have listings.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = MY_LISTINGS.map(p => {
+    const s = statusInfo(p);
+    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
+    // ASSUMPTION: `views` / `enquiriesCount` aren't confirmed fields on the
+    // property object yet — shows "—" until the backend returns them.
+    const views = typeof p.views === 'number' ? p.views : null;
+    const enquiries = typeof p.enquiriesCount === 'number' ? p.enquiriesCount : null;
+    const conv = (views && enquiries) ? ((enquiries / views) * 100).toFixed(1) + '%' : '—';
+
+    return `
+    <div class="perf-card">
+      <div class="perf-header">
+        <div class="perf-thumb"><img src="${img}" alt="${p.title}" loading="lazy"/></div>
+        <div style="flex:1;min-width:0;">
+          <div class="perf-name">${p.title}</div>
+          <div class="perf-loc">📍 ${p.location ? p.location.area + ', Lagos' : ''}</div>
+        </div>
+        <div class="perf-status"><span class="status-pill ${s.cls}">${s.label}</span></div>
+      </div>
+      <div class="perf-metrics">
+        <div class="perf-metric"><div class="perf-metric-num">${views ?? '—'}</div><div class="perf-metric-label">Views</div></div>
+        <div class="perf-metric"><div class="perf-metric-num">${enquiries ?? '—'}</div><div class="perf-metric-label">Enquiries</div></div>
+        <div class="perf-metric"><div class="perf-metric-num">${conv}</div><div class="perf-metric-label">Conv. rate</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchReviews(token, landlordId) {
+  try {
+    // ASSUMPTION: this endpoint isn't confirmed — adjust the path and the
+    // field names inside renderReviews() to match your actual reviews route.
+    const res = await fetch(API_URL + '/api/reviews?landlord=' + landlordId, {
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    const user = await res.json();
-
-    if (!res.ok) {
-      window.location = 'domivault-complete-onboarding.html';
-      return;
-    }
-
-    // Update avatar initial
-    const avatar = document.getElementById('profileAvatar');
-    if (avatar) avatar.textContent = user.name.charAt(0).toUpperCase();
-
-    // Update nav avatar
-    const navAvatar = document.querySelector('.navAvatar');
-    if (navAvatar) navAvatar.textContent = user.name.charAt(0).toUpperCase();
-
-    // Update name
-    const nameEls = document.querySelectorAll('.ph-name');
-    nameEls.forEach(el => el.textContent = user.name);
-
-    // Update email
-    const emailEls = document.querySelectorAll('.ph-email');
-    emailEls.forEach(el => el.textContent = user.email);
-
-    // Update info section
-    const infoValues = document.querySelectorAll('.info-value');
-    if (infoValues[0]) infoValues[0].textContent = user.name;
-    if (infoValues[1]) infoValues[1].textContent = user.email;
-    if (infoValues[2]) infoValues[2].textContent = user.phone || 'Not set';
-
-    // Update member since
-    const memberSince = document.getElementById('memberSince');
-    if (memberSince && user.createdAt) {
-      const date = new Date(user.createdAt);
-      const month = date.toLocaleString('en-US', { month: 'short' });
-      const year = date.getFullYear();
-      memberSince.textContent = '⭐ Member since ' + month + ' ' + year;
-    }
-
-    // Save to localStorage
-    localStorage.setItem('dv_user', JSON.stringify(user));
-
+    if (!res.ok) throw new Error('status ' + res.status);
+    const reviews = await res.json();
+    renderReviews(Array.isArray(reviews) ? reviews : (reviews.reviews || []));
   } catch (err) {
-    console.error('Failed to load profile:', err);
+    // Fails quietly and leaves the placeholder reviews in place — this
+    // endpoint hasn't been confirmed against your backend yet.
+    console.warn('Reviews endpoint not connected yet, showing placeholder data:', err.message);
   }
 }
 
-function handleLogout() {
-  if (confirm('Are you sure you want to log out?')) {
-    localStorage.removeItem('dv_token');
-    localStorage.removeItem('dv_user');
-    window.location = 'domivault-with-images.html';
+function renderReviews(reviews) {
+  const wrap = document.getElementById('reviewsList');
+  if (!wrap) return;
+
+  if (reviews.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.35);font-size:13px;">No reviews yet.</div>`;
+    document.getElementById('reviewBigNum').textContent = '—';
+    document.getElementById('reviewBigStars').textContent = '';
+    document.getElementById('reviewBigLabel').textContent = '0 reviews';
+    return;
   }
+
+  const avg = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+  document.getElementById('reviewBigNum').textContent = avg.toFixed(1);
+  document.getElementById('reviewBigStars').textContent = '★★★★★'.slice(0, Math.round(avg));
+  document.getElementById('reviewBigLabel').textContent = reviews.length + ' review' + (reviews.length !== 1 ? 's' : '');
+  document.getElementById('statAvgRating').textContent = avg.toFixed(1);
+
+  wrap.innerHTML = reviews.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">${(r.tenantName || '?').charAt(0)}</div>
+        <div><div class="review-name">${r.tenantName || 'Tenant'}</div></div>
+        <div class="review-date">${r.date || ''}</div>
+      </div>
+      <div class="review-stars">${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</div>
+      <div class="review-prop">${r.propertyName || ''}</div>
+      <div class="review-text">"${r.text || ''}"</div>
+    </div>
+  `).join('');
 }
 
-loadProfile();
+initDashboard();
+
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const viewsData   = { lekki:[28,35,42,38,55,67,82], ikoyi:[18,22,30,25,40,48,60] };
+const enqData     = { lekki:[2,3,4,3,5,6,8],         ikoyi:[1,2,3,2,4,4,6] };
+let chart;
+
+function buildChart(tab) {
+  const ctx = document.getElementById('analyticsChart').getContext('2d');
+  if (chart) chart.destroy();
+  const d1 = tab === 'views' ? viewsData.lekki : enqData.lekki;
+  const d2 = tab === 'views' ? viewsData.ikoyi : enqData.ikoyi;
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [
+        {
+          label: 'Lekki 4-Bed', data: d1,
+          borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.08)',
+          tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517',
+          fill: true, borderWidth: 2
+        },
+        {
+          label: 'Ikoyi 5-Bed', data: d2,
+          borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)',
+          tension: 0.4, pointRadius: 4, pointBackgroundColor: '#185FA5',
+          fill: true, borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,22,40,0.95)',
+          titleColor: 'rgba(255,255,255,0.7)',
+          bodyColor: 'white',
+          borderColor: 'rgba(186,117,23,0.3)',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function setChartTab(btn, tab) {
+  document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('chartTitle').textContent = tab === 'views'
+    ? 'Total listing views — last 7 days'
+    : 'Enquiries received — last 7 days';
+  buildChart(tab);
+}
+
+buildChart('views');
 </script>
 </body>
 </html>
