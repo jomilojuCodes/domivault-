@@ -372,7 +372,7 @@ body {
 <!-- TOP NAV -->
 <nav class="topnav">
   <div class="nav-left">
-    <a class="nav-logo" href="domivault-landlord-dashboard.html">
+    <a class="nav-logo" href="domivault-with-images.html">
       <svg viewBox="0 0 34 38" fill="none">
         <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
         <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
@@ -393,7 +393,7 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="nav-notif-badge">3</div>
     </button>
-    <div class="nav-avatar" id="navAvatarInitial">A</div>
+    <div class="nav-avatar">A</div>
   </div>
 </nav>
 
@@ -441,7 +441,7 @@ body {
   <main class="content">
 
     <!-- HEADER -->
-    <div class="page-greeting" id="profileSection">Good morning, <span id="greetingName">Landlord</span> 👋</div>
+    <div class="page-greeting" id="profileSection">Good morning, <span>Mr Adeyemi 👋</span></div>
     <div class="page-title">Your dashboard</div>
     <div class="verified-pill">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -450,20 +450,21 @@ body {
 <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card gold">
-        <div class="stat-num" id="statTotalListings">—</div>
+        <div class="stat-num">3</div>
         <div class="stat-label">Total listings</div>
+        <div class="stat-trend">↑ 1 this month</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" id="statLiveActive">—</div>
+        <div class="stat-num">2</div>
         <div class="stat-label">Live & active</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" id="statTotalEnquiries">14</div>
+        <div class="stat-num">14</div>
         <div class="stat-label">Total enquiries</div>
         <div class="stat-trend">↑ 4 this week</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" id="statAvgRating">4.8</div>
+        <div class="stat-num">4.8</div>
         <div class="stat-label">Average rating</div>
         <div class="stat-trend">★★★★★</div>
       </div>
@@ -512,25 +513,62 @@ days</div>
         </button>
       </div>
 
-      <div id="listingPerfList">
-        <div class="perf-card">
-          <div class="perf-header">
-            <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
-            <div style="flex:1;min-width:0;">
-              <div class="perf-name">Modern 4-Bed Apartment</div>
-              <div class="perf-loc">📍 Lekki Phase 1, Lagos</div>
-            </div>
-            <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
+      <div class="perf-card">
+        <div class="perf-header">
+          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
+          <div style="flex:1;min-width:0;">
+            <div class="perf-name">Modern 4-Bed Apartment</div>
+            <div class="perf-loc">📍 Lekki Phase 1, Lagos</div>
           </div>
-          <div class="perf-metrics">
-            <div class="perf-metric"><div class="perf-metric-num">247</div><div class="perf-metric-label">Views</div></div>
-            <div class="perf-metric"><div class="perf-metric-num">8</div><div class="perf-metric-label">Enquiries</div></div>
-            <div class="perf-metric"><div class="perf-metric-num">3.2%</div><div class="perf-metric-label">Conv. rate</div></div>
+          <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
+        </div>
+        <div class="perf-metrics">
+          <div class="perf-metric"><div class="perf-metric-num">247</div><div class="perf-metric-label">Views</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">8</div><div class="perf-metric-label">Enquiries</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">3.2%</div><div class="perf-metric-label">Conv. rate</div></div>
+        </div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-label"><span>Views this week</span><span>247 / 300 target</span></div>
+          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:82%;"></div></div>
+        </div>
+      </div>
+
+      <div class="perf-card">
+        <div class="perf-header">
+          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70" alt="Ikoyi house" loading="lazy"/></div>
+          <div style="flex:1;min-width:0;">
+            <div class="perf-name">Luxury 5-Bed Detached</div>
+            <div class="perf-loc">📍 Ikoyi, Lagos</div>
           </div>
-          <div class="perf-bar-wrap">
-            <div class="perf-bar-label"><span>Views this week</span><span>247 / 300 target</span></div>
-            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:82%;"></div></div>
+          <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
+        </div>
+        <div class="perf-metrics">
+          <div class="perf-metric"><div class="perf-metric-num">183</div><div class="perf-metric-label">Views</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">6</div><div class="perf-metric-label">Enquiries</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">3.3%</div><div class="perf-metric-label">Conv. rate</div></div>
+        </div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-label"><span>Views this week</span><span>183 / 300 target</span></div>
+          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:61%;"></div></div>
+        </div>
+      </div>
+<div class="perf-card">
+        <div class="perf-header">
+          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi" loading="lazy"/></div>
+          <div style="flex:1;min-width:0;">
+            <div class="perf-name">3-Bed Semi-Detached</div>
+            <div class="perf-loc">📍 Lekki Phase 2, Lagos</div>
           </div>
+          <div class="perf-status"><span class="status-pill status-pending">⏳ Pending</span></div>
+        </div>
+        <div class="perf-metrics">
+          <div class="perf-metric"><div class="perf-metric-num">0</div><div class="perf-metric-label">Views</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">0</div><div class="perf-metric-label">Enquiries</div></div>
+          <div class="perf-metric"><div class="perf-metric-num">—</div><div class="perf-metric-label">Conv. rate</div></div>
+        </div>
+        <div class="perf-bar-wrap">
+          <div class="perf-bar-label"><span>Awaiting inspection before going live</span><span></span></div>
+          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:0%;"></div></div>
         </div>
       </div>
     </div>
@@ -549,9 +587,9 @@ days</div>
 
       <div class="review-summary">
         <div>
-          <div class="review-big-num" id="reviewBigNum">4.8</div>
-          <div class="review-big-stars" id="reviewBigStars">★★★★★</div>
-          <div class="review-big-label" id="reviewBigLabel">12 reviews</div>
+          <div class="review-big-num">4.8</div>
+          <div class="review-big-stars">★★★★★</div>
+          <div class="review-big-label">12 reviews</div>
         </div>
         <div class="review-bars">
           <div class="review-bar-row"><div class="review-bar-star">5</div><div class="review-bar-track"><div class="review-bar-fill" style="width:75%;"></div></div></div>
@@ -562,8 +600,7 @@ days</div>
         </div>
       </div>
 
-<div id="reviewsList">
-      <div class="review-card">
+<div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div>
           <div><div class="review-name">Tunde A.</div></div>
@@ -595,7 +632,6 @@ days</div>
         <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
         <div class="review-text">"After being scammed elsewhere, Domivault was a breath of fresh air. Landlord was honest and the process was completely transparent."</div>
       </div>
-</div>
     </div>
 
     <hr class="section-divider"/>
@@ -676,22 +712,53 @@ days</div>
         </button>
       </div>
 
-      <div id="myListingsList">
-        <div class="listing-item">
-          <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
-          <div class="listing-info">
-            <div class="listing-name">Modern 4-Bed Apartment</div>
-            <div class="listing-loc">📍 Lekki Phase 1, Lagos</div>
-            <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦3,500,000/yr</span></div>
-          </div>
-          <div class="listing-actions">
-            <button class="listing-action-btn" aria-label="Edit listing">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <button class="listing-action-btn" aria-label="More options">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-            </button>
-          </div>
+      <div class="listing-item">
+        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
+        <div class="listing-info">
+          <div class="listing-name">Modern 4-Bed Apartment</div>
+          <div class="listing-loc">📍 Lekki Phase 1, Lagos</div>
+          <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦3,500,000/yr</span></div>
+        </div>
+        <div class="listing-actions">
+          <button class="listing-action-btn" aria-label="Edit listing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="listing-action-btn" aria-label="More options">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </div>
+<div class="listing-item">
+        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70" alt="Ikoyi house" loading="lazy"/></div>
+        <div class="listing-info">
+          <div class="listing-name">Luxury 5-Bed Detached</div>
+          <div class="listing-loc">📍 Ikoyi, Lagos</div>
+          <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦12,000,000/yr</span></div>
+        </div>
+        <div class="listing-actions">
+          <button class="listing-action-btn" aria-label="Edit listing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="listing-action-btn" aria-label="More options">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="listing-item">
+        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi" loading="lazy"/></div>
+        <div class="listing-info">
+          <div class="listing-name">3-Bed Semi-Detached</div>
+          <div class="listing-loc">📍 Lekki Phase 2, Lagos</div>
+          <div class="listing-meta"><span class="status-pill status-pending">⏳ Awaiting inspection</span></div>
+        </div>
+        <div class="listing-actions">
+          <button class="listing-action-btn" aria-label="Edit listing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+</button>
+          <button class="listing-action-btn" aria-label="More options">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
         </div>
       </div>
     </div>
@@ -751,210 +818,6 @@ days</div>
 </nav>
 
 <script>
-// ── AUTH / IDENTITY ──
-const API_URL = 'https://domivault-backend-production.up.railway.app';
-
-function getToken() {
-  return localStorage.getItem('dv_token');
-}
-
-// Decodes the JWT payload client-side (no network call) to get the landlord's
-// id/name immediately. ASSUMPTION: payload has `id`/`_id` and `name` — adjust
-// the fallback chains below if your token shape differs.
-function decodeToken(token) {
-  try {
-    const payload = token.split('.')[1];
-    const json = decodeURIComponent(
-      atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(json);
-  } catch (err) {
-    console.error('Failed to decode token:', err);
-    return null;
-  }
-}
-
-let MY_LISTINGS = [];
-
-async function initDashboard() {
-  const token = getToken();
-  if (!token) {
-    window.location = 'domivault-complete-onboarding.html';
-    return;
-  }
-
-  const decoded = decodeToken(token) || {};
-  const landlordId = decoded.id || decoded._id || decoded.userId || decoded.sub;
-  const landlordName = decoded.name || decoded.fullName || 'Landlord';
-
-  document.getElementById('greetingName').textContent = landlordName.split(' ')[0] || landlordName;
-  document.getElementById('navAvatarInitial').textContent = landlordName.charAt(0).toUpperCase();
-
-  await fetchMyListings(landlordId);
-  fetchReviews(token, landlordId); // best-effort — see note in fetchReviews
-}
-
-function statusInfo(p) {
-  if (p.status === 'rejected') return { cls: 'status-rejected', label: '✕ Rejected' };
-  if (p.isInspected) return { cls: 'status-live', label: '● Live' };
-  return { cls: 'status-pending', label: '⏳ Pending' };
-}
-
-async function fetchMyListings(landlordId) {
-  try {
-    // Reuses the same /api/properties endpoint the homepage already uses
-    // successfully, then filters to this landlord client-side — avoids
-    // guessing at a separate "my listings" route that might not exist.
-    const res = await fetch(API_URL + '/api/properties');
-    const data = await res.json();
-
-    MY_LISTINGS = data.filter(p => {
-      const lid = p.landlord && (p.landlord._id || p.landlord.id || p.landlord);
-      return String(lid) === String(landlordId);
-    });
-
-    renderStats();
-    renderListings();
-    renderPerformance();
-  } catch (err) {
-    console.error('Failed to load listings:', err);
-  }
-}
-
-function renderStats() {
-  document.getElementById('statTotalListings').textContent = MY_LISTINGS.length;
-  document.getElementById('statLiveActive').textContent = MY_LISTINGS.filter(p => p.isInspected).length;
-  // NOTE: "Total enquiries" and "Average rating" stat cards are still static —
-  // they depend on the enquiries/reviews endpoints, not yet confirmed.
-}
-
-function renderListings() {
-  const wrap = document.getElementById('myListingsList');
-  if (!wrap) return;
-
-  if (MY_LISTINGS.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.35);font-size:13px;">No listings yet. Submit your first property to get started.</div>`;
-    return;
-  }
-
-  wrap.innerHTML = MY_LISTINGS.map(p => {
-    const s = statusInfo(p);
-    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
-    const price = '\u20a6' + (p.price || 0).toLocaleString('en-NG') + '/yr';
-    return `
-    <div class="listing-item" onclick="window.location='domivault-listing-detail.html?id=${p._id}'">
-      <div class="listing-thumb"><img src="${img}" alt="${p.title}" loading="lazy"/></div>
-      <div class="listing-info">
-        <div class="listing-name">${p.title}</div>
-        <div class="listing-loc">📍 ${p.location ? p.location.area + ', Lagos' : ''}</div>
-        <div class="listing-meta">
-          <span class="status-pill ${s.cls}">${s.label}</span>
-          ${p.isInspected ? `<span class="listing-price">${price}</span>` : ''}
-        </div>
-      </div>
-      <div class="listing-actions">
-        <button class="listing-action-btn" aria-label="Edit listing" onclick="event.stopPropagation();window.location='domivault-property-submission.html?id=${p._id}'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="listing-action-btn" aria-label="More options" onclick="event.stopPropagation()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderPerformance() {
-  const wrap = document.getElementById('listingPerfList');
-  if (!wrap) return;
-
-  if (MY_LISTINGS.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.35);font-size:13px;">Performance stats will appear once you have listings.</div>`;
-    return;
-  }
-
-  wrap.innerHTML = MY_LISTINGS.map(p => {
-    const s = statusInfo(p);
-    const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
-    // ASSUMPTION: `views` / `enquiriesCount` aren't confirmed fields on the
-    // property object yet — shows "—" until the backend returns them.
-    const views = typeof p.views === 'number' ? p.views : null;
-    const enquiries = typeof p.enquiriesCount === 'number' ? p.enquiriesCount : null;
-    const conv = (views && enquiries) ? ((enquiries / views) * 100).toFixed(1) + '%' : '—';
-
-    return `
-    <div class="perf-card">
-      <div class="perf-header">
-        <div class="perf-thumb"><img src="${img}" alt="${p.title}" loading="lazy"/></div>
-        <div style="flex:1;min-width:0;">
-          <div class="perf-name">${p.title}</div>
-          <div class="perf-loc">📍 ${p.location ? p.location.area + ', Lagos' : ''}</div>
-        </div>
-        <div class="perf-status"><span class="status-pill ${s.cls}">${s.label}</span></div>
-      </div>
-      <div class="perf-metrics">
-        <div class="perf-metric"><div class="perf-metric-num">${views ?? '—'}</div><div class="perf-metric-label">Views</div></div>
-        <div class="perf-metric"><div class="perf-metric-num">${enquiries ?? '—'}</div><div class="perf-metric-label">Enquiries</div></div>
-        <div class="perf-metric"><div class="perf-metric-num">${conv}</div><div class="perf-metric-label">Conv. rate</div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function fetchReviews(token, landlordId) {
-  try {
-    // ASSUMPTION: this endpoint isn't confirmed — adjust the path and the
-    // field names inside renderReviews() to match your actual reviews route.
-    const res = await fetch(API_URL + '/api/reviews?landlord=' + landlordId, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (!res.ok) throw new Error('status ' + res.status);
-    const reviews = await res.json();
-    renderReviews(Array.isArray(reviews) ? reviews : (reviews.reviews || []));
-  } catch (err) {
-    // Fails quietly and leaves the placeholder reviews in place — this
-    // endpoint hasn't been confirmed against your backend yet.
-    console.warn('Reviews endpoint not connected yet, showing placeholder data:', err.message);
-  }
-}
-
-function renderReviews(reviews) {
-  const wrap = document.getElementById('reviewsList');
-  if (!wrap) return;
-
-  if (reviews.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.35);font-size:13px;">No reviews yet.</div>`;
-    document.getElementById('reviewBigNum').textContent = '—';
-    document.getElementById('reviewBigStars').textContent = '';
-    document.getElementById('reviewBigLabel').textContent = '0 reviews';
-    return;
-  }
-
-  const avg = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
-  document.getElementById('reviewBigNum').textContent = avg.toFixed(1);
-  document.getElementById('reviewBigStars').textContent = '★★★★★'.slice(0, Math.round(avg));
-  document.getElementById('reviewBigLabel').textContent = reviews.length + ' review' + (reviews.length !== 1 ? 's' : '');
-  document.getElementById('statAvgRating').textContent = avg.toFixed(1);
-
-  wrap.innerHTML = reviews.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">${(r.tenantName || '?').charAt(0)}</div>
-        <div><div class="review-name">${r.tenantName || 'Tenant'}</div></div>
-        <div class="review-date">${r.date || ''}</div>
-      </div>
-      <div class="review-stars">${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</div>
-      <div class="review-prop">${r.propertyName || ''}</div>
-      <div class="review-text">"${r.text || ''}"</div>
-    </div>
-  `).join('');
-}
-
-initDashboard();
-
 const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const viewsData   = { lekki:[28,35,42,38,55,67,82], ikoyi:[18,22,30,25,40,48,60] };
 const enqData     = { lekki:[2,3,4,3,5,6,8],         ikoyi:[1,2,3,2,4,4,6] };
