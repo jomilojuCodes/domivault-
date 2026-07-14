@@ -645,14 +645,77 @@ function simulateDocUpload(id) {
   document.getElementById(id).classList.add('uploaded');
 }
 
-function submitListing() {
-  populateReview();
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('stepSuccess').classList.add('active');
-  document.getElementById('progressWrap').style.display = 'none';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+function getToken() { return localStorage.getItem('dv_token'); }
 
+async function submitListing() {
+  const token = getToken();
+  if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
+
+  const title = document.getElementById('listingTitle').value.trim();
+  const description = document.getElementById('propDesc').value.trim();
+  const price = document.getElementById('annualRent').value;
+  const address = document.getElementById('propAddress').value.trim();
+  const area = document.getElementById('propArea').value;
+  const state = document.getElementById('propState').value;
+  const landmarks = document.getElementById('propLandmarks').value.trim();
+  const size = document.getElementById('propSize').value;
+  const furnishing = document.getElementById('furnishing').value;
+
+  if (!title || !description || !price || !address || !area || !selectedType) {
+    alert('Please fill in all required fields before submitting.');
+    return;
+  }
+
+  const btn = document.querySelector('#step6 .bp');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('type', selectedType);
+    formData.append('bedrooms', stepperValues.bedrooms);
+    formData.append('bathrooms', stepperValues.bathrooms);
+    formData.append('parking', stepperValues.parking);
+    formData.append('size', size || 0);
+    formData.append('furnishing', furnishing);
+    formData.append('amenities', selectedAmenities.join(','));
+    formData.append('address', address);
+    formData.append('area', area);
+    formData.append('state', state || 'Lagos');
+    formData.append('landmarks', landmarks);
+
+    const res = await fetch(API_URL + '/api/properties', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || 'Submission failed. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Submit for Inspection →';
+      return;
+    }
+
+    populateReview();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('stepSuccess').classList.add('active');
+    document.getElementById('progressWrap').style.display = 'none';
+    window.scrollTo({top:0,behavior:'smooth'});
+
+  } catch (err) {
+    console.error('Submission error:', err);
+    alert('Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit for Inspection →';
+  }
+}
 function populateReview() {
   const title = document.getElementById('listingTitle').value || 'Untitled listing';
   const beds = stepperValues.bedrooms;
