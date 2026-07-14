@@ -7,377 +7,126 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --navy: #0a1628;
-  --navy-mid: #132040;
-  --navy-light: #1c2f52;
-  --gold: #BA7517;
-  --gold-light: #EF9F27;
-  --stone: #888780;
-  --white: #ffffff;
-  --success: #2ecc71;
-  --error: #e05252;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'DM Sans', sans-serif;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --transition: 0.25s ease;
-}
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--sans);
-  background: var(--navy);
-  color: var(--white);
-  overflow-x: hidden;
-  padding-bottom: 72px;
-}
-
-/* ── TOP NAV ── */
-.topnav {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 5%;
-  background: rgba(10,22,40,0.96);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(186,117,23,0.15);
-}
-
-.nav-left { display: flex; align-items: center; gap: 10px; }
-.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.nav-logo svg { width: 28px; height: 32px; flex-shrink: 0; }
-.nav-wordmark { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--white); }
-.nav-wordmark span { color: var(--gold); }
-.nav-role { font-size: 11px; color: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.1); }
-
-.nav-right { display: flex; align-items: center; gap: 10px; }
-.nav-icon-btn {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--white); position: relative;
-  transition: background var(--transition);
-}
-.nav-icon-btn:hover { background: rgba(255,255,255,0.12); }
-.nav-icon-btn svg { width: 17px; height: 17px; }
-.nav-notif-badge {
-  position: absolute; top: -3px; right: -3px;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--gold); color: var(--navy);
-  font-size: 9px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--navy);
-}
-.nav-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--navy-light) 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-size: 1rem; font-weight: 700;
-  color: var(--navy); cursor: pointer; border: 2px solid rgba(186,117,23,0.3);
-}
-
-/* ── MAIN LAYOUT ── */
-.main-layout { display: flex; }
-
-/* ── DESKTOP SIDEBAR ── */
-.sidebar {
-  display: none;
-  width: 240px; flex-shrink: 0;
-  background: var(--navy-mid);
-  border-right: 1px solid rgba(186,117,23,0.12);
-  padding: 1.5rem 1rem;
-  position: sticky; top: 65px;
-  height: calc(100vh - 65px);
-  overflow-y: auto;
-}
-.sidebar::-webkit-scrollbar { width: 0; }
-
-.sidebar-nav { display: flex; flex-direction: column; gap: 4px; margin-bottom: 2rem; }
-.sidebar-btn {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0.75rem 1rem; border-radius: var(--radius-sm);
-  background: none; border: none; color: rgba(255,255,255,0.45);
-  cursor: pointer; font-family: var(--sans); font-size: 13px;
-  transition: all 0.2s; text-align: left; width: 100%;
-}
-.sidebar-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
-.sidebar-btn.active { background: rgba(186,117,23,0.1); color: var(--gold); font-weight: 500; }
-.sidebar-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
-.sidebar-badge { margin-left: auto; background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 100px; }
-
-.sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1rem 0; }
-.sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.2); padding: 0.5rem 1rem 0.4rem; }
-
-/* ── CONTENT ── */
-.content { flex: 1; min-width: 0; padding: 1.75rem 5%; max-width: 860px; margin: 0 auto; }
-
-/* ── HEADER ── */
-.page-greeting { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
-.page-greeting span { color: var(--gold); font-weight: 500; }
-.page-title { font-family: var(--serif); font-size: clamp(1.5rem,4vw,2rem); font-weight: 700; margin-bottom: 1rem; }
-.verified-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.25);
-  color: var(--success); font-size: 11px; font-weight: 600;
-  padding: 4px 12px; border-radius: 100px; margin-bottom: 1.5rem;
-}
-.verified-pill svg { width: 13px; height: 13px; }
-
-/* ── STATS GRID ── */
-.stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 1.5rem; }
-.stat-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--radius); padding: 1.1rem;
-}
-.stat-card.gold { border-color: rgba(186,117,23,0.3); background: rgba(186,117,23,0.05); }
-.stat-num { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: rgba(255,255,255,0.4); }
-.stat-trend { font-size: 11px; color: var(--success); margin-top: 4px; }
-
-/* ── ADD LISTING BTN ── */
-.add-listing-btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: var(--gold); color: var(--navy);
-  border: none; border-radius: var(--radius-sm);
-  padding: 0.75rem 1.5rem; font-family: var(--sans);
-  font-size: 14px; font-weight: 600; cursor: pointer;
-  margin-bottom: 1.75rem; transition: background var(--transition);
-}
-.add-listing-btn:hover { background: var(--gold-light); }
-.add-listing-btn svg { width: 16px; height: 16px; }
-
-/* ── SECTION ── */
-.section { margin-bottom: 2rem; }
-.section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 2rem; }
-.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.section-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; }
-.see-all { font-size: 12px; color: var(--gold); background: none; border: none; cursor: pointer; font-family: var(--sans); display: flex; align-items: center; gap: 4px; }
-.see-all svg { width: 13px; height: 13px; }
-
-/* ── ANALYTICS CHART ── */
-.chart-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--radius); padding: 1.25rem;
-}
-.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
-.chart-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
-.chart-tabs { display: flex; gap: 5px; }
-.chart-tab {
-  font-size: 11px; padding: 4px 10px; border-radius: 100px;
-  background: rgba(255,255,255,0.06); border: 1px solid transparent;
-  color: rgba(255,255,255,0.4); cursor: pointer; font-family: var(--sans);
-  transition: all 0.2s;
-}
-.chart-tab.active { background: rgba(186,117,23,0.15); color: var(--gold-light); border-color: rgba(186,117,23,0.3); }
-.chart-wrap { position: relative; height: 200px; }
-.chart-legend { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-.chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.4); }
-.chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-/* ── LISTING PERFORMANCE ── */
-.perf-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--radius); padding: 1.1rem;
-  margin-bottom: 10px; transition: border-color var(--transition);
-}
-.perf-card:hover { border-color: rgba(186,117,23,0.2); }
-.perf-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
-.perf-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
-.perf-thumb img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
-.perf-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-.perf-loc { font-size: 11px; color: rgba(255,255,255,0.35); }
-.perf-status { margin-left: auto; flex-shrink: 0; }
-.perf-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 0.85rem; }
-.perf-metric { background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); padding: 0.6rem; text-align: center; }
-.perf-metric-num { font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 2px; }
-.perf-metric-label { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.05em; }
-.perf-bar-wrap {}
-.perf-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 5px; }
-.perf-bar-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
-.perf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width 1s ease; }
-
-/* ── STATUS PILLS ── */
-.status-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 100px; }
-.status-live { background: rgba(46,204,113,0.12); color: var(--success); border: 1px solid rgba(46,204,113,0.25); }
-.status-pending { background: rgba(186,117,23,0.12); color: var(--gold-light); border: 1px solid rgba(186,117,23,0.25); }
-.status-rejected { background: rgba(224,82,82,0.12); color: var(--error); border: 1px solid rgba(224,82,82,0.25); }
-.status-draft { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
-
-/* ── REVIEWS ── */
-.review-summary {
-  display: flex; align-items: center; gap: 1.25rem;
-  background: rgba(186,117,23,0.05);
-  border: 1px solid rgba(186,117,23,0.15);
-  border-radius: var(--radius); padding: 1.25rem;
-  margin-bottom: 1rem;
-}
-.review-big-num { font-family: var(--serif); font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; }
-.review-big-stars { color: var(--gold); font-size: 14px; margin-top: 4px; }
-.review-big-label { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
-.review-bars { flex: 1; }
-.review-bar-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-.review-bar-star { font-size: 10px; color: rgba(255,255,255,0.35); width: 14px; text-align: right; }
-.review-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
-.review-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; }
-
-.review-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius); padding: 1rem;
-  margin-bottom: 10px;
-}
-.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.review-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
-.review-name { font-size: 13px; font-weight: 500; }
-.review-date { font-size: 11px; color: rgba(255,255,255,0.28); margin-left: auto; }
-.review-stars { color: var(--gold); font-size: 12px; margin-bottom: 4px; }
-.review-prop { font-size: 10px; color: var(--gold); margin-bottom: 6px; }
-.review-text { font-size: 13px; color: rgba(255,255,255,0.48); line-height: 1.7; }
-
-/* ── LISTINGS ── */
-.listing-item {
-  display: flex; align-items: center; gap: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius); padding: 1rem;
-  margin-bottom: 10px; cursor: pointer;
-  transition: border-color var(--transition);
-}
-.listing-item:hover { border-color: rgba(186,117,23,0.3); }
-.listing-thumb { width: 54px; height: 54px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
-.listing-thumb img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); }
-.listing-info { flex: 1; min-width: 0; }
-.listing-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.listing-loc { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
-.listing-meta { display: flex; align-items: center; gap: 7px; }
-.listing-price { font-size: 11px; color: var(--gold); font-weight: 500; }
-.listing-actions { display: flex; gap: 6px; flex-shrink: 0; }
-.listing-action-btn {
-  width: 28px; height: 28px; border-radius: 6px;
-  background: rgba(255,255,255,0.06); border: none;
-  color: rgba(255,255,255,0.5); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--transition);
-}
-.listing-action-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
-.listing-action-btn svg { width: 14px; height: 14px; }
-
-/* ── INSPECTION ── */
-.insp-item {
-  display: flex; align-items: flex-start; gap: 12px;
-  background: rgba(186,117,23,0.05);
-  border: 1px solid rgba(186,117,23,0.15);
-  border-radius: var(--radius); padding: 1rem;
-  margin-bottom: 10px;
-}
-.insp-icon {
-  width: 40px; height: 40px; border-radius: var(--radius-sm); flex-shrink: 0;
-  background: rgba(186,117,23,0.12);
-  display: flex; align-items: center; justify-content: center;
-}
-.insp-icon svg { width: 20px; height: 20px; color: var(--gold); }
-.insp-prop { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
-.insp-date { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
-.insp-status { font-size: 11px; color: var(--gold-light); font-weight: 600; }
-
-/* ── ENQUIRIES ── */
-.enquiry-item {
-  display: flex; align-items: flex-start; gap: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: var(--radius); padding: 1rem;
-  margin-bottom: 10px; cursor: pointer; position: relative;
-  transition: border-color var(--transition);
-}
-.enquiry-item:hover { border-color: rgba(186,117,23,0.3); }
-.enquiry-item.unread { border-color: rgba(186,117,23,0.2); background: rgba(186,117,23,0.04); }
-.enquiry-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); border-radius: 12px 0 0 12px; }
-.enquiry-unread-dot { position: absolute; top: 12px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
-.enquiry-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
-.enquiry-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-.enquiry-prop { font-size: 11px; color: var(--gold); margin-bottom: 4px; }
-.enquiry-msg { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
-.enquiry-time { font-size: 10px; color: rgba(255,255,255,0.25); }
-.enquiry-reply {
-  margin-left: auto; flex-shrink: 0;
-  background: rgba(186,117,23,0.12); color: var(--gold-light);
-  border: 1px solid rgba(186,117,23,0.25); border-radius: 6px;
-  padding: 5px 12px; font-size: 11px; font-weight: 500;
-  cursor: pointer; font-family: var(--sans); transition: all var(--transition);
-}
-.enquiry-reply:hover { background: rgba(186,117,23,0.2); }
-
-/* ── QUICK ACTIONS ── */
-.quick-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 2rem; }
-.quick-btn {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius); padding: 1rem;
-  color: rgba(255,255,255,0.6); font-family: var(--sans);
-  font-size: 13px; cursor: pointer; transition: all var(--transition);
-  text-align: left;
-}
-.quick-btn:hover { border-color: rgba(186,117,23,0.3); color: var(--white); }
-.quick-btn svg { width: 20px; height: 20px; color: var(--gold); flex-shrink: 0; }
-
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  display: flex; justify-content: space-around;
-  padding: 0.7rem 0 1rem;
-  background: rgba(10,22,40,0.97);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(186,117,23,0.15);
-}
-.bottom-nav-btn {
-  background: none; border: none;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  cursor: pointer; color: rgba(255,255,255,0.3);
-  font-family: var(--sans); transition: color 0.2s;
-}
-.bottom-nav-btn.active { color: var(--gold); }
-.bottom-nav-btn svg { width: 20px; height: 20px; }
-.bottom-nav-btn span { font-size: 10px; font-weight: 500; }
-.bottom-notif-badge {
-  position: absolute; top: -3px; right: -4px;
-  width: 15px; height: 15px; border-radius: 50%;
-  background: var(--gold); color: var(--navy);
-  font-size: 8px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--navy);
-}
-
-/* ── RESPONSIVE ── */
-@media (min-width: 860px) {
-  body { padding-bottom: 0; }
-  .bottom-nav { display: none; }
-  .sidebar { display: block; }
-  .content { padding: 2rem 3%; }
-  .stats-grid { grid-template-columns: repeat(4,1fr); }
-  .quick-grid { grid-template-columns: repeat(4,1fr); }
-}
-
-@media (max-width: 500px) {
-  .stats-grid { grid-template-columns: repeat(2,1fr); }
-  .perf-metrics { grid-template-columns: repeat(3,1fr); }
-  .enquiry-msg { max-width: 160px; }
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0a1628;--navy-mid:#132040;--navy-light:#1c2f52;--gold:#BA7517;--gold-light:#EF9F27;--white:#fff;--success:#2ecc71;--error:#e05252;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;--radius:12px;--radius-sm:8px;--transition:0.25s ease;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-x:hidden;padding-bottom:72px;}
+.topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:rgba(10,22,40,0.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(186,117,23,0.15);}
+.nav-left{display:flex;align-items:center;gap:10px;}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo svg{width:28px;height:32px;flex-shrink:0;}
+.nav-wordmark{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--white);}
+.nav-wordmark span{color:var(--gold);}
+.nav-role{font-size:11px;color:rgba(255,255,255,0.3);padding:2px 8px;border-radius:100px;border:1px solid rgba(255,255,255,0.1);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--white);position:relative;}
+.nav-icon-btn svg{width:17px;height:17px;}
+.nav-notif-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+.nav-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--navy);cursor:pointer;border:2px solid rgba(186,117,23,0.3);}
+.main-layout{display:flex;}
+.sidebar{display:none;width:240px;flex-shrink:0;background:var(--navy-mid);border-right:1px solid rgba(186,117,23,0.12);padding:1.5rem 1rem;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;margin-bottom:2rem;}
+.sidebar-btn{display:flex;align-items:center;gap:10px;padding:0.75rem 1rem;border-radius:var(--radius-sm);background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;font-family:var(--sans);font-size:13px;transition:all 0.2s;text-align:left;width:100%;}
+.sidebar-btn:hover{background:rgba(255,255,255,0.05);color:var(--white);}
+.sidebar-btn.active{background:rgba(186,117,23,0.1);color:var(--gold);font-weight:500;}
+.sidebar-btn svg{width:17px;height:17px;flex-shrink:0;}
+.sidebar-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:1px 6px;border-radius:100px;}
+.sidebar-divider{border:none;border-top:1px solid rgba(255,255,255,0.06);margin:1rem 0;}
+.sidebar-section-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:0.5rem 1rem 0.4rem;}
+.content{flex:1;min-width:0;padding:1.75rem 5%;max-width:860px;margin:0 auto;}
+.page-greeting{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:3px;}
+.page-greeting span{color:var(--gold);font-weight:500;}
+.page-title{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2rem);font-weight:700;margin-bottom:1rem;}
+.verified-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.25);color:var(--success);font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;margin-bottom:1.5rem;}
+.verified-pill svg{width:13px;height:13px;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem;}
+.stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);padding:1.1rem;}
+.stat-card.gold{border-color:rgba(186,117,23,0.3);background:rgba(186,117,23,0.05);}
+.stat-num{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px;}
+.stat-label{font-size:12px;color:rgba(255,255,255,0.4);}
+.stat-trend{font-size:11px;color:var(--success);margin-top:4px;}
+.add-listing-btn{display:inline-flex;align-items:center;gap:7px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);padding:0.75rem 1.5rem;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:1.75rem;transition:background var(--transition);}
+.add-listing-btn:hover{background:var(--gold-light);}
+.add-listing-btn svg{width:16px;height:16px;}
+.section{margin-bottom:2rem;}
+.section-divider{border:none;border-top:1px solid rgba(255,255,255,0.07);margin-bottom:2rem;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.section-label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;}
+.see-all{font-size:12px;color:var(--gold);background:none;border:none;cursor:pointer;font-family:var(--sans);}
+.chart-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);padding:1.25rem;}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;}
+.chart-title{font-size:13px;font-weight:500;color:rgba(255,255,255,0.7);}
+.chart-tabs{display:flex;gap:5px;}
+.chart-tab{font-size:11px;padding:4px 10px;border-radius:100px;background:rgba(255,255,255,0.06);border:1px solid transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-family:var(--sans);transition:all 0.2s;}
+.chart-tab.active{background:rgba(186,117,23,0.15);color:var(--gold-light);border-color:rgba(186,117,23,0.3);}
+.chart-wrap{position:relative;height:200px;}
+.chart-legend{display:flex;gap:1rem;margin-top:1rem;}
+.chart-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.4);}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%;}
+.listing-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:1rem;margin-bottom:10px;transition:border-color var(--transition);}
+.listing-item:hover{border-color:rgba(186,117,23,0.3);}
+.listing-thumb{width:54px;height:54px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;}
+.listing-thumb img{width:100%;height:100%;object-fit:cover;filter:brightness(0.85);}
+.listing-info{flex:1;min-width:0;}
+.listing-name{font-size:13px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.listing-loc{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:6px;}
+.listing-meta{display:flex;align-items:center;gap:7px;}
+.listing-price{font-size:11px;color:var(--gold);font-weight:500;}
+.listing-action-btn{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.06);border:none;color:rgba(255,255,255,0.5);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.listing-action-btn svg{width:14px;height:14px;}
+.status-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;}
+.status-live{background:rgba(46,204,113,0.12);color:var(--success);border:1px solid rgba(46,204,113,0.25);}
+.status-pending,.status-inspection_scheduled{background:rgba(186,117,23,0.12);color:var(--gold-light);border:1px solid rgba(186,117,23,0.25);}
+.status-rejected{background:rgba(224,82,82,0.12);color:var(--error);border:1px solid rgba(224,82,82,0.25);}
+.enquiry-item{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:1rem;margin-bottom:10px;cursor:pointer;position:relative;transition:border-color var(--transition);}
+.enquiry-item:hover{border-color:rgba(186,117,23,0.3);}
+.enquiry-item.unread{border-color:rgba(186,117,23,0.2);background:rgba(186,117,23,0.04);}
+.enquiry-item.unread::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:12px 0 0 12px;}
+.enquiry-unread-dot{position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--gold);}
+.enquiry-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+.enquiry-body{flex:1;min-width:0;}
+.enquiry-name{font-size:13px;font-weight:500;margin-bottom:2px;}
+.enquiry-prop{font-size:11px;color:var(--gold);margin-bottom:4px;}
+.enquiry-msg{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.enquiry-time{font-size:10px;color:rgba(255,255,255,0.25);}
+.enquiry-reply{margin-left:auto;flex-shrink:0;background:rgba(186,117,23,0.12);color:var(--gold-light);border:1px solid rgba(186,117,23,0.25);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);}
+.review-summary{display:flex;align-items:center;gap:1.25rem;background:rgba(186,117,23,0.05);border:1px solid rgba(186,117,23,0.15);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+.review-big-num{font-family:var(--serif);font-size:2.8rem;font-weight:700;color:var(--gold);line-height:1;}
+.review-big-stars{color:var(--gold);font-size:14px;margin-top:4px;}
+.review-big-label{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;}
+.review-bars{flex:1;}
+.review-bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.review-bar-star{font-size:10px;color:rgba(255,255,255,0.35);width:14px;text-align:right;}
+.review-bar-track{flex:1;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+.review-bar-fill{height:100%;background:var(--gold);border-radius:2px;}
+.review-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius);padding:1rem;margin-bottom:10px;}
+.review-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.review-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
+.review-name{font-size:13px;font-weight:500;}
+.review-date{font-size:11px;color:rgba(255,255,255,0.28);margin-left:auto;}
+.review-stars{color:var(--gold);font-size:12px;margin-bottom:4px;}
+.review-prop{font-size:10px;color:var(--gold);margin-bottom:6px;}
+.review-text{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.7;}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:2rem;}
+.quick-btn{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:1rem;color:rgba(255,255,255,0.6);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all var(--transition);text-align:left;}
+.quick-btn:hover{border-color:rgba(186,117,23,0.3);color:var(--white);}
+.quick-btn svg{width:20px;height:20px;color:var(--gold);flex-shrink:0;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-around;padding:0.7rem 0 1rem;background:rgba(10,22,40,0.97);backdrop-filter:blur(14px);border-top:1px solid rgba(186,117,23,0.15);}
+.bottom-nav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:rgba(255,255,255,0.3);font-family:var(--sans);transition:color 0.2s;position:relative;}
+.bottom-nav-btn.active{color:var(--gold);}
+.bottom-nav-btn svg{width:20px;height:20px;}
+.bottom-nav-btn span{font-size:10px;font-weight:500;}
+.bottom-notif-badge{position:absolute;top:-3px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+@media(min-width:860px){body{padding-bottom:0;}.bottom-nav{display:none;}.sidebar{display:block;}.content{padding:2rem 3%;}.stats-grid{grid-template-columns:repeat(4,1fr);}.quick-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
 <nav class="topnav">
   <div class="nav-left">
-    <a class="nav-logo" href="domivault-with-images.html">
+    <a class="nav-logo" href="domivault-landlord-dashboard.html">
       <svg viewBox="0 0 34 38" fill="none">
         <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
         <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
@@ -394,17 +143,15 @@ body {
     <span class="nav-role">Landlord</span>
   </div>
   <div class="nav-right">
-    <button class="nav-icon-btn" aria-label="Notifications" onclick="window.location='domivault-notifications.html'">
+    <button class="nav-icon-btn" onclick="window.location='domivault-notifications.html'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="nav-notif-badge">3</div>
+      <div class="nav-notif-badge" id="notifBadge" style="display:none;">0</div>
     </button>
-    <div class="nav-avatar">A</div>
+    <div class="nav-avatar" id="navAvatar">A</div>
   </div>
 </nav>
 
 <div class="main-layout">
-
-  <!-- DESKTOP SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-nav">
       <button class="sidebar-btn active">
@@ -418,7 +165,7 @@ body {
       <button class="sidebar-btn" onclick="window.location='domivault-landlord-messaging.html'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Messages
-        <span class="sidebar-badge">2</span>
+        <span class="sidebar-badge" id="msgBadge">0</span>
       </button>
       <button class="sidebar-btn" onclick="document.getElementById('reviewsSection').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -432,49 +179,26 @@ body {
     <hr class="sidebar-divider"/>
     <div class="sidebar-section-label">Account</div>
     <div class="sidebar-nav">
-      <button class="sidebar-btn" onclick="document.getElementById('profileSection').scrollIntoView({behavior:'smooth'})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profile
-      </button>
-      <button class="sidebar-btn" onclick="document.getElementById('settingsSectionD').scrollIntoView({behavior:'smooth'})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Settings
+      <button class="sidebar-btn" onclick="handleLogout()" style="color:rgba(224,82,82,0.6);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
       </button>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="content">
-
-    <!-- HEADER -->
-    <div class="page-greeting" id="profileSection">Good morning, <span>Mr Adeyemi 👋</span></div>
+    <div class="page-greeting" id="profileSection">Good morning, <span id="greetingName">Landlord</span></div>
     <div class="page-title">Your dashboard</div>
     <div class="verified-pill">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Verified landlord · Active
     </div>
 
-    <!-- STATS -->
     <div class="stats-grid">
-      <div class="stat-card gold">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Total listings</div>
-        <div class="stat-trend">↑ 1 this month</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">2</div>
-        <div class="stat-label">Live & active</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">14</div>
-        <div class="stat-label">Total enquiries</div>
-        <div class="stat-trend">↑ 4 this week</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">4.8</div>
-        <div class="stat-label">Average rating</div>
-        <div class="stat-trend">★★★★★</div>
-      </div>
+      <div class="stat-card gold"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total listings</div></div>
+      <div class="stat-card"><div class="stat-num" id="statLive">0</div><div class="stat-label">Live & active</div></div>
+      <div class="stat-card"><div class="stat-num" id="statEnquiries">0</div><div class="stat-label">Enquiries</div></div>
+      <div class="stat-card"><div class="stat-num">4.8</div><div class="stat-label">Avg rating</div><div class="stat-trend">★★★★★</div></div>
     </div>
 
     <button class="add-listing-btn" onclick="window.location='domivault-property-submission.html'">
@@ -484,7 +208,6 @@ body {
 
     <hr class="section-divider"/>
 
-    <!-- ANALYTICS CHART -->
     <div class="section">
       <div class="section-head" id="analyticsSection">
         <div class="section-label">Analytics</div>
@@ -494,110 +217,38 @@ body {
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title" id="chartTitle">Total listing views — last 7 days</div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="analyticsChart"></canvas>
-        </div>
-        <div class="chart-legend">
-          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#BA7517;"></div>Lekki 4-Bed Apartment</div>
-          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#185FA5;"></div>Ikoyi 5-Bed Detached</div>
-        </div>
+        <div class="chart-header"><div class="chart-title" id="chartTitle">Total listing views — last 7 days</div></div>
+        <div class="chart-wrap"><canvas id="analyticsChart"></canvas></div>
+        <div class="chart-legend"><div class="chart-legend-item"><div class="chart-legend-dot" style="background:#BA7517;"></div>Your listings</div></div>
       </div>
     </div>
 
     <hr class="section-divider"/>
 
-    <!-- LISTING PERFORMANCE -->
     <div class="section">
       <div class="section-head" id="myListingsSection">
-        <div class="section-label">Listing performance</div>
-        <button class="see-all">
-          See all
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+        <div class="section-label">My listings</div>
+        <button class="see-all" onclick="window.location='domivault-property-submission.html'">Add new +</button>
       </div>
-
-      <div class="perf-card">
-        <div class="perf-header">
-          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
-          <div style="flex:1;min-width:0;">
-            <div class="perf-name">Modern 4-Bed Apartment</div>
-            <div class="perf-loc">📍 Lekki Phase 1, Lagos</div>
-          </div>
-          <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
-        </div>
-        <div class="perf-metrics">
-          <div class="perf-metric"><div class="perf-metric-num">247</div><div class="perf-metric-label">Views</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">8</div><div class="perf-metric-label">Enquiries</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">3.2%</div><div class="perf-metric-label">Conv. rate</div></div>
-        </div>
-        <div class="perf-bar-wrap">
-          <div class="perf-bar-label"><span>Views this week</span><span>247 / 300 target</span></div>
-          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:82%;"></div></div>
-        </div>
-      </div>
-
-      <div class="perf-card">
-        <div class="perf-header">
-          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70" alt="Ikoyi house" loading="lazy"/></div>
-          <div style="flex:1;min-width:0;">
-            <div class="perf-name">Luxury 5-Bed Detached</div>
-            <div class="perf-loc">📍 Ikoyi, Lagos</div>
-          </div>
-          <div class="perf-status"><span class="status-pill status-live">● Live</span></div>
-        </div>
-        <div class="perf-metrics">
-          <div class="perf-metric"><div class="perf-metric-num">183</div><div class="perf-metric-label">Views</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">6</div><div class="perf-metric-label">Enquiries</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">3.3%</div><div class="perf-metric-label">Conv. rate</div></div>
-        </div>
-        <div class="perf-bar-wrap">
-          <div class="perf-bar-label"><span>Views this week</span><span>183 / 300 target</span></div>
-          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:61%;"></div></div>
-        </div>
-      </div>
-
-      <div class="perf-card">
-        <div class="perf-header">
-          <div class="perf-thumb"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi" loading="lazy"/></div>
-          <div style="flex:1;min-width:0;">
-            <div class="perf-name">3-Bed Semi-Detached</div>
-            <div class="perf-loc">📍 Lekki Phase 2, Lagos</div>
-          </div>
-          <div class="perf-status"><span class="status-pill status-pending">⏳ Pending</span></div>
-        </div>
-        <div class="perf-metrics">
-          <div class="perf-metric"><div class="perf-metric-num">0</div><div class="perf-metric-label">Views</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">0</div><div class="perf-metric-label">Enquiries</div></div>
-          <div class="perf-metric"><div class="perf-metric-num">—</div><div class="perf-metric-label">Conv. rate</div></div>
-        </div>
-        <div class="perf-bar-wrap">
-          <div class="perf-bar-label"><span>Awaiting inspection before going live</span><span></span></div>
-          <div class="perf-bar-track"><div class="perf-bar-fill" style="width:0%;"></div></div>
-        </div>
-      </div>
+      <div id="listingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading listings...</div></div>
     </div>
 
     <hr class="section-divider"/>
 
-    <!-- RECENT REVIEWS -->
     <div class="section">
-      <div class="section-head" id="reviewsSection">
-        <div class="section-label">Recent reviews</div>
-        <button class="see-all">
-          See all
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+      <div class="section-head">
+        <div class="section-label">Recent enquiries</div>
+        <button class="see-all" onclick="window.location='domivault-landlord-messaging.html'">See all</button>
       </div>
+      <div id="enquiriesContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading enquiries...</div></div>
+    </div>
 
+    <hr class="section-divider"/>
+
+    <div class="section">
+      <div class="section-head" id="reviewsSection"><div class="section-label">Recent reviews</div></div>
       <div class="review-summary">
-        <div>
-          <div class="review-big-num">4.8</div>
-          <div class="review-big-stars">★★★★★</div>
-          <div class="review-big-label">12 reviews</div>
-        </div>
+        <div><div class="review-big-num">4.8</div><div class="review-big-stars">★★★★★</div><div class="review-big-label">12 reviews</div></div>
         <div class="review-bars">
           <div class="review-bar-row"><div class="review-bar-star">5</div><div class="review-bar-track"><div class="review-bar-fill" style="width:75%;"></div></div></div>
           <div class="review-bar-row"><div class="review-bar-star">4</div><div class="review-bar-track"><div class="review-bar-fill" style="width:17%;"></div></div></div>
@@ -606,179 +257,18 @@ body {
           <div class="review-bar-row"><div class="review-bar-star">1</div><div class="review-bar-track"><div class="review-bar-fill" style="width:0%;"></div></div></div>
         </div>
       </div>
-
       <div class="review-card">
-        <div class="review-header">
-          <div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div>
-          <div><div class="review-name">Tunde A.</div></div>
-          <div class="review-date">Dec 2025</div>
-        </div>
+        <div class="review-header"><div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div><div><div class="review-name">Tunde A.</div></div><div class="review-date">Dec 2025</div></div>
         <div class="review-stars">★★★★★</div>
         <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
-        <div class="review-text">"Very responsive landlord. Property was exactly as described. The Domivault inspection gave me confidence before I even visited. Highly recommend."</div>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <div class="review-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">F</div>
-          <div><div class="review-name">Funmi O.</div></div>
-          <div class="review-date">Nov 2025</div>
-        </div>
-        <div class="review-stars">★★★★☆</div>
-        <div class="review-prop">Luxury 5-Bed Detached · Ikoyi</div>
-        <div class="review-text">"Great experience overall. Landlord was professional and transparent about all fees. Would rent again without hesitation."</div>
-      </div>
-
-      <div class="review-card">
-        <div class="review-header">
-          <div class="review-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
-          <div><div class="review-name">Kemi B.</div></div>
-          <div class="review-date">Oct 2025</div>
-        </div>
-        <div class="review-stars">★★★★★</div>
-        <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
-        <div class="review-text">"After being scammed elsewhere, Domivault was a breath of fresh air. Landlord was honest and the process was completely transparent."</div>
+        <div class="review-text">"Very responsive landlord. Property was exactly as described. The Domivault inspection gave me full confidence. Highly recommend."</div>
       </div>
     </div>
 
     <hr class="section-divider"/>
 
-    <!-- INSPECTION TRACKER -->
     <div class="section">
-      <div class="section-head">
-        <div class="section-label">Inspection tracker</div>
-      </div>
-      <div class="insp-item">
-        <div class="insp-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        </div>
-        <div>
-          <div class="insp-prop">3-Bed Semi-Detached, Lekki Phase 2</div>
-          <div class="insp-date">📅 Thursday 16 Jan 2026, 10:00 AM</div>
-          <div class="insp-status">Officer assigned · Awaiting visit</div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="section-divider"/>
-
-    <!-- RECENT ENQUIRIES -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-label">Recent enquiries</div>
-        <button class="see-all">
-          See all
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
-      </div>
-
-      <div class="enquiry-item unread">
-        <div class="enquiry-unread-dot"></div>
-        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">T</div>
-        <div style="flex:1;min-width:0;">
-          <div class="enquiry-name">Tunde Adeyemi</div>
-          <div class="enquiry-prop">Modern 4-Bed Apartment · Lekki</div>
-          <div class="enquiry-msg">"Hello, is the apartment still available? I would like to schedule a viewing..."</div>
-          <div class="enquiry-time">2 minutes ago</div>
-        </div>
-        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
-      </div>
-
-      <div class="enquiry-item unread">
-        <div class="enquiry-unread-dot"></div>
-        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">F</div>
-        <div style="flex:1;min-width:0;">
-          <div class="enquiry-name">Funmi Okafor</div>
-          <div class="enquiry-prop">Luxury 5-Bed Detached · Ikoyi</div>
-          <div class="enquiry-msg">"When can we schedule a viewing? I am very interested in the property..."</div>
-          <div class="enquiry-time">1 hour ago</div>
-        </div>
-        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
-      </div>
-
-      <div class="enquiry-item">
-        <div class="enquiry-avatar" style="background:linear-gradient(135deg,#854F0B,#132040);">K</div>
-        <div style="flex:1;min-width:0;">
-          <div class="enquiry-name">Kemi Balogun</div>
-          <div class="enquiry-prop">Modern 4-Bed Apartment · Lekki</div>
-          <div class="enquiry-msg">"Thank you for the quick response. I will confirm by end of week..."</div>
-          <div class="enquiry-time">Yesterday, 4:32 PM</div>
-        </div>
-        <button class="enquiry-reply" onclick="window.location='domivault-landlord-messaging.html'">Reply</button>
-      </div>
-    </div>
-
-    <hr class="section-divider"/>
-
-    <!-- MY LISTINGS -->
-    <div class="section">
-      <div class="section-head">
-        <div class="section-label">My listings</div>
-        <button class="see-all">
-          See all
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
-      </div>
-
-      <div class="listing-item">
-        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Lekki apartment" loading="lazy"/></div>
-        <div class="listing-info">
-          <div class="listing-name">Modern 4-Bed Apartment</div>
-          <div class="listing-loc">📍 Lekki Phase 1, Lagos</div>
-          <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦3,500,000/yr</span></div>
-        </div>
-        <div class="listing-actions">
-          <button class="listing-action-btn" aria-label="Edit listing">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="listing-action-btn" aria-label="More options">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="listing-item">
-        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70" alt="Ikoyi house" loading="lazy"/></div>
-        <div class="listing-info">
-          <div class="listing-name">Luxury 5-Bed Detached</div>
-          <div class="listing-loc">📍 Ikoyi, Lagos</div>
-          <div class="listing-meta"><span class="status-pill status-live">● Live</span><span class="listing-price">₦12,000,000/yr</span></div>
-        </div>
-        <div class="listing-actions">
-          <button class="listing-action-btn" aria-label="Edit listing">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="listing-action-btn" aria-label="More options">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="listing-item">
-        <div class="listing-thumb"><img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=200&q=70" alt="Lekki semi" loading="lazy"/></div>
-        <div class="listing-info">
-          <div class="listing-name">3-Bed Semi-Detached</div>
-          <div class="listing-loc">📍 Lekki Phase 2, Lagos</div>
-          <div class="listing-meta"><span class="status-pill status-pending">⏳ Awaiting inspection</span></div>
-        </div>
-        <div class="listing-actions">
-          <button class="listing-action-btn" aria-label="Edit listing">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="listing-action-btn" aria-label="More options">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <hr class="section-divider"/>
-
-    <!-- QUICK ACTIONS -->
-    <div class="section">
-      <div class="section-head" id="settingsSectionD">
-        <div class="section-label">Quick actions</div>
-      </div>
+      <div class="section-head" id="settingsSectionD"><div class="section-label">Quick actions</div></div>
       <div class="quick-grid">
         <button class="quick-btn" onclick="window.location='domivault-property-submission.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
@@ -788,88 +278,66 @@ body {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           All messages
         </button>
-        <button class="quick-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Edit profile
+        <button class="quick-btn" onclick="window.location='domivault-notifications.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notifications
         </button>
-        <button class="quick-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Settings
+        <button class="quick-btn" onclick="handleLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Log out
         </button>
       </div>
       <div style="display:flex;gap:1.25rem;justify-content:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,0.07);font-size:12px;">
-        <a href="domivault-terms-of-service.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Terms of Service</a>
-        <a href="domivault-privacy-policy.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Privacy Policy</a>
+        <a href="domivault-terms-of-service.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Terms</a>
+        <a href="domivault-privacy-policy.html" style="color:rgba(255,255,255,0.35);text-decoration:none;">Privacy</a>
       </div>
     </div>
-
   </main>
 </div>
 
-<!-- MOBILE BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="bottom-nav-btn active">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     <span>Dashboard</span>
   </button>
-  <button class="bottom-nav-btn">
+  <button class="bottom-nav-btn" onclick="window.location='domivault-property-submission.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
     <span>Listings</span>
   </button>
   <button class="bottom-nav-btn" style="position:relative;" onclick="window.location='domivault-landlord-messaging.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <div class="bottom-notif-badge">2</div>
+    <div class="bottom-notif-badge" id="bottomMsgBadge" style="display:none;"></div>
     <span>Messages</span>
   </button>
-  <button class="bottom-nav-btn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Profile</span>
+  <button class="bottom-nav-btn" onclick="window.location='domivault-notifications.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span>Alerts</span>
   </button>
 </nav>
 
 <script>
 const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const viewsData   = { lekki:[28,35,42,38,55,67,82], ikoyi:[18,22,30,25,40,48,60] };
-const enqData     = { lekki:[2,3,4,3,5,6,8],         ikoyi:[1,2,3,2,4,4,6] };
+const viewsData = [28,35,42,38,55,67,82];
+const enqData = [2,3,4,3,5,6,8];
 let chart;
 
 function buildChart(tab) {
   const ctx = document.getElementById('analyticsChart').getContext('2d');
   if (chart) chart.destroy();
-  const d1 = tab === 'views' ? viewsData.lekki : enqData.lekki;
-  const d2 = tab === 'views' ? viewsData.ikoyi : enqData.ikoyi;
-
   chart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: days,
-      datasets: [
-        {
-          label: 'Lekki 4-Bed', data: d1,
-          borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.08)',
-          tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517',
-          fill: true, borderWidth: 2
-        },
-        {
-          label: 'Ikoyi 5-Bed', data: d2,
-          borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)',
-          tension: 0.4, pointRadius: 4, pointBackgroundColor: '#185FA5',
-          fill: true, borderWidth: 2
-        }
-      ]
+      datasets: [{
+        data: tab === 'views' ? viewsData : enqData,
+        borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.08)',
+        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517',
+        fill: true, borderWidth: 2
+      }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(10,22,40,0.95)',
-          titleColor: 'rgba(255,255,255,0.7)',
-          bodyColor: 'white',
-          borderColor: 'rgba(186,117,23,0.3)',
-          borderWidth: 1
-        }
-      },
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 } },
       scales: {
         x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } },
         y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true }
@@ -881,13 +349,130 @@ function buildChart(tab) {
 function setChartTab(btn, tab) {
   document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('chartTitle').textContent = tab === 'views'
-    ? 'Total listing views — last 7 days'
-    : 'Enquiries received — last 7 days';
+  document.getElementById('chartTitle').textContent = tab === 'views' ? 'Total listing views — last 7 days' : 'Enquiries received — last 7 days';
   buildChart(tab);
 }
 
 buildChart('views');
+
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+function getToken() { return localStorage.getItem('dv_token'); }
+function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
+
+function getTimeAgo(dateStr) {
+  const date = new Date(dateStr), now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function handleLogout() {
+  if (confirm('Are you sure you want to log out?')) {
+    localStorage.removeItem('dv_token');
+    localStorage.removeItem('dv_user');
+    window.location = 'domivault-with-images.html';
+  }
+}
+
+async function loadDashboard() {
+  const token = getToken();
+  if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
+
+  const user = getUser();
+  if (user) {
+    const hour = new Date().getHours();
+    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
+    document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  try {
+    const res = await fetch(API_URL + '/api/properties/landlord/my-listings', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const listings = await res.json();
+
+    if (Array.isArray(listings)) {
+      document.getElementById('statTotal').textContent = listings.length;
+      document.getElementById('statLive').textContent = listings.filter(l => l.status === 'live').length;
+      renderListings(listings);
+    }
+
+    const msgRes = await fetch(API_URL + '/api/messages/conversations', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const convs = await msgRes.json();
+    if (Array.isArray(convs)) {
+      document.getElementById('statEnquiries').textContent = convs.length;
+      document.getElementById('msgBadge').textContent = convs.length;
+      if (convs.length > 0) {
+        const b = document.getElementById('bottomMsgBadge');
+        b.textContent = convs.length; b.style.display = 'flex';
+      }
+      renderEnquiries(convs);
+    }
+
+    const notifRes = await fetch(API_URL + '/api/notifications/unread-count', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const notifData = await notifRes.json();
+    if (notifData.unreadCount > 0) {
+      const nb = document.getElementById('notifBadge');
+      nb.textContent = notifData.unreadCount; nb.style.display = 'flex';
+    }
+
+  } catch (err) { console.error('Dashboard load failed:', err); }
+}
+
+function renderListings(listings) {
+  const c = document.getElementById('listingsContainer');
+  if (!listings.length) {
+    c.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No listings yet. <a href="domivault-property-submission.html" style="color:var(--gold);">Submit your first listing →</a></div>';
+    return;
+  }
+  c.innerHTML = listings.map(l => {
+    const img = l.images && l.images.length > 0 ? l.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=60';
+    const sc = 'status-' + l.status;
+    const st = l.status === 'live' ? '● Live' : l.status === 'pending' ? '⏳ Pending' : l.status === 'inspection_scheduled' ? '📅 Inspection' : l.status;
+    return `<div class="listing-item">
+      <div class="listing-thumb"><img src="${img}" alt="${l.title}" loading="lazy"/></div>
+      <div class="listing-info">
+        <div class="listing-name">${l.title}</div>
+        <div class="listing-loc">${l.location.area}, Lagos</div>
+        <div class="listing-meta"><span class="status-pill ${sc}">${st}</span><span class="listing-price">&#8358;${l.price.toLocaleString('en-NG')}/yr</span></div>
+      </div>
+      <button class="listing-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+    </div>`;
+  }).join('');
+}
+
+function renderEnquiries(convs) {
+  const c = document.getElementById('enquiriesContainer');
+  if (!convs.length) {
+    c.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No enquiries yet.</div>';
+    return;
+  }
+  c.innerHTML = convs.slice(0, 5).map(conv => {
+    const tenant = conv.participants.find(p => p.role === 'tenant');
+    if (!tenant) return '';
+    const prop = conv.property ? conv.property.title : 'Property';
+    return `<div class="enquiry-item unread" onclick="window.location='domivault-landlord-messaging.html'">
+      <div class="enquiry-unread-dot"></div>
+      <div class="enquiry-avatar" style="background:linear-gradient(135deg,#185FA5,#132040);">${tenant.name.charAt(0)}</div>
+      <div class="enquiry-body">
+        <div class="enquiry-name">${tenant.name}</div>
+        <div class="enquiry-prop">${prop}</div>
+        <div class="enquiry-msg">${conv.lastMessage || 'Started a conversation'}</div>
+        <div class="enquiry-time">${getTimeAgo(conv.lastMessageAt)}</div>
+      </div>
+      <button class="enquiry-reply" onclick="event.stopPropagation();window.location='domivault-landlord-messaging.html'">Reply</button>
+    </div>`;
+  }).join('');
+}
+
+loadDashboard();
 </script>
 </body>
 </html>
