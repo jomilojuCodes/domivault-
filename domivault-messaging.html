@@ -377,252 +377,202 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 
 <script>
 // ── DATA ──
-const CONVERSATIONS = [
-  {
-    id:1, name:'Mr Adeyemi Oluwaseun', init:'A',
-    prop:'Modern 4-Bed Apartment', loc:'Lekki Phase 1', price:'₦3,500,000/yr',
-    img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70',
-    last:'Yes, the apartment is still available. When would you like to schedule a viewing?',
-    time:'2m ago', unread:2, online:true,
-    color:'linear-gradient(135deg,#BA7517,#1c2f52)',
-    messages:[
-      {id:1,type:'received',text:'Hello! I saw your listing on Domivault. Is the 4-bedroom apartment in Lekki still available?',time:'10:14 AM',read:true},
-      {id:2,type:'sent',text:'Yes, the apartment is still available! It was inspected and verified by Domivault last month.',time:'10:16 AM',read:true},
-      {id:3,type:'received',text:'That\'s great! What\'s included in the annual rent? Is the service charge separate?',time:'10:18 AM',read:true},
-      {id:4,type:'sent',text:'The annual rent is ₦3,500,000. Service charge of ₦400,000 is separate. The apartment comes with 24hr power, security, and a swimming pool.',time:'10:21 AM',read:true},
-      {id:5,type:'received',text:'Sounds good. Can we schedule a viewing this week? I\'m available Thursday or Friday morning.',time:'10:45 AM',read:true},
-      {id:6,type:'sent',text:'Thursday works for me. Let\'s say 10 AM at the property? I\'ll send you the exact address.',time:'11:02 AM',read:true},
-      {id:7,type:'received',text:'Perfect! I\'ll be there. Is there parking available on site?',time:'11:05 AM',read:false},
-      {id:8,type:'received',text:'Also — is the price negotiable at all?',time:'11:06 AM',read:false},
-    ]
-  },
-  {
-    id:2, name:'Mrs Okafor', init:'O',
-    prop:'Luxury 5-Bed Detached', loc:'Ikoyi, Lagos', price:'₦12,000,000/yr',
-    img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=200&q=70',
-    last:'The property is available from the 1st of February. Let me know if that works.',
-    time:'Yesterday', unread:0, online:false,
-    color:'linear-gradient(135deg,#0F6E56,#1c2f52)',
-    messages:[
-      {id:1,type:'received',text:'Good afternoon! Thank you for your enquiry about the Ikoyi property.',time:'2:00 PM',read:true},
-      {id:2,type:'sent',text:'Good afternoon Mrs Okafor. I\'m very interested in the 5-bedroom. Is it available for immediate occupancy?',time:'2:05 PM',read:true},
-      {id:3,type:'received',text:'The property is available from the 1st of February. Let me know if that works for you and we can arrange a viewing.',time:'2:15 PM',read:true},
-    ]
-  },
-  {
-    id:3, name:'Mr Bello', init:'B',
-    prop:'Contemporary 3-Bed Flat', loc:'Victoria Island', price:'₦5,200,000/yr',
-    img:'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=200&q=70',
-    last:'Thank you for viewing the property. Hope to hear from you soon!',
-    time:'Mon', unread:0, online:false,
-    color:'linear-gradient(135deg,#185FA5,#1c2f52)',
-    messages:[
-      {id:1,type:'sent',text:'Hi Mr Bello, I came for the viewing today. The flat looks great!',time:'4:00 PM',read:true},
-      {id:2,type:'received',text:'Thank you for coming! I\'m glad you liked it. Please let me know if you have any questions.',time:'4:30 PM',read:true},
-      {id:3,type:'received',text:'Thank you for viewing the property. Hope to hear from you soon!',time:'4:31 PM',read:true},
-    ]
-  },
-  {
-    id:4, name:'Mrs Ibrahim', init:'I',
-    prop:'Spacious 5-Bed House', loc:'Ajah, Lagos', price:'₦8,000,000/yr',
-    img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&q=70',
-    last:'Please send your documents when you\'re ready to proceed.',
-    time:'Sun', unread:0, online:false,
-    color:'linear-gradient(135deg,#854F0B,#1c2f52)',
-    messages:[
-      {id:1,type:'sent',text:'Good evening Mrs Ibrahim. I\'m interested in the Ajah property.',time:'6:00 PM',read:true},
-      {id:2,type:'received',text:'Hello! Yes the property is available. Please send your documents when you\'re ready to proceed.',time:'6:45 PM',read:true},
-    ]
-  }
-];
+const API_URL = 'https://domivault-backend-production.up.railway.app';
+function getToken() { return localStorage.getItem('dv_token'); }
+function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
 
-let activeConvId = 1;
+let CONVERSATIONS = [];
+let activeConvId = null;
 let convTab = 'all';
 let searchQuery = '';
+let activeMessages = [];
 
-// ── RENDER CONVERSATIONS ──
+function getTimeAgo(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr), now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  const days = Math.floor(diff/86400);
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];
+  return date.toLocaleDateString('en-NG', {month:'short', day:'numeric'});
+}
+
+async function loadConversations() {
+  const token = getToken();
+  if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
+  try {
+    const res = await fetch(API_URL + '/api/messages/conversations', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      const user = getUser();
+      CONVERSATIONS = data.map(function(conv) {
+        const other = conv.participants.find(function(p) { return !user || p._id !== user._id; });
+        const prop = conv.property;
+        return {
+          id: conv._id,
+          name: other ? other.name : 'Landlord',
+          init: other ? other.name.charAt(0).toUpperCase() : 'L',
+          color: 'linear-gradient(135deg,#185FA5,#1c2f52)',
+          listing: prop ? prop.title : 'Property',
+          price: prop ? ('&#8358;' + prop.price.toLocaleString('en-NG') + '/yr') : '',
+          img: prop && prop.images && prop.images.length > 0 ? prop.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70',
+          last: conv.lastMessage || 'Started a conversation',
+          time: getTimeAgo(conv.lastMessageAt),
+          unread: 0,
+          online: false,
+          verified: other ? other.isVerified : false,
+        };
+      });
+      renderConvList();
+      if (CONVERSATIONS.length > 0) openConv(CONVERSATIONS[0].id);
+    }
+  } catch (err) {
+    console.error('Failed to load conversations:', err);
+  }
+}
+
+async function loadMessages(convId) {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/messages/' + convId, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const messages = await res.json();
+    if (Array.isArray(messages)) {
+      activeMessages = messages;
+      renderMessages(convId);
+    }
+  } catch (err) {
+    console.error('Failed to load messages:', err);
+  }
+}
+
+async function sendMessageToAPI(convId, text) {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/messages/' + convId, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const msg = await res.json();
+    if (res.ok) {
+      activeMessages.push(msg);
+      const conv = CONVERSATIONS.find(c => c.id === convId);
+      if (conv) { conv.last = text; conv.time = 'Just now'; }
+      renderMessages(convId);
+      renderConvList();
+    }
+  } catch (err) {
+    console.error('Failed to send message:', err);
+  }
+}
+
 function renderConvList() {
   const list = document.getElementById('convList');
   let convs = CONVERSATIONS;
-  if (convTab === 'unread') convs = convs.filter(c => c.unread > 0);
-  if (searchQuery) convs = convs.filter(c => c.name.toLowerCase().includes(searchQuery) || c.prop.toLowerCase().includes(searchQuery));
+  if (searchQuery) convs = convs.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.listing.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (convs.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.3);font-size:13px;">No conversations found</div>`;
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No conversations yet.</div>';
     return;
   }
 
   list.innerHTML = convs.map(c => `
-    <div class="conv-item ${c.unread > 0 ? 'unread' : ''} ${c.id === activeConvId ? 'active' : ''}" onclick="openConv(${c.id})">
-      <div class="conv-av-wrap">
-        <div class="conv-av" style="background:${c.color};">${c.init}</div>
-        ${c.online ? '<div class="conv-online"></div>' : ''}
-      </div>
-      <div class="conv-body">
-        <div class="conv-name">${c.name}</div>
-        <div class="conv-prop">${c.prop}</div>
+    <div class="conv-item ${c.unread > 0 ? 'unread' : ''} ${c.id === activeConvId ? 'active' : ''}" onclick="openConv('${c.id}')">
+      <div class="conv-avatar" style="background:${c.color};">${c.init}</div>
+      <div class="conv-info">
+        <div class="conv-name-row">
+          <div class="conv-name">${c.name}</div>
+          <div class="conv-time">${c.time}</div>
+        </div>
+        <div class="conv-listing">${c.listing}</div>
         <div class="conv-preview">${c.last}</div>
       </div>
-      <div class="conv-meta">
-        <div class="conv-time">${c.time}</div>
-        ${c.unread > 0 ? `<div class="conv-unread-cnt">${c.unread}</div>` : ''}
-      </div>
+      ${c.unread > 0 ? `<div class="conv-unread-badge">${c.unread}</div>` : ''}
     </div>
   `).join('');
 }
 
-// ── RENDER MESSAGES ──
-function renderMessages(convId) {
-  const conv = CONVERSATIONS.find(c => c.id === convId);
-  if (!conv) return;
-
-  // Update header
-  document.getElementById('chatAv').innerHTML = conv.init + (conv.online ? '<div class="chat-av-online"></div>' : '');
-  document.getElementById('chatAv').style.background = conv.color;
-  document.getElementById('chatName').textContent = conv.name;
-  document.getElementById('chatStatus').textContent = conv.online ? 'Online now' : 'Last seen recently';
-  document.getElementById('chatStatus').className = 'chat-status ' + (conv.online ? '' : 'away');
-
-  // Update property preview
-  document.getElementById('propName').textContent = conv.prop;
-  document.getElementById('propLoc').textContent = '📍 ' + conv.loc;
-  document.getElementById('propPrice').textContent = conv.price;
-  document.getElementById('propImg').src = conv.img;
-
-  // Render messages
-  const wrap = document.getElementById('messagesWrap');
-  const groups = groupByDate(conv.messages);
-
-  wrap.innerHTML = groups.map(group => `
-    <div class="msg-date"><span>${group.date}</span></div>
-    ${group.msgs.map(m => `
-      <div class="msg-row ${m.type}">
-        ${m.type === 'received' ? `<div class="msg-av-sm" style="background:${conv.color};">${conv.init}</div>` : ''}
-        <div class="msg-bubble ${m.type}">
-          ${m.text}
-          <div class="msg-time">
-            ${m.time}
-            ${m.type === 'sent' ? `<div class="msg-read">
-              <svg viewBox="0 0 24 24" fill="none" stroke="${m.read ? '#BA7517' : 'rgba(10,22,40,0.5)'}" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              <svg viewBox="0 0 24 24" fill="none" stroke="${m.read ? '#BA7517' : 'rgba(10,22,40,0.5)'}" stroke-width="2.5" stroke-linecap="round" style="margin-left:-6px;"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>` : ''}
-          </div>
-        </div>
-        ${m.type === 'sent' ? `<div class="msg-av-sm tenant">J</div>` : ''}
-      </div>
-    `).join('')}
-  `).join('');
-
-  // Show typing if online
-  if (conv.online) {
-    setTimeout(() => {
-      document.getElementById('typingWrap').style.display = 'block';
-      wrap.scrollTop = wrap.scrollHeight;
-    }, 800);
-  } else {
-    document.getElementById('typingWrap').style.display = 'none';
-  }
-
-  wrap.scrollTop = wrap.scrollHeight;
-
-  // Mark as read
-  conv.unread = 0;
-  renderConvList();
-}
-
-function groupByDate(messages) {
-  return [{ date: 'Today', msgs: messages }];
-}
-
 function openConv(id) {
   activeConvId = id;
-  renderMessages(id);
+  const conv = CONVERSATIONS.find(c => c.id === id);
+  if (!conv) return;
+
+  document.getElementById('chatName').textContent = conv.name;
+  document.getElementById('chatStatus').textContent = conv.listing;
+  const av = document.getElementById('chatAv');
+  if (av) { av.childNodes[0].textContent = conv.init; av.style.background = conv.color; }
+
+  loadMessages(id);
   renderConvList();
-  if (window.innerWidth < 768) {
-    document.getElementById('convPanel').classList.add('mobile-hidden');
-    document.getElementById('chatPanel').classList.remove('mobile-hidden');
-    document.getElementById('bottomNav').style.display = 'none';
-  }
+
+  document.querySelector('.chat-panel').classList.add('active');
 }
 
-function showConvList() {
-  document.getElementById('convPanel').classList.remove('mobile-hidden');
-  document.getElementById('chatPanel').classList.add('mobile-hidden');
-  document.getElementById('bottomNav').style.display = 'flex';
+function renderMessages(convId) {
+  const wrap = document.getElementById('messagesWrap');
+  if (!wrap) return;
+  const user = getUser();
+
+  if (!activeMessages.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:3rem;color:rgba(255,255,255,0.3);font-size:13px;">No messages yet.</div>';
+    return;
+  }
+
+  wrap.innerHTML = activeMessages.map(function(msg) {
+    const isMine = user && msg.sender && (msg.sender._id === user._id || msg.sender === user._id);
+    const type = isMine ? 'sent' : 'received';
+    const time = new Date(msg.createdAt).toLocaleTimeString('en-NG', {hour:'2-digit', minute:'2-digit'});
+    return `<div class="msg-row ${type}">
+      <div class="msg-bubble ${type}">
+        <div class="msg-text">${msg.text}</div>
+        <div class="msg-time">${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !activeConvId) return;
+  input.value = '';
+  autoResize(input);
+  sendMessageToAPI(activeConvId, text);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function setConvTab(btn, tab) {
-  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.conv-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   convTab = tab;
   renderConvList();
 }
 
-function filterConvs(q) {
-  searchQuery = q.toLowerCase();
+function searchConvs(q) {
+  searchQuery = q;
   renderConvList();
-}
-
-// ── SEND MESSAGE ──
-function sendMessage() {
-  const input = document.getElementById('msgInput');
-  const text = input.value.trim();
-  if (!text) return;
-
-  const conv = CONVERSATIONS.find(c => c.id === activeConvId);
-  const newMsg = { id: Date.now(), type:'sent', text, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), read:false };
-  conv.messages.push(newMsg);
-  conv.last = text;
-  conv.time = 'Just now';
-
-  input.value = '';
-  input.style.height = 'auto';
-  renderMessages(activeConvId);
-  renderConvList();
-
-  // Simulate reply after 1.5s
-  if (conv.online) {
-    setTimeout(() => {
-      document.getElementById('typingWrap').style.display = 'block';
-      document.getElementById('messagesWrap').scrollTop = document.getElementById('messagesWrap').scrollHeight;
-      setTimeout(() => {
-        document.getElementById('typingWrap').style.display = 'none';
-        const replies = [
-          'Yes of course! Let me know what time works for you.',
-          'That sounds great. I\'ll prepare the documents.',
-          'The price is as stated but we can discuss on viewing.',
-          'Parking is included — 2 spaces for this unit.'
-        ];
-        const reply = { id: Date.now(), type:'received', text: replies[Math.floor(Math.random()*replies.length)], time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), read:false };
-        conv.messages.push(reply);
-        conv.last = reply.text;
-        renderMessages(activeConvId);
-        renderConvList();
-      }, 2000);
-    }, 500);
-  }
-}
-
-function sendQuickReply(btn) {
-  document.getElementById('msgInput').value = btn.textContent;
-  sendMessage();
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
 }
 
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-// ── INIT ──
-renderConvList();
-renderMessages(activeConvId);
+loadConversations();
 </script>
 </body>
 </html>
