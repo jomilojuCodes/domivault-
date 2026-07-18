@@ -247,9 +247,8 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
         <input type="text" placeholder="Search enquiries..." oninput="filterConvs(this.value)"/>
       </div>
       <div class="conv-tabs">
-        <button class="ctab active" onclick="setTab(this,'all')">All <span style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">4</span></button>
-        <button class="ctab" onclick="setTab(this,'unread')">Unread <span style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">2</span></button>
-        <button class="ctab" onclick="setTab(this,'archived')">Archived</button>
+        <button class="ctab active" onclick="setTab(this,'all')">All <span id="tabAllCount" style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">0</span></button>
+        <button class="ctab" onclick="setTab(this,'unread')">Unread <span id="tabUnreadCount" style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">0</span></button>
       </div>
     </div>
     <div class="conv-list" id="convList"></div>
@@ -424,7 +423,17 @@ async function loadConversations() {
         };
       });
       renderConvList();
+      // Update tab counts
+      const allCount = document.getElementById('tabAllCount');
+      const unreadCount = document.getElementById('tabUnreadCount');
+      if (allCount) allCount.textContent = CONVS.length;
+      if (unreadCount) unreadCount.textContent = CONVS.filter(c => c.unread > 0).length;
       if (CONVS.length > 0) openConv(CONVS[0].id);
+      else {
+        // Show empty state
+        const list = document.getElementById('convList');
+        if (list) list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,0.3);font-size:13px;">No enquiries yet.<br/>When tenants message you, conversations will appear here.</div>';
+      }
     }
   } catch (err) {
     console.error('Failed to load conversations:', err);
@@ -821,9 +830,8 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
         <input type="text" placeholder="Search enquiries..." oninput="filterConvs(this.value)"/>
       </div>
       <div class="conv-tabs">
-        <button class="ctab active" onclick="setTab(this,'all')">All <span style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">4</span></button>
-        <button class="ctab" onclick="setTab(this,'unread')">Unread <span style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">2</span></button>
-        <button class="ctab" onclick="setTab(this,'archived')">Archived</button>
+        <button class="ctab active" onclick="setTab(this,'all')">All <span id="tabAllCount" style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">0</span></button>
+        <button class="ctab" onclick="setTab(this,'unread')">Unread <span id="tabUnreadCount" style="background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;">0</span></button>
       </div>
     </div>
     <div class="conv-list" id="convList"></div>
