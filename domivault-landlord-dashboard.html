@@ -198,7 +198,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <div class="stat-card gold"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total listings</div></div>
       <div class="stat-card"><div class="stat-num" id="statLive">0</div><div class="stat-label">Live & active</div></div>
       <div class="stat-card"><div class="stat-num" id="statEnquiries">0</div><div class="stat-label">Enquiries</div></div>
-      <div class="stat-card"><div class="stat-num">4.8</div><div class="stat-label">Avg rating</div><div class="stat-trend">★★★★★</div></div>
+      <div class="stat-card"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending</div></div>
     </div>
 
     <button class="add-listing-btn" onclick="window.location='domivault-property-submission.html'">
@@ -216,11 +216,12 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
           <button class="chart-tab" onclick="setChartTab(this,'enquiries')">Enquiries</button>
         </div>
       </div>
-      <div class="chart-card">
+      <div class="chart-card" id="analyticsCard">
         <div class="chart-header"><div class="chart-title" id="chartTitle">Total listing views — last 7 days</div></div>
         <div class="chart-wrap"><canvas id="analyticsChart"></canvas></div>
         <div class="chart-legend"><div class="chart-legend-item"><div class="chart-legend-dot" style="background:#BA7517;"></div>Your listings</div></div>
       </div>
+      <div id="analyticsEmpty" style="display:none;text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No analytics yet. Submit a listing to start tracking views.</div>
     </div>
 
     <hr class="section-divider"/>
@@ -247,22 +248,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
 
     <div class="section">
       <div class="section-head" id="reviewsSection"><div class="section-label">Recent reviews</div></div>
-      <div class="review-summary">
-        <div><div class="review-big-num">4.8</div><div class="review-big-stars">★★★★★</div><div class="review-big-label">12 reviews</div></div>
-        <div class="review-bars">
-          <div class="review-bar-row"><div class="review-bar-star">5</div><div class="review-bar-track"><div class="review-bar-fill" style="width:75%;"></div></div></div>
-          <div class="review-bar-row"><div class="review-bar-star">4</div><div class="review-bar-track"><div class="review-bar-fill" style="width:17%;"></div></div></div>
-          <div class="review-bar-row"><div class="review-bar-star">3</div><div class="review-bar-track"><div class="review-bar-fill" style="width:8%;"></div></div></div>
-          <div class="review-bar-row"><div class="review-bar-star">2</div><div class="review-bar-track"><div class="review-bar-fill" style="width:0%;"></div></div></div>
-          <div class="review-bar-row"><div class="review-bar-star">1</div><div class="review-bar-track"><div class="review-bar-fill" style="width:0%;"></div></div></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="review-header"><div class="review-avatar" style="background:linear-gradient(135deg,#0F6E56,#132040);">T</div><div><div class="review-name">Tunde A.</div></div><div class="review-date">Dec 2025</div></div>
-        <div class="review-stars">★★★★★</div>
-        <div class="review-prop">Modern 4-Bed Apartment · Lekki Phase 1</div>
-        <div class="review-text">"Very responsive landlord. Property was exactly as described. The Domivault inspection gave me full confidence. Highly recommend."</div>
-      </div>
+<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No reviews yet. Reviews will appear here once tenants leave feedback.</div>
     </div>
 
     <hr class="section-divider"/>
