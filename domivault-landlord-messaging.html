@@ -164,7 +164,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 .msg-send svg{width:18px;height:18px;color:var(--navy);}
 
 /* BOTTOM NAV */
-.bottom-nav{display:flex;justify-content:space-around;padding:.7rem 0 1rem;background:rgba(10,22,40,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(186,117,23,.15);flex-shrink:0;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-around;padding:.7rem 0 1rem;background:rgba(10,22,40,.97);backdrop-filter:blur(14px);border-top:1px solid rgba(186,117,23,.15);}
 .bnav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:rgba(255,255,255,.3);font-family:var(--sans);transition:color .2s;}
 .bnav-btn.active{color:var(--gold);}
 .bnav-btn svg{width:20px;height:20px;}
@@ -208,9 +208,9 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
   <div class="nav-right">
     <button class="iBtn" onclick="window.location='domivault-notifications.html'" aria-label="Notifications">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="nBadge">3</div>
+      <div class="nBadge" id="bellBadge" style="display:none;">0</div>
     </button>
-    <div class="navAvatar" id="navAvatar">A</div>
+    <div class="navAvatar" id="navAvatar">?</div>
   </div>
 </nav>
 
@@ -633,7 +633,30 @@ function handleLogout() {
 }
 
 // ── INIT ──
+async function loadNotifCount() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/notifications/unread-count', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    const badge = document.getElementById('bellBadge');
+    if (badge) {
+      if (data.unreadCount > 0) {
+        badge.textContent = data.unreadCount;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load notif count:', err);
+  }
+}
+
 loadConversations();
+loadNotifCount();
 </script>
 </body>
 </html>
