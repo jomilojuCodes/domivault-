@@ -131,8 +131,8 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     <!-- TABS -->
     <div class="tabs-wrap">
       <div class="tabs">
-        <button class="tab active" onclick="setTab(this,'all')">All <span class="tab-badge" id="allBadge">5</span></button>
-        <button class="tab" onclick="setTab(this,'messages')">Messages <span class="tab-badge" id="msgBadge">2</span></button>
+        <button class="tab active" onclick="setTab(this,'all')">All <span class="tab-badge" id="allBadge">0</span></button>
+        <button class="tab" onclick="setTab(this,'messages')">Messages <span class="tab-badge" id="msgBadge">0</span></button>
         <button class="tab" onclick="setTab(this,'listings')">Listings</button>
         <button class="tab" onclick="setTab(this,'viewings')">Viewings</button>
         <button class="tab" onclick="setTab(this,'system')">System</button>
@@ -210,6 +210,13 @@ async function fetchNotifications() {
   } catch (err) {
     console.error('Failed to fetch notifications:', err);
   }
+
+  // Update tab badge counts with real data
+  const allBadge = document.getElementById('allBadge');
+  const msgBadge = document.getElementById('msgBadge');
+  if (allBadge) allBadge.textContent = NOTIFICATIONS.length;
+  if (msgBadge) msgBadge.textContent = NOTIFICATIONS.filter(function(n) { return n.tab === 'messages'; }).length;
+
   renderNotifs();
 }
 
@@ -259,7 +266,7 @@ function getIconClass(type) {
 
 function getActions(n) {
   if (n.type === 'new_message' || n.type === 'new_enquiry') {
-    return [{label:'Reply', cls:'na-primary', fn:"window.location='domivault-messaging.html'"}, {label:'Dismiss', cls:'na-secondary', fn:"markRead('" + n._id + "')"}];
+    return [{label:'Reply', cls:'na-primary', fn:"window.location=(localStorage.getItem('dv_user') && JSON.parse(localStorage.getItem('dv_user')).role === 'landlord' ? 'domivault-landlord-messaging.html' : 'domivault-messaging.html')"}, {label:'Dismiss', cls:'na-secondary', fn:"markRead('" + n._id + "')"}];
   }
   if (n.type === 'listing_live' || n.type === 'listing_approved') {
     return [{label:'View listing', cls:'na-primary', fn:"window.location='domivault-landlord-dashboard.html'"}];
