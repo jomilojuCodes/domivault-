@@ -147,7 +147,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="nav-notif-badge" id="notifBadge" style="display:none;">0</div>
     </button>
-    <div class="nav-avatar" id="navAvatar">A</div>
+    <div class="nav-avatar" id="navAvatar">?</div>
   </div>
 </nav>
 
@@ -307,7 +307,11 @@ const viewsData = [28,35,42,38,55,67,82];
 const enqData = [2,3,4,3,5,6,8];
 let chart;
 
+// Analytics — only build chart if landlord has live listings
+let hasLiveListings = false;
+
 function buildChart(tab) {
+  if (!hasLiveListings) return;
   const ctx = document.getElementById('analyticsChart').getContext('2d');
   if (chart) chart.destroy();
   chart = new Chart(ctx, {
@@ -339,8 +343,6 @@ function setChartTab(btn, tab) {
   buildChart(tab);
 }
 
-buildChart('views');
-
 const API_URL = 'https://domivault-backend-production.up.railway.app';
 function getToken() { return localStorage.getItem('dv_token'); }
 function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
@@ -358,7 +360,7 @@ function handleLogout() {
   if (confirm('Are you sure you want to log out?')) {
     localStorage.removeItem('dv_token');
     localStorage.removeItem('dv_user');
-    window.location = 'domivault-with-images.html';
+    window.location = 'domivault-complete-onboarding.html';
   }
 }
 
@@ -381,8 +383,24 @@ async function loadDashboard() {
     const listings = await res.json();
 
     if (Array.isArray(listings)) {
+      const live = listings.filter(l => l.status === 'live').length;
+      const pending = listings.filter(l => l.status === 'pending' || l.status === 'inspection_scheduled').length;
       document.getElementById('statTotal').textContent = listings.length;
-      document.getElementById('statLive').textContent = listings.filter(l => l.status === 'live').length;
+      document.getElementById('statLive').textContent = live;
+      if (document.getElementById('statPending')) document.getElementById('statPending').textContent = pending;
+
+      // Show/hide analytics based on live listings
+      hasLiveListings = live > 0;
+      const card = document.getElementById('analyticsCard');
+      const empty = document.getElementById('analyticsEmpty');
+      if (hasLiveListings) {
+        if (card) card.style.display = 'block';
+        if (empty) empty.style.display = 'none';
+        buildChart('views');
+      } else {
+        if (card) card.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+      }
       renderListings(listings);
     }
 
