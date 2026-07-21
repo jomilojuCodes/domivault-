@@ -141,7 +141,29 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
 .modal-btn-confirm{background:var(--error);color:white;}
 .page{display:none;}
 .page.active{display:block;}
-@media(max-width:768px){.sidebar{display:none;}.content{padding:1.5rem 5%;}}
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .content{padding:1.5rem 5% 80px;}
+  .admin-bottom-nav{display:flex!important;}
+}
+.admin-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  justify-content:space-around;
+  padding:0.7rem 0 1rem;
+  background:rgba(10,22,40,0.97);
+  backdrop-filter:blur(14px);
+  border-top:1px solid rgba(186,117,23,0.15);
+}
+.admin-bnav-btn{
+  background:none;border:none;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;color:rgba(255,255,255,0.3);
+  font-family:var(--sans);transition:color 0.2s;
+}
+.admin-bnav-btn.active{color:var(--gold);}
+.admin-bnav-btn svg{width:20px;height:20px;}
+.admin-bnav-btn span{font-size:10px;font-weight:500;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
@@ -167,7 +189,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
   </div>
   <div class="tb-right">
     <button class="iBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
-    <div class="tb-avatar" id="adminAvatar">D</div>
+    <div class="tb-avatar" id="adminAvatar">A</div>
   </div>
 </nav>
 
@@ -304,6 +326,17 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
 </div>
 
 <script>
+(function() {
+  try {
+    var u = localStorage.getItem('dv_user');
+    if (u) {
+      var user = JSON.parse(u);
+      var av = document.getElementById('adminAvatar');
+      if (av) av.textContent = user.name.charAt(0).toUpperCase();
+    }
+  } catch(e) {}
+})();
+
 const API_URL = 'https://domivault-backend-production.up.railway.app';
 function getToken() { return localStorage.getItem('dv_token'); }
 function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
@@ -637,8 +670,48 @@ function buildReportCharts() {
   });
 }
 
+// ── UPDATE MOBILE BOTTOM NAV ──
+function updateBnav(page) {
+  document.querySelectorAll('.admin-bnav-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  var active = document.getElementById('bnav-' + page);
+  if (active) active.classList.add('active');
+}
+
+// Override setPage to also update bnav
+var _origSetPage = setPage;
+setPage = function(btn, page) {
+  _origSetPage(btn, page);
+  updateBnav(page);
+};
+
 // Initialize
 loadOverview();
 </script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="admin-bottom-nav">
+  <button class="admin-bnav-btn active" id="bnav-overview" onclick="setPage(this,'overview');updateBnav('overview')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Overview</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-listings" onclick="setPage(this,'listings');updateBnav('listings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <span>Listings</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-users" onclick="setPage(this,'users');updateBnav('users')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Users</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-verifications" onclick="setPage(this,'verifications');updateBnav('verifications')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>Verify</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-reports" onclick="setPage(this,'reports');updateBnav('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Reports</span>
+  </button>
+</nav>
 </body>
 </html>
