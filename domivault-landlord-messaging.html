@@ -44,16 +44,16 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 .snav-badge{position:absolute;top:4px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;}
 
 /* CONV PANEL */
-.conv-panel{width:100%;max-width:380px;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;background:var(--navy);}
-.conv-header{padding:1.25rem 1.25rem .75rem;flex-shrink:0;}
+.conv-panel{width:100%;max-width:380px;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;flex-shrink:0;background:var(--navy);overflow:visible;}
+.conv-header{padding:1.25rem 1.25rem .75rem;flex-shrink:0;overflow:visible;}
 .conv-title{font-family:var(--serif);font-size:1.4rem;font-weight:700;margin-bottom:.25rem;}
 .conv-subtitle{font-size:12px;color:rgba(255,255,255,.35);margin-bottom:.85rem;}
 .conv-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:.65rem .9rem;margin-bottom:.75rem;}
 .conv-search svg{width:15px;height:15px;color:rgba(255,255,255,.3);flex-shrink:0;}
 .conv-search input{flex:1;background:none;border:none;outline:none;color:var(--white);font-size:13px;font-family:var(--sans);}
 .conv-search input::placeholder{color:rgba(255,255,255,.25);}
-.conv-tabs{display:flex;gap:4px;margin-bottom:.5rem;}
-.ctab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.conv-tabs{display:flex;gap:4px;margin-bottom:.5rem;position:sticky;top:0;z-index:5;background:var(--navy);padding:0.5rem 0;}
+.ctab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .2s;position:relative;z-index:10;}
 .ctab.active{background:rgba(186,117,23,.15);border-color:rgba(186,117,23,.3);color:var(--gold-light);}
 .conv-list{flex:1;overflow-y:auto;}
 .conv-list::-webkit-scrollbar{width:0;}
@@ -368,6 +368,22 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 </nav>
 
 <script>
+// ── SET AVATAR IMMEDIATELY ──
+(function() {
+  try {
+    var u = localStorage.getItem('dv_user');
+    if (u) {
+      var user = JSON.parse(u);
+      var init = user.name.charAt(0).toUpperCase();
+      // Set all avatar elements
+      var navAv = document.getElementById('navAvatar');
+      if (navAv) navAv.textContent = init;
+      var allAv = document.querySelectorAll('.navAvatar');
+      allAv.forEach(function(el) { el.textContent = init; });
+    }
+  } catch(e) {}
+})();
+
 const API_URL = 'https://domivault-backend-production.up.railway.app';
 function getToken() { return localStorage.getItem('dv_token'); }
 function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
@@ -453,6 +469,10 @@ async function loadConversations() {
 
 // ── RENDER CONVERSATION LIST ──
 function renderConvList() {
+  filterByTab();
+}
+
+function _oldRenderConvList() {
   const list = document.getElementById('convList');
   if (!list) return;
 
@@ -602,10 +622,45 @@ function backToList() {
 }
 
 // ── TAB SWITCHING ──
+let currentTab = 'all';
+
 function setTab(btn, tab) {
   document.querySelectorAll('.ctab').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
-  renderConvList();
+  currentTab = tab;
+  filterByTab();
+}
+
+function filterByTab() {
+  const list = document.getElementById('convList');
+  if (!list) return;
+  
+  let filtered = CONVS;
+  if (currentTab === 'unread') {
+    filtered = CONVS.filter(function(c) { return c.unread > 0; });
+  }
+  
+  if (filtered.length === 0 && currentTab === 'unread') {
+    list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,0.25);font-size:13px;">No unread messages.</div>';
+    return;
+  }
+  
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,0.25);font-size:13px;line-height:2;">No enquiries yet.<br/>When tenants message you,<br/>conversations will appear here.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(c) {
+    return '<div class="conv-item ' + (c.unread > 0 ? 'unread' : '') + ' ' + (c.id === activeConvId ? 'active' : '') + '" onclick="openConv(\'' + c.id + '\')">' +
+      '<div class="conv-av" style="background:' + c.color + ';">' + c.init + '</div>' +
+      '<div class="conv-body">' +
+      '<div class="conv-name">' + c.name + '</div>' +
+      '<div class="conv-listing">' + c.listing + '</div>' +
+      '<div class="conv-preview">' + c.last + '</div>' +
+      '</div>' +
+      '<div class="conv-meta"><div class="conv-time">' + c.time + '</div></div>' +
+      '</div>';
+  }).join('');
 }
 
 // ── SEARCH ──
