@@ -357,7 +357,29 @@ function setPage(btn, page) {
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
-  if (page === 'reports') setTimeout(buildReportCharts, 50);
+  if (page === 'reports') {
+    // Make sure stats are loaded first
+    if (window._domivaultStats) {
+      setTimeout(buildReportCharts, 50);
+    } else {
+      // Load stats then build charts
+      const token = getToken();
+      fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(r => r.json())
+        .then(stats => {
+          window._domivaultStats = stats;
+          // Update report stat cards
+          if (document.getElementById('repUsers')) {
+            document.getElementById('repUsers').textContent = stats.totalUsers || 0;
+            document.getElementById('repLandlords').textContent = stats.totalLandlords || 0;
+            document.getElementById('repTenants').textContent = stats.totalTenants || 0;
+            document.getElementById('repLive').textContent = stats.liveListings || 0;
+          }
+          setTimeout(buildReportCharts, 50);
+        })
+        .catch(err => console.error('Stats load failed:', err));
+    }
+  }
   if (page === 'listings') loadListings();
   if (page === 'users') loadUsers();
   if (page === 'verifications') loadVerifications();
@@ -643,11 +665,16 @@ async function loadVerifications() {
 }
 
 // ── CHARTS ──
-let chartsBuilt = false;
-function buildReportCharts() {
-  if (chartsBuilt) return; chartsBuilt = true;
+let growthChartInstance = null;
+let pieChartInstance = null;
 
+function buildReportCharts() {
   const stats = window._domivaultStats || {};
+  if (!stats.totalUsers && stats.totalUsers !== 0) {
+    // Stats not loaded yet, wait
+    setTimeout(buildReportCharts, 500);
+    return;
+  }
 
   // Update report stats with real data
   document.getElementById('repUsers').textContent = stats.totalUsers || allUsers.length;
@@ -659,7 +686,8 @@ function buildReportCharts() {
   const labels = stats.labels || ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'];
   const growthData = stats.cumulativeUsers || [0,0,0,0,0,0,0,stats.totalUsers || 0];
 
-  new Chart(document.getElementById('growthChart'), {
+  if (growthChartInstance) { growthChartInstance.destroy(); growthChartInstance = null; }
+  growthChartInstance = new Chart(document.getElementById('growthChart'), {
     type: 'line',
     data: {
       labels: labels,
@@ -698,7 +726,8 @@ function buildReportCharts() {
     landlords > 0 ? landlords : 0.001
   ] : [1, 1];
   const pieColors = ['#BA7517','#185FA5'];
-  new Chart(document.getElementById('userPieChart'), {
+  if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+  pieChartInstance = new Chart(document.getElementById('userPieChart'), {
     type: 'doughnut',
     data: { 
       labels: pieLabels, 
