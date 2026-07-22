@@ -690,13 +690,18 @@ function buildReportCharts() {
 
   const landlords = stats.totalLandlords || 0;
   const tenants = stats.totalTenants || 0;
-  // Only show pie if we have users
-  const pieData = tenants + landlords > 0 ? [tenants, landlords] : [1, 1];
-  const pieColors = tenants + landlords > 0 ? ['#BA7517','#185FA5'] : ['rgba(255,255,255,0.05)','rgba(255,255,255,0.05)'];
+  // Build pie data — always show both segments, use 0.5 placeholder if zero so chart renders
+  const hasUsers = tenants + landlords > 0;
+  const pieLabels = ['Tenants (' + tenants + ')','Landlords (' + landlords + ')'];
+  const pieData = hasUsers ? [
+    tenants > 0 ? tenants : 0.001,
+    landlords > 0 ? landlords : 0.001
+  ] : [1, 1];
+  const pieColors = ['#BA7517','#185FA5'];
   new Chart(document.getElementById('userPieChart'), {
     type: 'doughnut',
     data: { 
-      labels: ['Tenants','Landlords'], 
+      labels: pieLabels, 
       datasets: [{ 
         data: pieData, 
         backgroundColor: pieColors, 
@@ -707,8 +712,18 @@ function buildReportCharts() {
     options: { 
       responsive: true, maintainAspectRatio: false, 
       plugins: { 
-        legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } },
-        tooltip: { callbacks: { label: function(ctx) { return tenants + landlords === 0 ? 'No users yet' : ctx.label + ': ' + ctx.raw; } } }
+        legend: { 
+          position: 'bottom', 
+          labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } 
+        },
+        tooltip: { 
+          callbacks: { 
+            label: function(ctx) { 
+              var real = ctx.dataIndex === 0 ? tenants : landlords;
+              return ctx.label.split(' ')[0] + ': ' + real;
+            } 
+          } 
+        }
       } 
     }
   });
