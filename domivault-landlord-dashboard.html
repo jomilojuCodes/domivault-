@@ -189,9 +189,9 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
   <main class="content">
     <div class="page-greeting" id="profileSection">Good morning, <span id="greetingName">Landlord</span></div>
     <div class="page-title">Your dashboard</div>
-    <div class="verified-pill">
+    <div class="verified-pill" id="verifiedPill">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Verified landlord · Active
+      <span id="verifiedText">Checking...</span>
     </div>
 
     <div class="stats-grid">
@@ -311,29 +311,14 @@ let chart;
 let hasLiveListings = false;
 
 function buildChart(tab) {
-  if (!hasLiveListings) return;
-  const ctx = document.getElementById('analyticsChart').getContext('2d');
-  if (chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: days,
-      datasets: [{
-        data: tab === 'views' ? viewsData : enqData,
-        borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.08)',
-        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517',
-        fill: true, borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 } },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true }
-      }
-    }
-  });
+  // Analytics coming soon - show placeholder
+  const card = document.getElementById('analyticsCard');
+  const empty = document.getElementById('analyticsEmpty');
+  if (card) card.style.display = 'none';
+  if (empty) {
+    empty.style.display = 'block';
+    empty.textContent = 'Analytics tracking coming soon. Views and enquiries will appear here once live.';
+  }
 }
 
 function setChartTab(btn, tab) {
@@ -374,6 +359,34 @@ async function loadDashboard() {
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
     document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  // Fetch real user data to check isVerified
+  try {
+    const meRes = await fetch(API_URL + '/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const meData = await meRes.json();
+    const pill = document.getElementById('verifiedPill');
+    const pillText = document.getElementById('verifiedText');
+    if (pill && pillText) {
+      if (meData.isVerified) {
+        pill.style.background = 'rgba(46,204,113,0.1)';
+        pill.style.border = '1px solid rgba(46,204,113,0.25)';
+        pill.style.color = 'var(--success)';
+        pillText.textContent = 'Verified landlord · Active';
+      } else {
+        pill.style.background = 'rgba(186,117,23,0.1)';
+        pill.style.border = '1px solid rgba(186,117,23,0.25)';
+        pill.style.color = 'var(--gold-light)';
+        pillText.textContent = 'Unverified · Pending review';
+      }
+    }
+    // Update localStorage with fresh data
+    localStorage.setItem('dv_user', JSON.stringify(meData));
+  } catch(err) {
+    const pillText = document.getElementById('verifiedText');
+    if (pillText) pillText.textContent = 'Landlord · Active';
   }
 
   try {
