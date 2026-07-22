@@ -389,35 +389,38 @@ async function loadOverview() {
   if (user) document.getElementById('adminAvatar').textContent = user.name.charAt(0).toUpperCase();
 
   try {
-    const [propRes, userRes] = await Promise.all([
+    // Load real stats
+    const [statsRes, propRes, userRes] = await Promise.all([
+      fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } }),
       fetch(API_URL + '/api/admin/properties', { headers: { 'Authorization': 'Bearer ' + token } }),
       fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } })
     ]);
 
+    const stats = await statsRes.json();
     const properties = await propRes.json();
     const users = await userRes.json();
     allUsers = Array.isArray(users) ? users : [];
 
+    // Update stats from real data
+    if (stats) {
+      document.getElementById('statUsers').textContent = stats.totalUsers || 0;
+      document.getElementById('statLandlords').textContent = stats.totalLandlords || 0;
+      document.getElementById('statLive').textContent = stats.liveListings || 0;
+      document.getElementById('statPending').textContent = stats.pendingListings || 0;
+      document.getElementById('pendingBadge').textContent = stats.pendingListings || 0;
+
+      // Store stats for charts
+      window._domivaultStats = stats;
+    }
+
     if (Array.isArray(properties)) {
       const pending = properties.filter(p => p.status === 'pending');
-      const live = properties.filter(p => p.status === 'live');
-
-      document.getElementById('statPending').textContent = pending.length;
-      document.getElementById('statLive').textContent = live.length;
-      document.getElementById('pendingBadge').textContent = pending.length;
-
-      // Overview pending
       const container = document.getElementById('overviewPendingContainer');
       if (pending.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No pending listings.</div>';
       } else {
         container.innerHTML = pending.slice(0, 3).map(p => renderListingCard(p)).join('');
       }
-    }
-
-    if (Array.isArray(users)) {
-      document.getElementById('statUsers').textContent = users.length;
-      document.getElementById('statLandlords').textContent = users.filter(u => u.role === 'landlord').length;
     }
 
   } catch (err) {
@@ -644,29 +647,58 @@ let chartsBuilt = false;
 function buildReportCharts() {
   if (chartsBuilt) return; chartsBuilt = true;
 
-  // Update report stats
-  document.getElementById('repUsers').textContent = allUsers.length;
-  document.getElementById('repLandlords').textContent = allUsers.filter(u => u.role === 'landlord').length;
-  document.getElementById('repTenants').textContent = allUsers.filter(u => u.role === 'tenant').length;
+  const stats = window._domivaultStats || {};
 
-  const liveCount = document.getElementById('statLive').textContent;
-  document.getElementById('repLive').textContent = liveCount;
+  // Update report stats with real data
+  document.getElementById('repUsers').textContent = stats.totalUsers || allUsers.length;
+  document.getElementById('repLandlords').textContent = stats.totalLandlords || allUsers.filter(u => u.role === 'landlord').length;
+  document.getElementById('repTenants').textContent = stats.totalTenants || allUsers.filter(u => u.role === 'tenant').length;
+  document.getElementById('repLive').textContent = stats.liveListings || 0;
+
+  // Use real weekly signup data
+  const labels = stats.labels || ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'];
+  const growthData = stats.cumulativeUsers || [0,0,0,0,0,0,0,stats.totalUsers || 0];
 
   new Chart(document.getElementById('growthChart'), {
     type: 'line',
     data: {
-      labels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'],
-      datasets: [{ data: [2,4,6,8,10,12,15,allUsers.length], borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.08)', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517', fill: true, borderWidth: 2 }]
+      labels: labels,
+      datasets: [{ 
+        label: 'Total users',
+        data: growthData, 
+        borderColor: '#BA7517', 
+        backgroundColor: 'rgba(186,117,23,0.08)', 
+        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517', 
+        fill: true, borderWidth: 2 
+      }]
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } }, y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true } } }
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 } }, 
+      scales: { 
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } }, 
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } }, beginAtZero: true } 
+      } 
+    }
   });
 
-  const landlords = allUsers.filter(u => u.role === 'landlord').length;
-  const tenants = allUsers.filter(u => u.role === 'tenant').length;
+  const landlords = stats.totalLandlords || 0;
+  const tenants = stats.totalTenants || 0;
   new Chart(document.getElementById('userPieChart'), {
     type: 'doughnut',
-    data: { labels: ['Tenants','Landlords'], datasets: [{ data: [tenants, landlords], backgroundColor: ['#BA7517','#185FA5'], borderColor: '#0a1628', borderWidth: 3 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } } } }
+    data: { 
+      labels: ['Tenants','Landlords'], 
+      datasets: [{ 
+        data: [tenants, landlords], 
+        backgroundColor: ['#BA7517','#185FA5'], 
+        borderColor: '#0a1628', 
+        borderWidth: 3 
+      }] 
+    },
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } } } 
+    }
   });
 }
 
