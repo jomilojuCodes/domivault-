@@ -540,7 +540,9 @@ function closeRejectModal() { document.getElementById('rejectModal').classList.r
 async function confirmReject() {
   const token = getToken();
   if (!token) return;
+  const reason = document.getElementById('rejectReason').value;
   closeRejectModal();
+
   if (rejectTarget === 'listing' && rejectId) {
     try {
       await fetch(API_URL + '/api/admin/properties/' + rejectId + '/reject', {
@@ -548,7 +550,18 @@ async function confirmReject() {
       });
       showToast('Listing rejected.', 'error');
       loadListings(); loadOverview();
-    } catch (err) { console.error('Reject failed:', err); }
+    } catch (err) { console.error('Reject listing failed:', err); }
+  }
+
+  if (rejectTarget === 'verification' && rejectId) {
+    try {
+      // Suspend the landlord account and send notification
+      await fetch(API_URL + '/api/admin/users/' + rejectId + '/suspend', {
+        method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+      });
+      showToast('Landlord verification rejected.', 'error');
+      loadVerifications();
+    } catch (err) { console.error('Reject verification failed:', err); }
   }
 }
 
