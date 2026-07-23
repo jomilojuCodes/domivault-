@@ -669,40 +669,40 @@ function renderVerifCard(u, isVerified) {
   const statusText = isVerified ? '✅ Verified' : '⏳ Pending';
   const borderColor = isVerified ? 'rgba(46,204,113,0.15)' : 'rgba(186,117,23,0.25)';
 
-  return `<div class="queue-card" id="verif-\${u._id}" style="border-color:\${borderColor};margin-bottom:12px;">
+  return `<div class="queue-card" id="verif-${u._id}" style="border-color:${borderColor};margin-bottom:12px;">
     <div class="qc-header">
-      <div class="qc-avatar" style="background:linear-gradient(135deg,\${isVerified ? '#0F6E56' : '#BA7517'},#132040);">\${u.name.charAt(0)}</div>
+      <div class="qc-avatar" style="background:linear-gradient(135deg,${isVerified ? '#0F6E56' : '#BA7517'},#132040);">${u.name.charAt(0)}</div>
       <div style="flex:1;">
-        <div class="qc-name">\${u.name}</div>
-        <div class="qc-sub">\${u.email} · \${u.phone || 'No phone'}</div>
-        <div style="font-size:11px;margin-top:3px;color:\${statusColor};">\${statusText}</div>
+        <div class="qc-name">${u.name}</div>
+        <div class="qc-sub">${u.email} · ${u.phone || 'No phone'}</div>
+        <div style="font-size:11px;margin-top:3px;color:${statusColor};">${statusText}</div>
       </div>
-      <div class="qc-time">Joined \${joined}</div>
+      <div class="qc-time">Joined ${joined}</div>
     </div>
     <div class="qc-details">
       <div class="qc-row">
         <span class="qc-row-label">NIN</span>
-        <span class="qc-row-value" style="color:\${u.nin ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">\${u.nin || '❌ Not submitted'}</span>
+        <span class="qc-row-value" style="color:${u.nin ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">${u.nin || '❌ Not submitted'}</span>
       </div>
       <div class="qc-row">
         <span class="qc-row-label">CAC Number</span>
-        <span class="qc-row-value" style="color:\${u.cacNumber ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">\${u.cacNumber || '❌ Not submitted'}</span>
+        <span class="qc-row-value" style="color:${u.cacNumber ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">${u.cacNumber || '❌ Not submitted'}</span>
       </div>
       <div class="qc-row">
         <span class="qc-row-label">Selfie / Face</span>
-        <span class="qc-row-value">\${u.selfieUrl ? '<a href="' + u.selfieUrl + '" target="_blank" style="color:var(--gold);">📷 View selfie →</a>' : '<span style="color:var(--error);">❌ Not submitted</span>'}</span>
+        <span class="qc-row-value">${u.selfieUrl ? '<a href="' + u.selfieUrl + '" target="_blank" style="color:var(--gold);">📷 View selfie →</a>' : '<span style="color:var(--error);">❌ Not submitted</span>'}</span>
       </div>
       <div class="qc-row">
         <span class="qc-row-label">Account status</span>
-        <span class="qc-row-value" style="color:\${u.isSuspended ? 'var(--error)' : 'var(--success)'};">\${u.isSuspended ? '🔴 Suspended' : '🟢 Active'}</span>
+        <span class="qc-row-value" style="color:${u.isSuspended ? 'var(--error)' : 'var(--success)'};">${u.isSuspended ? '🔴 Suspended' : '🟢 Active'}</span>
       </div>
     </div>
-    \${!isVerified ? `<div class="qc-actions">
-      <button class="qc-btn qc-btn-approve" onclick="verifyUser('\${u._id}', this)">✓ Verify landlord</button>
-      <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification','\${u._id}')">✕ Reject</button>
+    ${!isVerified ? `<div class="qc-actions">
+      <button class="qc-btn qc-btn-approve" onclick="verifyUser('${u._id}', this)">✓ Verify landlord</button>
+      <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification','${u._id}')">✕ Reject</button>
     </div>` : `<div class="qc-actions">
       <span class="status-pill status-approved" style="padding:6px 14px;">✅ Verified</span>
-      <button class="qc-btn qc-btn-reject" onclick="toggleSuspend('\${u._id}', \${u.isSuspended}, this)">\${u.isSuspended ? '🔓 Reinstate' : '🔴 Suspend'}</button>
+      <button class="qc-btn qc-btn-reject" onclick="toggleSuspend('${u._id}', ${u.isSuspended}, this)">${u.isSuspended ? '🔓 Reinstate' : '🔴 Suspend'}</button>
     </div>`}
   </div>`;
 }
