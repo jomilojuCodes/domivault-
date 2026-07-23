@@ -188,7 +188,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     <div class="tb-badge">Admin</div>
   </div>
   <div class="tb-right">
-    <button class="iBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    
     <div class="tb-avatar" id="adminAvatar">A</div>
   </div>
 </nav>
@@ -358,27 +358,22 @@ function setPage(btn, page) {
   if (btn) btn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if (page === 'reports') {
-    // Make sure stats are loaded first
-    if (window._domivaultStats) {
-      setTimeout(buildReportCharts, 50);
-    } else {
-      // Load stats then build charts
-      const token = getToken();
-      fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })
-        .then(r => r.json())
-        .then(stats => {
-          window._domivaultStats = stats;
-          // Update report stat cards
-          if (document.getElementById('repUsers')) {
-            document.getElementById('repUsers').textContent = stats.totalUsers || 0;
-            document.getElementById('repLandlords').textContent = stats.totalLandlords || 0;
-            document.getElementById('repTenants').textContent = stats.totalTenants || 0;
-            document.getElementById('repLive').textContent = stats.liveListings || 0;
-          }
-          setTimeout(buildReportCharts, 50);
-        })
-        .catch(err => console.error('Stats load failed:', err));
-    }
+    const token = getToken();
+    fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function(r) { return r.json(); })
+      .then(function(stats) {
+        window._domivaultStats = stats;
+        var repUsers = document.getElementById('repUsers');
+        var repLandlords = document.getElementById('repLandlords');
+        var repTenants = document.getElementById('repTenants');
+        var repLive = document.getElementById('repLive');
+        if (repUsers) repUsers.textContent = stats.totalUsers !== undefined ? stats.totalUsers : 0;
+        if (repLandlords) repLandlords.textContent = stats.totalLandlords !== undefined ? stats.totalLandlords : 0;
+        if (repTenants) repTenants.textContent = stats.totalTenants !== undefined ? stats.totalTenants : 0;
+        if (repLive) repLive.textContent = stats.liveListings !== undefined ? stats.liveListings : 0;
+        setTimeout(buildReportCharts, 100);
+      })
+      .catch(function(err) { console.error('Stats load failed:', err); });
   }
   if (page === 'listings') loadListings();
   if (page === 'users') loadUsers();
@@ -571,6 +566,8 @@ async function loadUsers() {
 
 function renderUsersTable(users) {
   const tbody = document.getElementById('usersTableBody');
+  // Filter out admin accounts
+  users = users.filter(function(u) { return u.role !== 'admin'; });
   if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);">No users found.</td></tr>'; return; }
   tbody.innerHTML = users.map(u => {
     const init = u.name.charAt(0).toUpperCase();
@@ -626,42 +623,88 @@ async function toggleSuspend(id, isSuspended, btn) {
 async function loadVerifications() {
   const token = getToken();
   if (!token) return;
+  const container = document.getElementById('verificationsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div>';
+
   try {
     const res = await fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
     const users = await res.json();
     if (!Array.isArray(users)) return;
 
-    const pending = users.filter(u => u.role === 'landlord' && u.verificationStatus === 'pending_review');
-    const container = document.getElementById('verificationsContainer');
+    // Show ALL unverified landlords
+    const unverified = users.filter(u => u.role === 'landlord' && !u.isVerified);
+    const verified = users.filter(u => u.role === 'landlord' && u.isVerified);
 
-    if (pending.length === 0) {
-      container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No pending verifications.</div>';
+    if (unverified.length === 0 && verified.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No landlords registered yet.</div>';
       return;
     }
 
-    container.innerHTML = pending.map(u => `
-      <div class="queue-card" id="verif-${u._id}">
-        <div class="qc-header">
-          <div class="qc-avatar">${u.name.charAt(0)}</div>
-          <div>
-            <div class="qc-name">${u.name}</div>
-            <div class="qc-sub">${u.email} · ${u.phone || 'No phone'}</div>
-          </div>
-          <div class="qc-time">${getTimeAgo(u.updatedAt)}</div>
-        </div>
-        <div class="qc-details">
-          <div class="qc-row"><span class="qc-row-label">NIN</span><span class="qc-row-value">${u.nin || 'Not submitted'}</span></div>
-          <div class="qc-row"><span class="qc-row-label">CAC Number</span><span class="qc-row-value">${u.cacNumber || 'Not submitted'}</span></div>
-          <div class="qc-row"><span class="qc-row-label">Face verification</span><span class="qc-row-value">${u.selfieUrl ? '✅ Submitted' : '❌ Not submitted'}</span></div>
-          <div class="qc-row"><span class="qc-row-label">Status</span><span class="qc-row-value">${u.verificationStatus}</span></div>
-        </div>
-        <div class="qc-actions">
-          <button class="qc-btn qc-btn-approve" onclick="verifyUser('${u._id}', this)">✓ Verify & Approve</button>
-          <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification','${u._id}')">✕ Reject</button>
-        </div>
+    let html = '';
+
+    // Unverified landlords first
+    if (unverified.length > 0) {
+      html += '<div style="font-size:11px;font-weight:600;color:var(--error);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem;">Pending verification (' + unverified.length + ')</div>';
+      html += unverified.map(u => renderVerifCard(u, false)).join('');
+    } else {
+      html += '<div style="text-align:center;padding:1.5rem;background:rgba(46,204,113,0.05);border:1px solid rgba(46,204,113,0.15);border-radius:12px;color:var(--success);font-size:13px;margin-bottom:1rem;">✅ All landlords are verified!</div>';
+    }
+
+    // Verified landlords
+    if (verified.length > 0) {
+      html += '<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.08em;margin:1.5rem 0 0.75rem;">Verified landlords (' + verified.length + ')</div>';
+      html += verified.map(u => renderVerifCard(u, true)).join('');
+    }
+
+    container.innerHTML = html;
+  } catch (err) {
+    console.error('Load verifications failed:', err);
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error);font-size:13px;">Failed to load. Please try again.</div>';
+  }
+}
+
+function renderVerifCard(u, isVerified) {
+  const joined = new Date(u.createdAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'});
+  const statusColor = isVerified ? 'var(--success)' : 'var(--gold-light)';
+  const statusText = isVerified ? '✅ Verified' : '⏳ Pending';
+  const borderColor = isVerified ? 'rgba(46,204,113,0.15)' : 'rgba(186,117,23,0.25)';
+
+  return \`<div class="queue-card" id="verif-\${u._id}" style="border-color:\${borderColor};margin-bottom:12px;">
+    <div class="qc-header">
+      <div class="qc-avatar" style="background:linear-gradient(135deg,\${isVerified ? '#0F6E56' : '#BA7517'},#132040);">\${u.name.charAt(0)}</div>
+      <div style="flex:1;">
+        <div class="qc-name">\${u.name}</div>
+        <div class="qc-sub">\${u.email} · \${u.phone || 'No phone'}</div>
+        <div style="font-size:11px;margin-top:3px;color:\${statusColor};">\${statusText}</div>
       </div>
-    `).join('');
-  } catch (err) { console.error('Load verifications failed:', err); }
+      <div class="qc-time">Joined \${joined}</div>
+    </div>
+    <div class="qc-details">
+      <div class="qc-row">
+        <span class="qc-row-label">NIN</span>
+        <span class="qc-row-value" style="color:\${u.nin ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">\${u.nin || '❌ Not submitted'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">CAC Number</span>
+        <span class="qc-row-value" style="color:\${u.cacNumber ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">\${u.cacNumber || '❌ Not submitted'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">Selfie / Face</span>
+        <span class="qc-row-value">\${u.selfieUrl ? '<a href="' + u.selfieUrl + '" target="_blank" style="color:var(--gold);">📷 View selfie →</a>' : '<span style="color:var(--error);">❌ Not submitted</span>'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">Account status</span>
+        <span class="qc-row-value" style="color:\${u.isSuspended ? 'var(--error)' : 'var(--success)'};">\${u.isSuspended ? '🔴 Suspended' : '🟢 Active'}</span>
+      </div>
+    </div>
+    \${!isVerified ? \`<div class="qc-actions">
+      <button class="qc-btn qc-btn-approve" onclick="verifyUser('\${u._id}', this)">✓ Verify landlord</button>
+      <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification','\${u._id}')">✕ Reject</button>
+    </div>\` : \`<div class="qc-actions">
+      <span class="status-pill status-approved" style="padding:6px 14px;">✅ Verified</span>
+      <button class="qc-btn qc-btn-reject" onclick="toggleSuspend('\${u._id}', \${u.isSuspended}, this)">\${u.isSuspended ? '🔓 Reinstate' : '🔴 Suspend'}</button>
+    </div>\`}
+  </div>\`;
 }
 
 // ── CHARTS ──
@@ -670,11 +713,6 @@ let pieChartInstance = null;
 
 function buildReportCharts() {
   const stats = window._domivaultStats || {};
-  if (!stats.totalUsers && stats.totalUsers !== 0) {
-    // Stats not loaded yet, wait
-    setTimeout(buildReportCharts, 500);
-    return;
-  }
 
   // Update report stats with real data
   document.getElementById('repUsers').textContent = stats.totalUsers || allUsers.length;
