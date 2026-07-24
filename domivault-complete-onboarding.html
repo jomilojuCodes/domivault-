@@ -1531,8 +1531,13 @@ html, body {
   }
 
   function profileNext() {
-    if (selectedType === 'landlord') goTo('lintro');
-    else goTo('tsuccess');
+    if (selectedType === 'landlord') {
+      // Landlord goes straight to dashboard
+      // Verification is done from the dashboard
+      window.location = 'domivault-landlord-dashboard.html';
+    } else {
+      goTo('tsuccess');
+    }
   }
 
   // Fix 5: Update avatar initial from first name typed in signup
