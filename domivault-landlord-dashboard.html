@@ -194,6 +194,15 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <span id="verifiedText">Checking...</span>
     </div>
 
+    <!-- Verification Banner - shown only if unverified -->
+    <div id="verificationBanner" style="display:none;background:rgba(186,117,23,0.08);border:1px solid rgba(186,117,23,0.3);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:var(--gold-light);margin-bottom:3px;">⚠️ Complete your verification</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;">Submit your NIN, CAC number and a selfie to get the Verified Landlord badge. Your listings won't go live until you're verified.</div>
+      </div>
+      <button onclick="window.location='domivault-landlord-verification.html'" style="background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Verify now →</button>
+    </div>
+
     <div class="stats-grid">
       <div class="stat-card gold"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total listings</div></div>
       <div class="stat-card"><div class="stat-num" id="statLive">0</div><div class="stat-label">Live & active</div></div>
@@ -375,11 +384,17 @@ async function loadDashboard() {
         pill.style.border = '1px solid rgba(46,204,113,0.25)';
         pill.style.color = 'var(--success)';
         pillText.textContent = 'Verified landlord · Active';
+        // Hide verification banner
+        const banner = document.getElementById('verificationBanner');
+        if (banner) banner.style.display = 'none';
       } else {
         pill.style.background = 'rgba(186,117,23,0.1)';
         pill.style.border = '1px solid rgba(186,117,23,0.25)';
         pill.style.color = 'var(--gold-light)';
         pillText.textContent = 'Unverified · Pending review';
+        // Show verification banner
+        const banner = document.getElementById('verificationBanner');
+        if (banner) banner.style.display = 'flex';
       }
     }
     // Update localStorage with fresh data
