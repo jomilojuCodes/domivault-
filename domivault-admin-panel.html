@@ -209,6 +209,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     <button class="sb-btn" onclick="setPage(this,'verifications')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Verifications
+      <span class="sb-badge red" id="verificationsBadge" style="display:none;">0</span>
     </button>
     <div class="sb-section-label">Platform</div>
     <button class="sb-btn" onclick="setPage(this,'users')">
@@ -440,6 +441,20 @@ async function loadOverview() {
       }
     }
 
+    // Count pending verifications and update badge
+    if (Array.isArray(users)) {
+      const pendingVerifs = users.filter(u => u.role === 'landlord' && !u.isVerified && u.verificationStatus === 'pending_review');
+      const badge = document.getElementById('verificationsBadge');
+      if (badge) {
+        if (pendingVerifs.length > 0) {
+          badge.textContent = pendingVerifs.length;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
   } catch (err) {
     console.error('Overview load failed:', err);
   }
@@ -555,11 +570,12 @@ async function confirmReject() {
 
   if (rejectTarget === 'verification' && rejectId) {
     try {
-      // Suspend the landlord account and send notification
-      await fetch(API_URL + '/api/admin/users/' + rejectId + '/suspend', {
-        method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+      await fetch(API_URL + '/api/admin/users/' + rejectId + '/reject-verification', {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || 'Your documents did not meet our requirements. Please resubmit.' })
       });
-      showToast('Landlord verification rejected.', 'error');
+      showToast('Verification rejected. Landlord has been notified.', 'error');
       loadVerifications();
     } catch (err) { console.error('Reject verification failed:', err); }
   }
