@@ -23,127 +23,78 @@
   --radius: 16px;
   --radius-sm: 10px;
   --transition: 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --header-h: 64px;
 }
 
 html, body {
-  min-height: 100%;
+  height: 100%;
   font-family: var(--sans);
-  background: #060e1a;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow: auto;
-  padding: 2rem 1rem;
-}
-
-/* On mobile — go full screen, no phone frame border */
-@media (max-width: 700px) {
-  html, body {
-    padding: 0 !important;
-    margin: 0 !important;
-    background: var(--navy) !important;
-    display: block !important;
-    overflow: hidden !important;
-    height: 100% !important;
-    width: 100% !important;
-  }
-  .desktop-wrapper {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-  }
-  .phone-scale-wrap {
-    transform: none !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  .phone-frame {
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-  }
-  .dynamic-island { display: none !important; }
-  .status-bar { display: none !important; }
-  .flow-guide { display: none !important; }
-}
-
-/* ── PHONE FRAME ── */
-.phone-frame {
-  width: 390px;
-  height: 844px;
   background: var(--navy);
-  border-radius: 44px;
-  overflow: hidden;
-  position: relative;
-  flex-shrink: 0;
-  box-shadow:
-    0 0 0 10px #1a1a1a,
-    0 0 0 12px #2a2a2a,
-    0 40px 80px rgba(0,0,0,0.6),
-    0 0 120px rgba(186,117,23,0.08);
+  color: var(--white);
+}
+body { position: relative; overflow: hidden; }
+
+/* ── Persistent faint background texture ── */
+.site-bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(186,117,23,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(186,117,23,0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
-/* Scale phone to fit screen height */
-.phone-scale-wrap {
-  transform-origin: top center;
+/* ── SITE HEADER (persistent) ── */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+  z-index: 60; display: flex; align-items: center;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  background: rgba(10,22,40,0.7);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(186,117,23,0.12);
 }
-
-.dynamic-island {
-  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-  width: 120px; height: 34px;
-  background: #000; border-radius: 20px; z-index: 51;
-}
-
-.status-bar {
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 50px; z-index: 50;
-  display: flex; align-items: flex-end; justify-content: space-between;
-  padding: 0 28px 10px;
-  font-size: 12px; font-weight: 600; color: var(--white);
-}
-.status-time { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-.status-icons { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.site-logo { display: flex; align-items: center; gap: 9px; cursor: pointer; text-decoration: none; }
+.site-logo svg { width: 24px; height: 27px; flex-shrink: 0; }
+.site-logo-word { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; color: var(--white); }
+.site-logo-word span { color: var(--gold); }
 
 /* ── SCREENS ── */
 .screen {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
+  position: fixed; top: var(--header-h); left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none;
+  overflow-y: auto;
   transition: opacity var(--transition), transform var(--transition);
-  transform: translateX(40px);
+  transform: translateX(24px);
 }
 .screen.active { opacity: 1; pointer-events: all; transform: translateX(0); }
-.screen.exit   { opacity: 0; transform: translateX(-40px); }
+.screen.exit   { opacity: 0; transform: translateX(-24px); }
 
-/* ── SCROLL INNER ── */
+/* ── SCREEN INNER (the readable content column) ── */
 .screen-inner {
-  flex: 1; display: flex; flex-direction: column;
-  padding: 60px 24px 28px;
-  overflow-y: auto;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex; flex-direction: column;
+  min-height: min-content;
 }
 .screen-inner::-webkit-scrollbar { width: 0; }
 
 /* ── BACK BUTTON ── */
 .back-btn {
-  position: absolute; top: 56px; left: 20px; z-index: 10;
   width: 38px; height: 38px; border-radius: 50%;
   background: rgba(255,255,255,0.07); border: none;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; color: var(--white); transition: background 0.2s;
+  margin-bottom: 1.5rem; flex-shrink: 0;
 }
 .back-btn:hover { background: rgba(255,255,255,0.12); }
 .back-btn svg { width: 18px; height: 18px; }
 
 /* ── PROGRESS DOTS (onboarding) ── */
 .progress-dots {
-  display: flex; gap: 6px; margin-bottom: 1.75rem; padding-top: 0.5rem;
+  display: flex; gap: 6px; margin-bottom: 1.75rem;
 }
 .dot {
   height: 4px; border-radius: 2px;
@@ -157,7 +108,7 @@ html, body {
 /* ── PROGRESS BAR (verification) ── */
 .progress-header {
   display: flex; align-items: center; gap: 10px;
-  margin-bottom: 1.75rem; padding-top: 0.5rem;
+  margin-bottom: 1.75rem;
 }
 .progress-bar-wrap {
   flex: 1; height: 4px;
@@ -179,12 +130,12 @@ html, body {
 }
 .screen-title {
   font-family: var(--serif);
-  font-size: 1.9rem; font-weight: 700;
+  font-size: clamp(1.9rem, 3.4vw, 2.3rem); font-weight: 700;
   line-height: 1.15; margin-bottom: 0.5rem;
 }
 .screen-title em { color: var(--gold); font-style: normal; }
 .screen-sub {
-  font-size: 0.85rem; color: rgba(255,255,255,0.42);
+  font-size: 0.88rem; color: rgba(255,255,255,0.42);
   line-height: 1.65; margin-bottom: 1.5rem;
 }
 
@@ -277,9 +228,9 @@ html, body {
 .terms a { color: var(--gold); text-decoration: none; }
 
 /* ── OTP ── */
-.otp-wrap { display: flex; gap: 8px; margin-bottom: 1.4rem; }
+.otp-wrap { display: flex; gap: 8px; margin-bottom: 1.4rem; max-width: 360px; }
 .otp-input {
-  flex: 1; aspect-ratio: 1;
+  flex: 1; aspect-ratio: 1; max-width: 58px;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-sm);
@@ -395,7 +346,6 @@ html, body {
 
 /* ── SPLASH ── */
 #splash {
-  background: var(--navy);
   align-items: center; justify-content: center; overflow: hidden;
 }
 .splash-grid {
@@ -408,8 +358,8 @@ html, body {
 }
 @keyframes gridDrift { 0%{background-position:0 0} 100%{background-position:48px 48px} }
 .splash-glow {
-  position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%);
-  width: 340px; height: 340px;
+  position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%);
+  width: 420px; height: 420px;
   background: radial-gradient(ellipse, rgba(186,117,23,0.18) 0%, transparent 70%);
   animation: glowBreath 4s ease-in-out infinite;
 }
@@ -420,13 +370,14 @@ html, body {
 .splash-content {
   position: relative; z-index: 2;
   display: flex; flex-direction: column; align-items: center;
+  padding: 2rem 1.5rem;
   animation: splashIn 0.9s ease both;
 }
 @keyframes splashIn { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-.splash-logo { width: 68px; height: 76px; margin-bottom: 1.4rem; }
-.splash-wordmark { font-family: var(--serif); font-size: 2.7rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
+.splash-logo { width: 76px; height: 84px; margin-bottom: 1.4rem; }
+.splash-wordmark { font-family: var(--serif); font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -0.5px; margin-bottom: 0.4rem; }
 .splash-wordmark span { color: var(--gold); }
-.splash-tagline { font-size: 0.71rem; color: var(--stone); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 3rem; }
+.splash-tagline { font-size: 0.75rem; color: var(--stone); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 3rem; }
 .splash-btn {
   background: var(--gold); color: var(--navy);
   border: none; border-radius: 100px;
@@ -530,7 +481,7 @@ html, body {
 .pending-title em { color: var(--gold); font-style: normal; }
 .pending-sub {
   font-size: 0.84rem; color: rgba(255,255,255,0.4);
-  line-height: 1.72; margin-bottom: 2rem; max-width: 270px;
+  line-height: 1.72; margin-bottom: 2rem; max-width: 320px;
   animation: fadeUp 0.6s 0.3s ease both;
 }
 .pending-timer {
@@ -561,7 +512,7 @@ html, body {
 .success-title em { color: var(--gold); font-style: normal; }
 .success-sub {
   font-size: 0.87rem; color: rgba(255,255,255,0.4);
-  line-height: 1.72; margin-bottom: 2.5rem; max-width: 270px;
+  line-height: 1.72; margin-bottom: 2.5rem; max-width: 300px;
   animation: fadeUp 0.6s 0.3s ease both;
 }
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
@@ -575,148 +526,36 @@ html, body {
 }
 .success-btn:hover { background: var(--gold-light); }
 
-/* ── DESKTOP WRAPPER ── */
-.desktop-wrapper { display: flex; gap: 3rem; align-items: flex-start; justify-content: center; width: 100%; }
-.flow-guide { display: none !important; }
-.flow-guide h3 { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.25rem; }
-.flow-guide-sub { font-size: 0.74rem; color: rgba(255,255,255,0.28); margin-bottom: 1.25rem; }
-
-.flow-section-label {
-  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: rgba(255,255,255,0.25);
-  padding: 0.5rem 0.75rem 0.25rem; margin-top: 0.5rem;
+/* ── RESPONSIVE ── */
+@media (max-width: 420px) {
+  .field-row { grid-template-columns: 1fr; }
+  .screen-inner { padding: 2rem 1.25rem 3rem; }
 }
-
-.flow-step-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 0.55rem 0.75rem; border-radius: 8px;
-  cursor: pointer; transition: background 0.2s; margin-bottom: 2px;
-}
-.flow-step-item:hover { background: rgba(255,255,255,0.04); }
-.flow-step-item.active { background: rgba(186,117,23,0.1); }
-.flow-step-item.tenant-only { opacity: 0.4; }
-.flow-step-item.landlord-only { opacity: 0.4; }
-
-.flow-step-num {
-  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.68rem; font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.35);
-  transition: all 0.2s;
-}
-.flow-step-item.active .flow-step-num,
-.flow-step-item.done .flow-step-num { background: var(--gold); border-color: var(--gold); color: var(--navy); }
-
-.flow-step-label { font-size: 0.78rem; color: rgba(255,255,255,0.32); transition: color 0.2s; }
-.flow-step-item.active .flow-step-label { color: var(--white); font-weight: 500; }
-.flow-step-item.done .flow-step-label   { color: rgba(255,255,255,0.45); }
-.flow-connector { width: 1px; height: 12px; background: rgba(255,255,255,0.07); margin-left: 20px; }
-
-.guide-note {
-  margin-top: 1.25rem; padding: 0.8rem;
-  background: rgba(186,117,23,0.07); border: 1px solid rgba(186,117,23,0.15);
-  border-radius: 10px;
-}
-.guide-note-title { font-size: 0.65rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
-.guide-note-text  { font-size: 0.73rem; color: rgba(255,255,255,0.28); line-height: 1.6; }
-
-@media (max-width: 700px) {
-  .desktop-wrapper { flex-direction: column; align-items: center; padding: 0; }
-  .flow-guide { display: none; }
-  body { padding: 1rem 0.5rem; }
+@media (min-width: 860px) {
+  .screen-inner { padding-top: 4rem; }
 }
 </style>
 </head>
 <body>
-<div class="desktop-wrapper">
 
-  <!-- ── FLOW GUIDE ── -->
-  <div class="flow-guide">
-    <h3>Domivault Onboarding</h3>
-    <div class="flow-guide-sub">Complete unified flow</div>
+<div class="site-bg-grid"></div>
 
-    <div class="flow-section-label">All users</div>
-    <div class="flow-step-item active" id="g-splash"  onclick="goTo('splash')">
-      <div class="flow-step-num">①</div><div class="flow-step-label">Splash screen</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-usertype" onclick="goTo('usertype')">
-      <div class="flow-step-num">②</div><div class="flow-step-label">Choose user type</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-signup" onclick="goTo('signup')">
-      <div class="flow-step-num">③</div><div class="flow-step-label">Create account</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-verify" onclick="goTo('verify')">
-      <div class="flow-step-num">④</div><div class="flow-step-label">Verify email</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-profile" onclick="goTo('profile')">
-      <div class="flow-step-num">⑤</div><div class="flow-step-label">Profile setup</div>
-    </div>
-
-    <div class="flow-section-label" style="margin-top:0.75rem;">🏡 Tenant only</div>
-    <div class="flow-step-item tenant-only" id="g-tsuccess" onclick="goTo('tsuccess')">
-      <div class="flow-step-num">✓</div><div class="flow-step-label">Welcome! Dashboard</div>
-    </div>
-
-    <div class="flow-section-label" style="margin-top:0.75rem;">🏗️ Landlord only</div>
-    <div class="flow-step-item landlord-only" id="g-lintro"   onclick="goTo('lintro')">
-      <div class="flow-step-num">A</div><div class="flow-step-label">Verification overview</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item landlord-only" id="g-nin"      onclick="goTo('nin')">
-      <div class="flow-step-num">B</div><div class="flow-step-label">NIN verification</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item landlord-only" id="g-cac"      onclick="goTo('cac')">
-      <div class="flow-step-num">C</div><div class="flow-step-label">CAC registration</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item landlord-only" id="g-face"     onclick="goTo('face')">
-      <div class="flow-step-num">D</div><div class="flow-step-label">Face verification</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item landlord-only" id="g-lreview"  onclick="goTo('lreview')">
-      <div class="flow-step-num">E</div><div class="flow-step-label">Review & submit</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item landlord-only" id="g-pending"  onclick="goTo('pending')">
-      <div class="flow-step-num">✓</div><div class="flow-step-label">Pending approval</div>
-    </div>
-
-    <div class="flow-section-label" style="margin-top:0.75rem;">🔑 Sign in flow</div>
-    <div class="flow-step-item" id="g-signin" onclick="goTo('signin')">
-      <div class="flow-step-num">I</div><div class="flow-step-label">Sign in</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-signin-otp" onclick="goTo('signin-otp')">
-      <div class="flow-step-num">II</div><div class="flow-step-label">Phone OTP</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-forgot" onclick="goTo('forgot')">
-      <div class="flow-step-num">III</div><div class="flow-step-label">Forgot password</div>
-    </div>
-    <div class="flow-connector"></div>
-    <div class="flow-step-item" id="g-reset" onclick="goTo('reset')">
-      <div class="flow-step-num">IV</div><div class="flow-step-label">Reset password</div>
-    </div>
-
-    <div class="guide-note">
-      <div class="guide-note-title">Click any step</div>
-      <div class="guide-note-text">Use buttons inside the phone or click steps here to navigate the full flow.</div>
-    </div>
-  </div>
-
-  <!-- ── PHONE ── -->
-  <div class="phone-scale-wrap" id="phoneScaleWrap">
-  <div class="phone-frame">
-    <div class="dynamic-island"></div>
-    <div class="status-bar">
-      <div class="status-time">9:41</div>
-      <div class="status-icons"><span>●●●</span><span>WiFi</span><span>100%</span></div>
-    </div>
+<header class="site-header">
+  <a class="site-logo" onclick="goTo('splash')">
+    <svg viewBox="0 0 34 38" fill="none">
+      <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
+      <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
+      <circle cx="17" cy="25" r="3" fill="#BA7517"/>
+      <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="9" y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="1" x2="1" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+      <line x1="17" y1="1" x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <div class="site-logo-word">Domi<span>vault</span></div>
+  </a>
+</header>
 
     <!-- ════════════════════════════
          SHARED ONBOARDING SCREENS
@@ -747,10 +586,10 @@ html, body {
 
     <!-- S2: USER TYPE -->
     <div class="screen" id="usertype">
-      <button class="back-btn" onclick="goTo('splash')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('splash')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-dots">
           <div class="dot done"></div><div class="dot active"></div>
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -782,10 +621,10 @@ html, body {
 
     <!-- S3: SIGN UP -->
     <div class="screen" id="signup">
-      <button class="back-btn" onclick="goTo('usertype')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('usertype')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-dots">
           <div class="dot done"></div><div class="dot done"></div>
           <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
@@ -842,16 +681,16 @@ html, body {
         </div>
         <div class="terms">By creating an account you agree to our <a href="domivault-terms-of-service.html" target="_blank">Terms of Service</a> and <a href="domivault-privacy-policy.html" target="_blank">Privacy Policy</a>.</div>
         <div id="signup-error" style="display:none;background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.82rem;color:#e05252;margin-bottom:1rem;line-height:1.5;"></div>
-<button class="btn-primary" onclick="handleSignUp()">Create Account</button>
+        <button class="btn-primary" onclick="handleSignUp()">Create Account</button>
       </div>
     </div>
 
   <!-- S4: VERIFY EMAIL -->
     <div class="screen" id="verify">
-      <button class="back-btn" onclick="goTo('signup')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('signup')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-dots">
           <div class="dot done"></div><div class="dot done"></div>
           <div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
@@ -875,10 +714,10 @@ html, body {
 
     <!-- S5: PROFILE SETUP -->
     <div class="screen" id="profile">
-      <button class="back-btn" onclick="goTo('verify')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('verify')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-dots">
           <div class="dot done"></div><div class="dot done"></div>
           <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
@@ -926,10 +765,10 @@ html, body {
 
     <!-- L0: VERIFICATION OVERVIEW -->
     <div class="screen" id="lintro">
-      <button class="back-btn" onclick="goTo('profile')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('profile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">🏗️ Landlord Verification</div>
         <div class="screen-title">Verify your <em>identity</em></div>
         <div class="screen-sub">Before you can list any property, we need to verify who you are and that your business is legitimate. Property documents are handled during listing.</div>
@@ -960,10 +799,10 @@ html, body {
 
     <!-- L1: NIN -->
     <div class="screen" id="nin">
-      <button class="back-btn" onclick="goTo('lintro')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('lintro')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-header">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:33%"></div></div>
           <div class="progress-label">Step 1 of 3</div>
@@ -1000,10 +839,10 @@ html, body {
 
     <!-- L2: CAC -->
     <div class="screen" id="cac">
-      <button class="back-btn" onclick="goTo('nin')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('nin')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-header">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:66%"></div></div>
           <div class="progress-label">Step 2 of 3</div>
@@ -1045,10 +884,10 @@ html, body {
 
     <!-- L3: PROPERTY DOCUMENT -->
     <div class="screen" id="propdoc">
-      <button class="back-btn" onclick="goTo('cac')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('cac')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-header">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:60%"></div></div>
           <div class="progress-label">Step 3 of 5</div>
@@ -1086,10 +925,10 @@ html, body {
 
     <!-- L4: UTILITY BILL -->
     <div class="screen" id="utility">
-      <button class="back-btn" onclick="goTo('propdoc')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('propdoc')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-header">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:80%"></div></div>
           <div class="progress-label">Step 4 of 5</div>
@@ -1130,10 +969,10 @@ html, body {
 
     <!-- L5: FACE VERIFICATION -->
     <div class="screen" id="face">
-      <button class="back-btn" onclick="goTo('cac')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('cac')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="progress-header">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
           <div class="progress-label">Step 3 of 3</div>
@@ -1163,10 +1002,10 @@ html, body {
 
     <!-- L6: REVIEW & SUBMIT -->
     <div class="screen" id="lreview">
-      <button class="back-btn" onclick="goTo('face')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
+        <button class="back-btn" onclick="goTo('face')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">✅ Final Review</div>
         <div class="screen-title">Ready to <em>submit?</em></div>
         <div class="screen-sub">All 3 verification steps are complete. Review before sending to our team.</div>
@@ -1189,7 +1028,7 @@ html, body {
         <div class="pending-timer">⏱ Expected: 24–48 hours</div>
 
         <!-- What happens next -->
-        <div style="width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;text-align:left;">
+        <div style="width:100%;max-width:400px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1.5rem;text-align:left;">
           <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem;">What happens next</div>
           <div style="display:flex;flex-direction:column;gap:0.65rem;">
             <div style="display:flex;align-items:flex-start;gap:0.75rem;">
@@ -1207,7 +1046,7 @@ html, body {
           </div>
         </div>
 
-        <button class="success-btn" style="width:100%;padding:1rem;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;animation:fadeUp 0.6s 0.4s ease both;" onclick="window.location='domivault-landlord-dashboard.html'">Go to Dashboard →</button>
+        <button class="success-btn" style="width:100%;max-width:400px;padding:1rem;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius-sm);font-family:var(--sans);font-size:1rem;font-weight:700;cursor:pointer;animation:fadeUp 0.6s 0.4s ease both;" onclick="window.location='domivault-landlord-dashboard.html'">Go to Dashboard →</button>
         <div style="font-size:0.77rem;color:rgba(255,255,255,0.22);margin-top:0.75rem;text-align:center;">You can browse but won't be able to list properties until approved.</div>
       </div>
     </div>
@@ -1218,26 +1057,10 @@ html, body {
 
     <!-- SI1: SIGN IN -->
     <div class="screen" id="signin">
-      <button class="back-btn" onclick="goTo('splash')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
-
-        <!-- Logo mark -->
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:2rem;padding-top:0.5rem;">
-          <svg width="28" height="32" viewBox="0 0 34 38" fill="none">
-            <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
-            <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
-            <circle cx="17" cy="25" r="3" fill="#BA7517"/>
-            <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="9"  y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="17" y1="1"  x2="1"  y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
-            <line x1="17" y1="1"  x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          <span style="font-family:var(--serif);font-size:1.3rem;font-weight:700;">Domi<span style="color:var(--gold);">vault</span></span>
-        </div>
+        <button class="back-btn" onclick="goTo('splash')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
 
         <div class="screen-tag">Welcome back</div>
         <div class="screen-title">Sign in to your <em>account</em></div>
@@ -1298,11 +1121,10 @@ html, body {
 
     <!-- SI2: PHONE OTP SIGN IN -->
     <div class="screen" id="signin-otp">
-      <button class="back-btn" onclick="goTo('signin')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
-        <div style="height:0.5rem;"></div>
+        <button class="back-btn" onclick="goTo('signin')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">📱 Phone sign in</div>
         <div class="screen-title">Enter your <em>phone number</em></div>
         <div class="screen-sub">We'll send a one-time code to your number to sign you in securely.</div>
@@ -1334,11 +1156,10 @@ html, body {
 
     <!-- SI3: OTP VERIFY -->
     <div class="screen" id="signin-otp-verify">
-      <button class="back-btn" onclick="goTo('signin-otp')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
-        <div style="height:0.5rem;"></div>
+        <button class="back-btn" onclick="goTo('signin-otp')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">📱 Phone verification</div>
         <div class="screen-title">Enter the <em>OTP code</em></div>
         <div class="screen-sub">We sent a 6-digit code to your phone number.</div>
@@ -1364,11 +1185,10 @@ html, body {
 
     <!-- SI4: FORGOT PASSWORD -->
     <div class="screen" id="forgot">
-      <button class="back-btn" onclick="goTo('signin')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
-        <div style="height:0.5rem;"></div>
+        <button class="back-btn" onclick="goTo('signin')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">🔑 Password reset</div>
         <div class="screen-title">Forgot your <em>password?</em></div>
         <div class="screen-sub">No worries — enter your email and we'll send you a reset link right away.</div>
@@ -1404,11 +1224,10 @@ html, body {
 
     <!-- SI6: RESET PASSWORD -->
     <div class="screen" id="reset">
-      <button class="back-btn" onclick="goTo('forgot')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
       <div class="screen-inner">
-        <div style="height:0.5rem;"></div>
+        <button class="back-btn" onclick="goTo('forgot')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
         <div class="screen-tag">🔑 New password</div>
         <div class="screen-title">Reset your <em>password</em></div>
         <div class="screen-sub">Choose a strong new password for your Domivault account.</div>
@@ -1455,25 +1274,9 @@ html, body {
       </div>
     </div>
 
-  </div><!-- /phone-frame -->
-  </div><!-- /phone-scale-wrap -->
-</div><!-- /desktop-wrapper -->
-
 <script>
   let currentScreen = 'splash';
   let selectedType  = null;
-
-  const guideMap = {
-    splash:'g-splash', usertype:'g-usertype', signup:'g-signup',
-    verify:'g-verify', profile:'g-profile', tsuccess:'g-tsuccess',
-    lintro:'g-lintro', nin:'g-nin', cac:'g-cac', propdoc:'g-propdoc',
-    utility:'g-utility', face:'g-face', lreview:'g-lreview', pending:'g-pending',
-    signin:'g-signin', 'signin-otp':'g-signin-otp', 'signin-otp-verify':'g-signin-otp',
-    forgot:'g-forgot', 'forgot-sent':'g-forgot', reset:'g-reset', 'reset-success':'g-reset'
-  };
-
-  // Upload zones to reset when navigating back
-  const uploadZones = ['nin-upload','cac-upload','prop-upload','util-upload'];
 
   function goTo(id) {
     if (currentScreen === id) return;
@@ -1488,7 +1291,6 @@ html, body {
     }, 220);
 
     currentScreen = id;
-    updateGuide(id);
 
     // Init password strength only when reset screen is entered
     if (id === 'reset') initPasswordStrength();
@@ -1496,31 +1298,8 @@ html, body {
     // Fire confetti on success screens
     if (id === 'tsuccess' || id === 'reset-success') fireConfetti();
 
-    // Unlock tenant/landlord sections in guide
-    if (id === 'tsuccess') {
-      document.querySelectorAll('.tenant-only').forEach(el => el.style.opacity = '1');
-    }
-    if (['lintro','nin','cac','propdoc','utility','face','lreview','pending'].includes(id)) {
-      document.querySelectorAll('.landlord-only').forEach(el => el.style.opacity = '1');
-    }
-
-    // Update guide done states
-    const order = ['splash','usertype','signup','verify','profile','tsuccess','lintro','nin','cac','propdoc','utility','face','lreview','pending'];
-    const idx   = order.indexOf(id);
-    document.querySelectorAll('.flow-step-item').forEach(el => el.classList.remove('done'));
-    order.slice(0, idx).forEach(s => {
-      const g = guideMap[s];
-      if (g) { const el = document.getElementById(g); if (el) el.classList.add('done'); }
-    });
-  }
-
-  function updateGuide(id) {
-    Object.values(guideMap).forEach(gId => {
-      const el = document.getElementById(gId);
-      if (el) el.classList.remove('active');
-    });
-    const target = guideMap[id];
-    if (target) { const el = document.getElementById(target); if (el) el.classList.add('active'); }
+    // Scroll new screen to top
+    setTimeout(() => { if (next.scrollTo) next.scrollTo(0,0); }, 0);
   }
 
   function selectType(type) {
@@ -1540,18 +1319,17 @@ html, body {
     }
   }
 
-  // Fix 5: Update avatar initial from first name typed in signup
+  // Update avatar initial from first name typed in signup
   function updateAvatar(val) {
     const avatar = document.getElementById('profile-avatar');
     if (!avatar) return;
     const letter = val.trim().charAt(0).toUpperCase() || 'J';
-    // Replace text node only, preserve the edit button child
     const editBtn = avatar.querySelector('.avatar-edit');
     avatar.textContent = letter;
     if (editBtn) avatar.appendChild(editBtn);
   }
 
-  // Fix 3: OTP scoped to parent wrap id
+  // OTP scoped to parent wrap id
   function otpNext(input, idx, wrapId) {
     if (input.value) {
       input.classList.add('filled');
@@ -1562,7 +1340,7 @@ html, body {
     }
   }
 
-  // Fix 6: Upload reset on navigating back — call resetUpload(zoneId) when needed
+  // Upload reset on navigating back
   function resetUpload(zoneId) {
     const zone = document.getElementById(zoneId);
     if (!zone) return;
@@ -1587,37 +1365,6 @@ html, body {
     if (name) name.textContent   = fileName + ' — uploaded ✓';
   }
 
-  // Fix 2: Sign in error clears properly
-  function handleSignIn() {
-    const email = document.getElementById('signin-email')?.value?.trim() || '';
-    const pass  = document.getElementById('signin-password')?.value || '';
-    const errEl = document.getElementById('signin-error');
-    if (!email || !pass) {
-      errEl.style.display = 'block';
-      errEl.textContent   = '⚠️ Please enter your email and password.';
-      return;
-    }
-    errEl.style.display = 'none';
-    if (email.toLowerCase().includes('landlord')) {
-      selectedType = 'landlord'; goTo('pending');
-    } else {
-      selectedType = 'tenant'; goTo('tsuccess');
-    }
-  }
-
-  // Clear error as user types
-  document.getElementById('signin-email')?.addEventListener('input', () => {
-    document.getElementById('signin-error').style.display = 'none';
-  });
-  document.getElementById('signin-password')?.addEventListener('input', () => {
-    document.getElementById('signin-error').style.display = 'none';
-  });
-
-  function simulateSignIn() {
-    selectedType = 'tenant';
-    goTo('tsuccess');
-  }
-
   function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);
     if (!input) return;
@@ -1625,7 +1372,7 @@ html, body {
     btn.textContent = input.type === 'password' ? '👁' : '🙈';
   }
 
-  // Fix 1: Password strength only initialised when reset screen entered
+  // Password strength — only initialised when reset screen entered
   function initPasswordStrength() {
     const newPwd = document.getElementById('new-password');
     if (!newPwd || newPwd._strengthInit) return;
@@ -1649,17 +1396,16 @@ html, body {
     });
   }
 
-  // Confetti on success screens
+  // Confetti on success screens — attaches to the viewport, not a phone frame
   function fireConfetti() {
     const canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:99;';
-    const phone = document.querySelector('.phone-frame');
-    phone.appendChild(canvas);
+    canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99;';
+    document.body.appendChild(canvas);
     const ctx = canvas.getContext('2d');
-    canvas.width  = phone.offsetWidth;
-    canvas.height = phone.offsetHeight;
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const pieces = Array.from({length: 60}, () => ({
+    const pieces = Array.from({length: 90}, () => ({
       x: Math.random() * canvas.width,
       y: -10,
       r: Math.random() * 5 + 3,
@@ -1692,167 +1438,139 @@ html, body {
     draw();
   }
 
-  // Scale phone frame to fit any screen height
-  function scalePhone() {
-    const wrap  = document.getElementById('phoneScaleWrap');
-    if (!wrap) return;
-    const padding = 64; // top + bottom body padding
-    const availH  = window.innerHeight - padding;
-    const availW  = window.innerWidth;
-    const phoneH  = 844;
-    const phoneW  = 414;
-    const scaleH  = availH / phoneH;
-    const scaleW  = availW < 700 ? (availW - 32) / phoneW : 1;
-    const scale   = Math.min(scaleH, scaleW, 1);
-    wrap.style.transform       = `scale(${scale})`;
-    wrap.style.transformOrigin = 'top center';
-    wrap.style.marginBottom    = `${Math.round((phoneH * scale) - phoneH)}px`;
+  // ── BACKEND API CONNECTION ──
+  const API_URL = 'https://domivault-backend-production.up.railway.app';
+
+  function saveAuth(token, user) {
+    localStorage.setItem('dv_token', token);
+    localStorage.setItem('dv_user', JSON.stringify(user));
+  }
+  function getToken() { return localStorage.getItem('dv_token'); }
+  function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
+
+  function showError(elementId, message) {
+    const el = document.getElementById(elementId);
+    if (el) { el.textContent = message; el.style.display = 'block'; }
+  }
+  function hideError(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) el.style.display = 'none';
   }
 
-  scalePhone();
-  window.addEventListener('resize', scalePhone);
+  // ── SIGN UP ──
+  async function handleSignUp() {
+    const fname = document.getElementById('signup-fname')?.value?.trim() || '';
+    const lname = document.querySelector('#signup .field-input[placeholder="Adeyemi"]')?.value?.trim() || '';
+    const email = document.querySelector('#signup input[type="email"]')?.value?.trim() || '';
+    const phone = document.querySelector('#signup input[type="tel"]')?.value?.trim() || '';
+    const password = document.getElementById('signup-password')?.value || '';
 
-function simulateFaceUpload() {
-  const zone = document.getElementById('faceUploadZone');
-  if (!zone) return;
-  zone.style.borderStyle = 'solid';
-  zone.style.borderColor = 'rgba(46,204,113,.4)';
-  zone.style.background = 'rgba(46,204,113,.04)';
-  zone.innerHTML = '<div style="font-size:1.5rem;">✅</div><div style="font-size:.88rem;font-weight:600;color:#2ecc71;">Photo uploaded successfully</div><div style="font-size:.74rem;color:rgba(255,255,255,.35);">selfie-photo.jpg</div>';
-}
-
-// ── BACKEND API CONNECTION ──
-const API_URL = 'https://domivault-backend-production.up.railway.app';
-
-// Store token and user in localStorage
-function saveAuth(token, user) {
-  localStorage.setItem('dv_token', token);
-  localStorage.setItem('dv_user', JSON.stringify(user));
-}
-
-function getToken() {
-  return localStorage.getItem('dv_token');
-}
-
-function getUser() {
-  const u = localStorage.getItem('dv_user');
-  return u ? JSON.parse(u) : null;
-}
-
-// Show error message
-function showError(elementId, message) {
-  const el = document.getElementById(elementId);
-  if (el) { el.textContent = message; el.style.display = 'block'; }
-}
-
-function hideError(elementId) {
-  const el = document.getElementById(elementId);
-  if (el) el.style.display = 'none';
-}
-
-// ── SIGN UP ──
-async function handleSignUp() {
-  const fname = document.getElementById('signup-fname')?.value?.trim() || '';
-  const lname = document.querySelector('#signup .field-input[placeholder="Adeyemi"]')?.value?.trim() || '';
-  const email = document.querySelector('#signup input[type="email"]')?.value?.trim() || '';
-  const phone = document.querySelector('#signup input[type="tel"]')?.value?.trim() || '';
-  const password = document.getElementById('signup-password')?.value || '';
-
-  if (!fname || !email || !password) {
-    showError('signup-error', 'Please fill in all required fields.');
-    return;
-  }
-
-  const btn = document.querySelector('#signup .btn-primary');
-  btn.disabled = true;
-  btn.textContent = 'Creating account...';
-
-  try {
-    const res = await fetch(API_URL + '/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: fname + ' ' + lname,
-        email,
-        password,
-        phone,
-        role: selectedType || 'tenant',
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      showError('signup-error', data.message || 'Registration failed. Please try again.');
-      btn.disabled = false;
-      btn.textContent = 'Create Account';
+    if (!fname || !email || !password) {
+      showError('signup-error', 'Please fill in all required fields.');
       return;
     }
 
-    saveAuth(data.token, data);
-    hideError('signup-error');
-    goTo('verify');
+    const btn = document.querySelector('#signup .btn-primary');
+    btn.disabled = true;
+    btn.textContent = 'Creating account...';
 
-  } catch (err) {
-    showError('signup-error', 'Network error. Please check your connection.');
-    btn.disabled = false;
-    btn.textContent = 'Create Account';
+    try {
+      const res = await fetch(API_URL + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fname + ' ' + lname,
+          email,
+          password,
+          phone,
+          role: selectedType || 'tenant',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError('signup-error', data.message || 'Registration failed. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+        return;
+      }
+
+      saveAuth(data.token, data);
+      hideError('signup-error');
+      goTo('verify');
+
+    } catch (err) {
+      showError('signup-error', 'Network error. Please check your connection.');
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
   }
-}
 
-// ── SIGN IN ──
-async function handleSignIn() {
-  const email = document.getElementById('signin-email')?.value?.trim() || '';
-  const password = document.getElementById('signin-password')?.value || '';
-  const errEl = document.getElementById('signin-error');
+  // ── SIGN IN ──
+  async function handleSignIn() {
+    const email = document.getElementById('signin-email')?.value?.trim() || '';
+    const password = document.getElementById('signin-password')?.value || '';
+    const errEl = document.getElementById('signin-error');
 
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.style.display = 'block';
-    return;
-  }
+    if (!email || !password) {
+      errEl.textContent = 'Please enter your email and password.';
+      errEl.style.display = 'block';
+      return;
+    }
 
-  errEl.style.display = 'none';
+    errEl.style.display = 'none';
 
-  const btn = document.querySelector('#signin .btn-primary');
-  btn.disabled = true;
-  btn.textContent = 'Signing in...';
+    const btn = document.querySelector('#signin .btn-primary');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
 
-  try {
-    const res = await fetch(API_URL + '/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch(API_URL + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      errEl.textContent = data.message || 'Incorrect email or password.';
+      if (!res.ok) {
+        errEl.textContent = data.message || 'Incorrect email or password.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+        return;
+      }
+
+      saveAuth(data.token, data);
+
+      if (data.role === 'landlord') {
+        window.location = 'domivault-landlord-dashboard.html';
+      } else if (data.role === 'admin') {
+        window.location = 'domivault-admin-panel.html';
+      } else {
+        window.location = 'domivault-homepage.html';
+      }
+
+    } catch (err) {
+      errEl.textContent = 'Network error. Please check your connection.';
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Sign In';
-      return;
     }
-
-    saveAuth(data.token, data);
-
-    // Redirect based on role
-    if (data.role === 'landlord') {
-      window.location = 'domivault-landlord-dashboard.html';
-    } else if (data.role === 'admin') {
-      window.location = 'domivault-admin-panel.html';
-    } else {
-      window.location = 'domivault-homepage.html';
-    }
-
-  } catch (err) {
-    errEl.textContent = 'Network error. Please check your connection.';
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Sign In';
   }
-}
+
+  document.getElementById('signin-email')?.addEventListener('input', () => {
+    document.getElementById('signin-error').style.display = 'none';
+  });
+  document.getElementById('signin-password')?.addEventListener('input', () => {
+    document.getElementById('signin-error').style.display = 'none';
+  });
+
+  function simulateSignIn() {
+    selectedType = 'tenant';
+    goTo('tsuccess');
+  }
 </script>
 </body>
 </html>
