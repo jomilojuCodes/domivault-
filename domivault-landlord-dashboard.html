@@ -363,6 +363,9 @@ async function loadDashboard() {
   if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
 
   const user = getUser();
+  // Role guard - redirect admin and tenant away from landlord dashboard
+  if (user && user.role === 'admin') { window.location = 'domivault-admin-panel.html'; return; }
+  if (user && user.role === 'tenant') { window.location = 'domivault-homepage.html'; return; }
   if (user) {
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -370,7 +373,7 @@ async function loadDashboard() {
     document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
   }
 
-  // Fetch real user data to check isVerified
+  // Fetch real user data to check verification status
   try {
     const meRes = await fetch(API_URL + '/api/auth/me', {
       headers: { 'Authorization': 'Bearer ' + token }
@@ -378,26 +381,50 @@ async function loadDashboard() {
     const meData = await meRes.json();
     const pill = document.getElementById('verifiedPill');
     const pillText = document.getElementById('verifiedText');
+    const banner = document.getElementById('verificationBanner');
+    const status = meData.verificationStatus || 'not_started';
+
     if (pill && pillText) {
-      if (meData.isVerified) {
+      if (meData.isVerified || status === 'verified') {
         pill.style.background = 'rgba(46,204,113,0.1)';
         pill.style.border = '1px solid rgba(46,204,113,0.25)';
         pill.style.color = 'var(--success)';
         pillText.textContent = 'Verified landlord · Active';
-        // Hide verification banner
-        const banner = document.getElementById('verificationBanner');
         if (banner) banner.style.display = 'none';
+
+      } else if (status === 'pending_review') {
+        pill.style.background = 'rgba(24,95,165,0.1)';
+        pill.style.border = '1px solid rgba(24,95,165,0.25)';
+        pill.style.color = '#5DA8E8';
+        pillText.textContent = 'Verification under review';
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'rgba(24,95,165,0.08)';
+          banner.style.borderColor = 'rgba(24,95,165,0.3)';
+          banner.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#5DA8E8;margin-bottom:3px;">Verification under review</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;">Our team is reviewing your documents. We will notify you within 24-48 hours.</div></div>';
+        }
+
+      } else if (status === 'rejected') {
+        pill.style.background = 'rgba(224,82,82,0.1)';
+        pill.style.border = '1px solid rgba(224,82,82,0.25)';
+        pill.style.color = 'var(--error)';
+        pillText.textContent = 'Verification rejected';
+        const reason = meData.rejectionReason || 'Your documents did not meet our requirements.';
+        if (banner) {
+          banner.style.display = 'flex';
+          banner.style.background = 'rgba(224,82,82,0.08)';
+          banner.style.borderColor = 'rgba(224,82,82,0.3)';
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location='domivault-landlord-verification.html'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
+        }
+
       } else {
         pill.style.background = 'rgba(186,117,23,0.1)';
         pill.style.border = '1px solid rgba(186,117,23,0.25)';
         pill.style.color = 'var(--gold-light)';
-        pillText.textContent = 'Unverified · Pending review';
-        // Show verification banner
-        const banner = document.getElementById('verificationBanner');
+        pillText.textContent = 'Unverified · Action required';
         if (banner) banner.style.display = 'flex';
       }
     }
-    // Update localStorage with fresh data
     localStorage.setItem('dv_user', JSON.stringify(meData));
   } catch(err) {
     const pillText = document.getElementById('verifiedText');
