@@ -379,6 +379,15 @@ async function loadDashboard() {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     const meData = await meRes.json();
+
+    // Update greeting and avatar with real data from API
+    const hour = new Date().getHours();
+    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const greetEl = document.querySelector('.page-greeting');
+    if (greetEl) greetEl.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + meData.name + '</span>';
+    const navAv = document.getElementById('navAvatar');
+    if (navAv) navAv.textContent = meData.name.charAt(0).toUpperCase();
+
     const pill = document.getElementById('verifiedPill');
     const pillText = document.getElementById('verifiedText');
     const banner = document.getElementById('verificationBanner');
