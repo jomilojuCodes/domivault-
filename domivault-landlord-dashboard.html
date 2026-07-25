@@ -366,7 +366,7 @@ async function loadDashboard() {
   // Role guard - redirect admin and tenant away from landlord dashboard
   if (user && user.role === 'admin') { window.location = 'domivault-admin-panel.html'; return; }
   if (user && user.role === 'tenant') { window.location = 'domivault-homepage.html'; return; }
-  if (user) {
+  if (user && user.name) {
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
@@ -381,12 +381,14 @@ async function loadDashboard() {
     const meData = await meRes.json();
 
     // Update greeting and avatar with real data from API
-    const hour = new Date().getHours();
-    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    const greetEl = document.querySelector('.page-greeting');
-    if (greetEl) greetEl.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + meData.name + '</span>';
-    const navAv = document.getElementById('navAvatar');
-    if (navAv) navAv.textContent = meData.name.charAt(0).toUpperCase();
+    if (meData && meData.name) {
+      const hour = new Date().getHours();
+      const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      const greetEl = document.querySelector('.page-greeting');
+      if (greetEl) greetEl.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + meData.name + '</span>';
+      const navAv = document.getElementById('navAvatar');
+      if (navAv) navAv.textContent = meData.name.charAt(0).toUpperCase();
+    }
 
     const pill = document.getElementById('verifiedPill');
     const pillText = document.getElementById('verifiedText');
@@ -423,7 +425,7 @@ async function loadDashboard() {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(224,82,82,0.08)';
           banner.style.borderColor = 'rgba(224,82,82,0.3)';
-          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location='domivault-landlord-verification.html'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location=\'domivault-landlord-verification.html\'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
         }
 
       } else {
