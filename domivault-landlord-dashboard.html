@@ -162,6 +162,25 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <div class="nav-notif-badge" id="notifBadge" style="display:none;">0</div>
     </button>
     <div class="nav-avatar" id="navAvatar">?</div>
+  <script>
+  // Run immediately before page loads
+  (function() {
+    var u = localStorage.getItem('dv_user');
+    if (u) {
+      try {
+        var user = JSON.parse(u);
+        if (user && user.name) {
+          var hour = new Date().getHours();
+          var t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+          var greet = document.querySelector('.page-greeting');
+          if (greet) greet.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
+          var av = document.getElementById('navAvatar');
+          if (av) av.textContent = user.name.charAt(0).toUpperCase();
+        }
+      } catch(e) {}
+    }
+  })();
+  </script>
   </div>
 </nav>
 
@@ -193,6 +212,10 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     <hr class="sidebar-divider"/>
     <div class="sidebar-section-label">Account</div>
     <div class="sidebar-nav">
+      <button class="sidebar-btn" onclick="window.location='domivault-landlord-profile.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+      </button>
       <button class="sidebar-btn" onclick="handleLogout()" style="color:rgba(224,82,82,0.6);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Log out
@@ -322,6 +345,10 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     <span>Alerts</span>
   </button>
+  <button class="bottom-nav-btn" onclick="window.location='domivault-landlord-profile.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Profile</span>
+  </button>
 </nav>
 
 <script>
@@ -381,8 +408,7 @@ async function loadDashboard() {
   if (user && user.role === 'admin') { window.location = 'domivault-admin-panel.html'; return; }
   if (user && user.role === 'tenant') { window.location = 'domivault-homepage.html'; return; }
 
-  // Set name and avatar IMMEDIATELY from localStorage before API call (guarded — a
-  // cached user object without a name must never crash the rest of the dashboard)
+  // Set name and avatar IMMEDIATELY from localStorage before API call
   if (user && user.name) {
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -392,6 +418,13 @@ async function loadDashboard() {
     if (navAv) navAv.textContent = user.name.charAt(0).toUpperCase();
   }
 
+  if (user) {
+    const hour = new Date().getHours();
+    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
+    document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
+  }
+
   // Fetch real user data to check verification status
   try {
     const meRes = await fetch(API_URL + '/api/auth/me', {
@@ -399,15 +432,15 @@ async function loadDashboard() {
     });
     const meData = await meRes.json();
 
-    // Update greeting and avatar with real data from API (guarded the same way)
-    if (meData && meData.name) {
-      const hour = new Date().getHours();
-      const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-      const greetEl = document.querySelector('.page-greeting');
-      if (greetEl) greetEl.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + meData.name + '</span>';
-      const navAv = document.getElementById('navAvatar');
-      if (navAv) navAv.textContent = meData.name.charAt(0).toUpperCase();
-    }
+    // Update greeting and avatar with real data from API
+    const hour = new Date().getHours();
+    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const greetEl = document.querySelector('.page-greeting');
+    if (greetEl && meData.name) greetEl.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + meData.name + '</span>';
+    const navAv = document.getElementById('navAvatar');
+    if (navAv && meData.name) navAv.textContent = meData.name.charAt(0).toUpperCase();
+    // Update localStorage with fresh user data
+    localStorage.setItem('dv_user', JSON.stringify(meData));
 
     const pill = document.getElementById('verifiedPill');
     const pillText = document.getElementById('verifiedText');
@@ -444,7 +477,7 @@ async function loadDashboard() {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(224,82,82,0.08)';
           banner.style.borderColor = 'rgba(224,82,82,0.3)';
-          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location=\'domivault-landlord-verification.html\'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location='domivault-landlord-verification.html'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
         }
 
       } else {
