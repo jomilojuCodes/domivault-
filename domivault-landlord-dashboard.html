@@ -162,25 +162,6 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <div class="nav-notif-badge" id="notifBadge" style="display:none;">0</div>
     </button>
     <div class="nav-avatar" id="navAvatar">?</div>
-  <script>
-  // Run immediately before page loads
-  (function() {
-    var u = localStorage.getItem('dv_user');
-    if (u) {
-      try {
-        var user = JSON.parse(u);
-        if (user && user.name) {
-          var hour = new Date().getHours();
-          var t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-          var greet = document.querySelector('.page-greeting');
-          if (greet) greet.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
-          var av = document.getElementById('navAvatar');
-          if (av) av.textContent = user.name.charAt(0).toUpperCase();
-        }
-      } catch(e) {}
-    }
-  })();
-  </script>
   </div>
 </nav>
 
@@ -408,7 +389,8 @@ async function loadDashboard() {
   if (user && user.role === 'admin') { window.location = 'domivault-admin-panel.html'; return; }
   if (user && user.role === 'tenant') { window.location = 'domivault-homepage.html'; return; }
 
-  // Set name and avatar IMMEDIATELY from localStorage before API call
+  // Set name and avatar IMMEDIATELY from localStorage before API call (guarded — a
+  // cached user object without a name must never crash the rest of the dashboard)
   if (user && user.name) {
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -418,13 +400,6 @@ async function loadDashboard() {
     if (navAv) navAv.textContent = user.name.charAt(0).toUpperCase();
   }
 
-  if (user) {
-    const hour = new Date().getHours();
-    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
-    document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
-  }
-
   // Fetch real user data to check verification status
   try {
     const meRes = await fetch(API_URL + '/api/auth/me', {
@@ -432,7 +407,7 @@ async function loadDashboard() {
     });
     const meData = await meRes.json();
 
-    // Update greeting and avatar with real data from API
+    // Update greeting and avatar with real data from API (guarded the same way)
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     const greetEl = document.querySelector('.page-greeting');
@@ -477,12 +452,7 @@ async function loadDashboard() {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(224,82,82,0.08)';
           banner.style.borderColor = 'rgba(224,82,82,0.3)';
-          var rejectBtn = document.createElement('button');
-          rejectBtn.textContent = 'Resubmit';
-          rejectBtn.style.cssText = 'background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
-          rejectBtn.onclick = function() { window.location = 'domivault-landlord-verification.html'; };
-          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div>';
-          banner.appendChild(rejectBtn);
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location=\'domivault-landlord-verification.html\'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
         }
 
       } else {
@@ -493,7 +463,6 @@ async function loadDashboard() {
         if (banner) banner.style.display = 'flex';
       }
     }
-    localStorage.setItem('dv_user', JSON.stringify(meData));
   } catch(err) {
     const pillText = document.getElementById('verifiedText');
     if (pillText) pillText.textContent = 'Landlord · Active';
