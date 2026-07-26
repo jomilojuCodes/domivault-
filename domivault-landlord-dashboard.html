@@ -477,7 +477,12 @@ async function loadDashboard() {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(224,82,82,0.08)';
           banner.style.borderColor = 'rgba(224,82,82,0.3)';
-          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location='domivault-landlord-verification.html'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
+          var rejectBtn = document.createElement('button');
+          rejectBtn.textContent = 'Resubmit';
+          rejectBtn.style.cssText = 'background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
+          rejectBtn.onclick = function() { window.location = 'domivault-landlord-verification.html'; };
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div>';
+          banner.appendChild(rejectBtn);
         }
 
       } else {
