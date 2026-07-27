@@ -83,6 +83,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 .chat-back{display:none;background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;padding:4px;margin-right:4px;}
 .chat-back svg{width:20px;height:20px;}
 .chat-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--navy);flex-shrink:0;position:relative;}
+.chat-av-online{position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;background:var(--success);border:2px solid var(--navy);}
 .chat-header-info{flex:1;min-width:0;}
 .chat-name{font-size:14px;font-weight:600;margin-bottom:1px;}
 .chat-status{font-size:11px;color:var(--success);}
@@ -145,12 +146,10 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 .qr{background:rgba(255,255,255,.05);border:1px solid rgba(186,117,23,.2);color:rgba(255,255,255,.65);border-radius:100px;padding:5px 12px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:var(--sans);transition:all .2s;flex-shrink:0;}
 .qr:hover{background:rgba(186,117,23,.12);border-color:rgba(186,117,23,.4);color:var(--gold-light);}
 
-/* SCHEDULE VIEWING BAR — evergreen suggestion, not a status claim, so it
-   uses the gold "action" accent rather than the green "confirmed" accent */
-.schedule-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:.25rem 1.25rem;padding:.7rem 1rem;background:rgba(186,117,23,.06);border:1px solid rgba(186,117,23,.18);border-radius:var(--rs);flex-shrink:0;}
-.schedule-bar-text{font-size:12px;color:rgba(255,255,255,.55);}
-.schedule-bar-btn{font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;background:rgba(186,117,23,.15);color:var(--gold-light);border:1px solid rgba(186,117,23,.3);cursor:pointer;font-family:var(--sans);transition:all .2s;}
-.schedule-bar-btn:hover{background:rgba(186,117,23,.25);}
+/* SCHEDULE VIEWING BTN */
+.schedule-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:.25rem 1.25rem;padding:.7rem 1rem;background:rgba(46,204,113,.05);border:1px solid rgba(46,204,113,.15);border-radius:var(--rs);flex-shrink:0;}
+.schedule-bar-text{font-size:12px;color:rgba(255,255,255,.5);}
+.schedule-bar-btn{font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);cursor:pointer;font-family:var(--sans);}
 
 /* INPUT */
 .msg-input-wrap{display:flex;align-items:flex-end;gap:8px;padding:.85rem 1.25rem;background:rgba(10,22,40,.97);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
@@ -265,7 +264,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
       </button>
       <div class="chat-av" id="chatAv" style="background:linear-gradient(135deg,#185FA5,#1c2f52);">T</div>
       <div class="chat-header-info">
-        <div class="chat-name" id="chatName">Loading...</div>
+        <div class="chat-name" id="chatName">Tunde Adeyemi</div>
         <div class="chat-status" id="chatStatus"></div>
       </div>
       <div class="chat-header-actions">
@@ -281,13 +280,15 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
       </div>
     </div>
 
-    <!-- LISTING THIS ENQUIRY IS ABOUT -->
+    <!-- CHAT CONTENT — hidden until conversation selected -->
+  <div id="chatContent" style="display:none;flex-direction:column;flex:1;min-height:0;">
+  <!-- LISTING THIS ENQUIRY IS ABOUT -->
     <div class="listing-banner">
       <div class="lb-thumb"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70" alt="Property" id="lbImg"/></div>
       <div class="lb-info">
         <div class="lb-label">Enquiry about</div>
-        <div class="lb-name" id="lbName">Loading listing...</div>
-        <div class="lb-price" id="lbPrice"></div>
+        <div class="lb-name" id="lbName">Modern 4-Bed Apartment, Lekki Phase 1</div>
+        <div class="lb-price" id="lbPrice">₦3,850,000/yr</div>
       </div>
       <div class="lb-actions">
         <button class="lb-btn lb-btn-primary" onclick="window.location='domivault-listing-detail.html'">View listing</button>
@@ -298,15 +299,21 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
     <!-- TENANT INFO -->
     <div class="tenant-info-bar">
       <span class="tib-label">Tenant:</span>
-      <span class="tib-val" id="tibName">Loading...</span>
-      <div class="tib-divider" id="tibVerifiedDivider" style="display:none;"></div>
+      <span class="tib-val" id="tibName">Tunde Adeyemi</span>
+      <div class="tib-divider"></div>
       <span class="tib-verified" id="tibVerified" style="display:none;">✓ Verified tenant</span>
       <div class="tib-divider"></div>
       <span class="tib-val" style="color:rgba(255,255,255,.3);font-size:11px;" id="tibJoined">—</span>
     </div>
 
     <!-- MESSAGES -->
-    <div class="messages-wrap" id="messagesWrap"></div>
+    <div class="messages-wrap" id="messagesWrap">
+  <div id="noConvState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.2);text-align:center;padding:2rem;">
+    <div style="font-size:3rem;margin-bottom:1rem;">💬</div>
+    <div style="font-family:var(--serif);font-size:1.4rem;font-weight:600;margin-bottom:.5rem;color:rgba(255,255,255,0.3);">No conversation selected</div>
+    <div style="font-size:13px;line-height:1.6;">Select an enquiry from the left to start replying</div>
+  </div>
+</div>
 
     <!-- TYPING -->
     <div id="typingWrap" style="padding:0 1.25rem .5rem;display:none;">
@@ -318,12 +325,10 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
       </div>
     </div>
 
-    <!-- SCHEDULE VIEWING BAR — an evergreen suggestion, not a status claim,
-         so it's honest to show on every conversation regardless of whether
-         a viewing was actually requested -->
+    <!-- SCHEDULE VIEWING BAR -->
     <div class="schedule-bar">
       <div class="schedule-bar-text">📅 Want to schedule a viewing for this property?</div>
-      <button class="schedule-bar-btn" onclick="scheduleViewing()">Schedule →</button>
+      <button class="schedule-bar-btn" style="background:var(--gold);color:var(--navy);" onclick="scheduleViewing()">Schedule →</button>
     </div>
 
     <!-- QUICK REPLIES — LANDLORD RESPONSES -->
@@ -348,6 +353,7 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 
   </div>
 </div>
+  </div><!-- end chatContent -->
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="bottom-nav" id="bottomNav">
@@ -370,20 +376,18 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);}
 </nav>
 
 <script>
-// ── SET AVATAR IMMEDIATELY (guarded — a cached user object without a
-// name must never throw, since that would silently abort this IIFE) ──
+// ── SET AVATAR IMMEDIATELY ──
 (function() {
   try {
     var u = localStorage.getItem('dv_user');
     if (u) {
       var user = JSON.parse(u);
-      if (user && user.name) {
-        var init = user.name.charAt(0).toUpperCase();
-        var navAv = document.getElementById('navAvatar');
-        if (navAv) navAv.textContent = init;
-        var allAv = document.querySelectorAll('.navAvatar');
-        allAv.forEach(function(el) { el.textContent = init; });
-      }
+      var init = (user && user.name) ? user.name.charAt(0).toUpperCase() : '?';
+      // Set all avatar elements
+      var navAv = document.getElementById('navAvatar');
+      if (navAv) navAv.textContent = init;
+      var allAv = document.querySelectorAll('.navAvatar');
+      allAv.forEach(function(el) { el.textContent = init; });
     }
   } catch(e) {}
 })();
@@ -408,23 +412,13 @@ function getTimeAgo(dateStr) {
   return date.toLocaleDateString('en-NG', {month:'short', day:'numeric'});
 }
 
-function formatJoinDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return '';
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return 'Member since ' + months[d.getMonth()] + ' ' + d.getFullYear();
-}
-
 // ── LOAD CONVERSATIONS ──
 async function loadConversations() {
   const token = getToken();
   if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
 
   const user = getUser();
-  // Guarded — a cached user object without a name must never crash this
-  // function before it reaches the fetch below
-  if (user && user.name) {
+  if (user) {
     const av = document.getElementById('navAvatar');
     if (av) av.textContent = user.name.charAt(0).toUpperCase();
   }
@@ -442,25 +436,25 @@ async function loadConversations() {
           return !user || p._id !== user._id;
         });
         const prop = conv.property;
-        // Guarded — a participant without a name must never crash the
-        // whole conversation list
-        const otherName = other && other.name ? other.name : 'Tenant';
+        const name = (other && other.name) ? other.name : 'Tenant';
+        const propTitle = prop ? prop.title : 'Property';
         return {
           id: conv._id,
-          name: otherName,
-          init: otherName.charAt(0).toUpperCase(),
+          name: name,
+          init: name.charAt(0).toUpperCase(),
           color: 'linear-gradient(135deg,#185FA5,#1c2f52)',
-          listing: prop ? prop.title : 'Property',
+          listing: propTitle,
           price: prop ? ('&#8358;' + Number(prop.price).toLocaleString('en-NG') + '/yr') : '',
           img: prop && prop.images && prop.images.length > 0 ? prop.images[0] : '',
           last: conv.lastMessage || 'Started a conversation',
           time: getTimeAgo(conv.lastMessageAt),
           unread: 0,
-          // Real tenant data, read straight off this conversation's
-          // participant/property — no separate lookup needed
-          verified: !!(other && (other.isVerified || other.verificationStatus === 'verified')),
-          joinedAt: other && other.createdAt ? other.createdAt : null,
+          // Real data attached directly
+          verified: other ? !!other.isVerified : false,
+          joinedAt: other ? other.createdAt : null,
           propId: prop ? prop._id : null,
+          propImg: prop && prop.images && prop.images.length > 0 ? prop.images[0] : '',
+          propPrice: prop ? ('&#8358;' + Number(prop.price).toLocaleString('en-NG') + '/yr') : '',
         };
       });
 
@@ -482,12 +476,6 @@ async function loadConversations() {
         if (chatName) chatName.textContent = 'No conversations';
         const chatStatus = document.getElementById('chatStatus');
         if (chatStatus) chatStatus.textContent = 'Messages from tenants will appear here';
-        const lbName = document.getElementById('lbName');
-        if (lbName) lbName.textContent = '';
-        const lbPrice = document.getElementById('lbPrice');
-        if (lbPrice) lbPrice.textContent = '';
-        const tibName = document.getElementById('tibName');
-        if (tibName) tibName.textContent = '';
       }
     }
   } catch (err) {
@@ -498,6 +486,31 @@ async function loadConversations() {
 // ── RENDER CONVERSATION LIST ──
 function renderConvList() {
   filterByTab();
+}
+
+function _oldRenderConvList() {
+  const list = document.getElementById('convList');
+  if (!list) return;
+
+  if (CONVS.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:3rem 1rem;color:rgba(255,255,255,0.25);font-size:13px;line-height:2;">No enquiries yet.<br/>Tenant messages will appear here.</div>';
+    return;
+  }
+
+  list.innerHTML = CONVS.map(function(c) {
+    return '<div class="conv-item ' + (c.unread > 0 ? 'unread' : '') + ' ' + (c.id === activeConvId ? 'active' : '') + '" onclick="openConv('' + c.id + '')">' +
+      '<div class="conv-avatar" style="background:' + c.color + ';">' + c.init + '</div>' +
+      '<div class="conv-info">' +
+      '<div class="conv-name-row">' +
+      '<div class="conv-name">' + c.name + '</div>' +
+      '<div class="conv-time">' + c.time + '</div>' +
+      '</div>' +
+      '<div class="conv-listing">' + c.listing + '</div>' +
+      '<div class="conv-preview">' + c.last + '</div>' +
+      '</div>' +
+      (c.unread > 0 ? '<div class="conv-unread-badge">' + c.unread + '</div>' : '') +
+      '</div>';
+  }).join('');
 }
 
 // ── OPEN CONVERSATION ──
@@ -519,42 +532,36 @@ function openConv(id) {
     else chatAv.prepend(document.createTextNode(conv.init));
   }
 
-  // Listing banner — pulled from this conversation's real property data
-  const lbImg = document.getElementById('lbImg');
-  if (lbImg && conv.img) lbImg.src = conv.img;
-  const lbName = document.getElementById('lbName');
-  if (lbName) lbName.textContent = conv.listing;
-  const lbPrice = document.getElementById('lbPrice');
-  if (lbPrice) lbPrice.innerHTML = conv.price || '';
-
+  // Update tenant info bar — data is already on the conv object
+  const tibJoined = document.getElementById('tibJoined');
+  const tibVerified = document.getElementById('tibVerified');
   const editBtn = document.getElementById('editListingBtn');
-  if (editBtn) {
-    if (conv.propId) editBtn.setAttribute('data-prop-id', conv.propId);
-    else editBtn.removeAttribute('data-prop-id');
+
+  // Member since
+  if (tibJoined && conv.joinedAt) {
+    const d = new Date(conv.joinedAt);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    tibJoined.textContent = 'Member since ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // Tenant info bar — real verified status and join date, hidden rather
-  // than faked when the data isn't available
-  const tibName = document.getElementById('tibName');
-  if (tibName) tibName.textContent = conv.name;
-
-  const tibVerified = document.getElementById('tibVerified');
-  const tibVerifiedDivider = document.getElementById('tibVerifiedDivider');
-  if (tibVerified && tibVerifiedDivider) {
+  // Verified badge
+  if (tibVerified) {
     if (conv.verified) {
-      tibVerified.style.display = 'inline-flex';
-      tibVerifiedDivider.style.display = 'block';
+      tibVerified.style.display = 'inline';
+      tibVerified.textContent = '✓ Verified tenant';
     } else {
       tibVerified.style.display = 'none';
-      tibVerifiedDivider.style.display = 'none';
     }
   }
 
-  const tibJoined = document.getElementById('tibJoined');
-  if (tibJoined) {
-    const joinedText = formatJoinDate(conv.joinedAt);
-    tibJoined.textContent = joinedText || '—';
-  }
+  // Update listing info
+  const lbImg = document.querySelector('.lb-thumb img');
+  const lbName = document.querySelector('.lb-name');
+  const lbPrice = document.querySelector('.lb-price');
+  if (lbImg && conv.propImg) lbImg.src = conv.propImg;
+  if (lbName) lbName.textContent = conv.listing;
+  if (lbPrice) lbPrice.innerHTML = conv.propPrice;
+  if (editBtn && conv.propId) editBtn.setAttribute('data-prop-id', conv.propId);
 
   loadMessages(id);
   renderConvList();
@@ -562,9 +569,14 @@ function openConv(id) {
   // Show chat panel on mobile
   const chatPanel = document.getElementById('chatPanel');
   if (chatPanel) chatPanel.classList.add('active');
+
+  // Show chat content, hide empty state
+  const chatContent = document.getElementById('chatContent');
+  const noConvState = document.getElementById('noConvState');
+  if (chatContent) chatContent.style.display = 'flex';
+  if (noConvState) noConvState.style.display = 'none';
 }
 
-// ── EDIT LISTING — routes to the real property this conversation is about ──
 function editListing() {
   const btn = document.getElementById('editListingBtn');
   const propId = btn ? btn.getAttribute('data-prop-id') : null;
@@ -575,10 +587,9 @@ function editListing() {
   }
 }
 
-// ── SCHEDULE VIEWING — prefills a scheduling message so the landlord can
-// propose times directly in the conversation, no separate booking flow needed ──
 function scheduleViewing() {
-  const msg = "I'd like to schedule a viewing for this property. What dates and times work for you?";
+  // Send a scheduling message to tenant
+  const msg = 'I would like to schedule a viewing for this property. Please let me know your available dates and times.';
   const input = document.getElementById('msgInput');
   if (input) {
     input.value = msg;
@@ -643,13 +654,6 @@ function sendMessage() {
   input.value = '';
   autoResize(input);
   sendMessageToAPI(activeConvId, text);
-}
-
-function sendQuickReply(btn) {
-  const input = document.getElementById('msgInput');
-  if (!input || !btn) return;
-  input.value = btn.textContent;
-  sendMessage();
 }
 
 async function sendMessageToAPI(convId, text) {
