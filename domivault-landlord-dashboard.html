@@ -162,6 +162,25 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       <div class="nav-notif-badge" id="notifBadge" style="display:none;">0</div>
     </button>
     <div class="nav-avatar" id="navAvatar">?</div>
+  <script>
+  // Run immediately before page loads
+  (function() {
+    var u = localStorage.getItem('dv_user');
+    if (u) {
+      try {
+        var user = JSON.parse(u);
+        if (user && user.name) {
+          var hour = new Date().getHours();
+          var t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+          var greet = document.querySelector('.page-greeting');
+          if (greet) greet.innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
+          var av = document.getElementById('navAvatar');
+          if (av) av.textContent = user.name.charAt(0).toUpperCase();
+        }
+      } catch(e) {}
+    }
+  })();
+  </script>
   </div>
 </nav>
 
@@ -389,8 +408,7 @@ async function loadDashboard() {
   if (user && user.role === 'admin') { window.location = 'domivault-admin-panel.html'; return; }
   if (user && user.role === 'tenant') { window.location = 'domivault-homepage.html'; return; }
 
-  // Set name and avatar IMMEDIATELY from localStorage before API call (guarded — a
-  // cached user object without a name must never crash the rest of the dashboard)
+  // Set name and avatar IMMEDIATELY from localStorage before API call
   if (user && user.name) {
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -400,6 +418,13 @@ async function loadDashboard() {
     if (navAv) navAv.textContent = user.name.charAt(0).toUpperCase();
   }
 
+  if (user) {
+    const hour = new Date().getHours();
+    const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    document.querySelector('.page-greeting').innerHTML = t + ', <span style="color:var(--gold);font-weight:500;">' + user.name + '</span>';
+    document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
+  }
+
   // Fetch real user data to check verification status
   try {
     const meRes = await fetch(API_URL + '/api/auth/me', {
@@ -407,7 +432,7 @@ async function loadDashboard() {
     });
     const meData = await meRes.json();
 
-    // Update greeting and avatar with real data from API (guarded the same way)
+    // Update greeting and avatar with real data from API
     const hour = new Date().getHours();
     const t = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     const greetEl = document.querySelector('.page-greeting');
@@ -452,7 +477,12 @@ async function loadDashboard() {
           banner.style.display = 'flex';
           banner.style.background = 'rgba(224,82,82,0.08)';
           banner.style.borderColor = 'rgba(224,82,82,0.3)';
-          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div><button onclick="window.location=\'domivault-landlord-verification.html\'" style="background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Resubmit</button>';
+          var rejectBtn = document.createElement('button');
+          rejectBtn.textContent = 'Resubmit';
+          rejectBtn.style.cssText = 'background:var(--error);color:white;border:none;border-radius:8px;padding:0.65rem 1.25rem;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;';
+          rejectBtn.onclick = function() { window.location = 'domivault-landlord-verification.html'; };
+          banner.innerHTML = '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--error);margin-bottom:3px;">Verification rejected</div><div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Reason: ' + reason + '</div></div>';
+          banner.appendChild(rejectBtn);
         }
 
       } else {
@@ -463,6 +493,7 @@ async function loadDashboard() {
         if (banner) banner.style.display = 'flex';
       }
     }
+    localStorage.setItem('dv_user', JSON.stringify(meData));
   } catch(err) {
     const pillText = document.getElementById('verifiedText');
     if (pillText) pillText.textContent = 'Landlord · Active';
@@ -538,6 +569,9 @@ function renderTracker(l) {
   if (isRejected) {
     return '<div class="listing-tracker"><div style="font-size:11px;color:var(--error);background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.2);border-radius:6px;padding:6px 10px;">❌ Listing rejected — please review and resubmit</div></div>';
   }
+  if (l.status === 'rented') {
+    return '<div class="listing-tracker"><div style="font-size:11px;color:var(--success);background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:6px;padding:6px 10px;">🏠 Rented on ' + (l.rentedAt ? formatDate(l.rentedAt) : 'recently') + ' — well done!</div></div>';
+  }
 
   const steps = [
     { label: 'Submitted', date: formatDate(l.createdAt), done: isSubmitted, active: isSubmitted && !isApproved },
@@ -558,6 +592,41 @@ function renderTracker(l) {
     '</div></div>';
 }
 
+async function markAsRented(id, btn) {
+  if (!confirm('Mark this property as rented? It will be removed from search results and tenants who saved it will be notified.')) return;
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+  try {
+    const res = await fetch(API_URL + '/api/properties/' + id + '/mark-rented', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('Property marked as rented!');
+      loadDashboard();
+    } else {
+      alert(data.message || 'Failed to update.');
+      btn.disabled = false;
+      btn.textContent = 'Mark as Rented';
+    }
+  } catch (err) {
+    alert('Network error. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Mark as Rented';
+  }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);padding:.75rem 1.5rem;border-radius:100px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
 function renderListings(listings) {
   const c = document.getElementById('listingsContainer');
   if (!listings.length) {
@@ -567,7 +636,8 @@ function renderListings(listings) {
   c.innerHTML = listings.map(l => {
     const img = l.images && l.images.length > 0 ? l.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=60';
     const sc = 'status-' + l.status;
-    const st = l.status === 'live' ? '● Live' : l.status === 'pending' ? '⏳ Pending' : l.status === 'inspection_scheduled' ? '📅 Inspection' : l.status;
+    const st = l.status === 'live' ? '● Live' : l.status === 'pending' ? '⏳ Pending' : l.status === 'inspection_scheduled' ? '📅 Inspection' : l.status === 'rented' ? '🏠 Rented' : l.status === 'rejected' ? '❌ Rejected' : l.status;
+    const rentedBtn = l.status === 'live' ? `<button onclick="markAsRented('${l._id}', this)" style="background:rgba(46,204,113,0.1);color:var(--success);border:1px solid rgba(46,204,113,0.25);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;">Mark as Rented</button>` : '';
     return `<div class="listing-item">
       <div class="listing-thumb"><img src="${img}" alt="${l.title}" loading="lazy"/></div>
       <div class="listing-info">
@@ -575,7 +645,9 @@ function renderListings(listings) {
         <div class="listing-loc">${l.location.area}, Lagos</div>
         <div class="listing-meta"><span class="status-pill ${sc}">${st}</span><span class="listing-price">&#8358;${l.price.toLocaleString('en-NG')}/yr</span></div>
       </div>
-      <button class="listing-action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        ${rentedBtn}
+      </div>
     </div>
     ${renderTracker(l)}
     </div>`;
