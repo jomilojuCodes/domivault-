@@ -572,6 +572,12 @@ function renderTracker(l) {
   if (l.status === 'rented') {
     return '<div class="listing-tracker"><div style="font-size:11px;color:var(--success);background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:6px;padding:6px 10px;">🏠 Rented on ' + (l.rentedAt ? formatDate(l.rentedAt) : 'recently') + ' — well done!</div></div>';
   }
+  if (l.status === 'withdrawal_requested') {
+    return '<div class="listing-tracker"><div style="font-size:11px;color:var(--gold-light);background:rgba(186,117,23,0.08);border:1px solid rgba(186,117,23,0.2);border-radius:6px;padding:6px 10px;">⏳ Withdrawal requested — awaiting admin review. Reason: ' + (l.withdrawalReason || '') + '</div></div>';
+  }
+  if (l.status === 'withdrawn') {
+    return '<div class="listing-tracker"><div style="font-size:11px;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:6px 10px;">🗑️ Listing withdrawn and removed from search results.</div></div>';
+  }
 
   const steps = [
     { label: 'Submitted', date: formatDate(l.createdAt), done: isSubmitted, active: isSubmitted && !isApproved },
@@ -619,12 +625,44 @@ async function markAsRented(id, btn) {
   }
 }
 
-function showToast(msg) {
+function showToast(msg, type) {
   const t = document.createElement('div');
   t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);padding:.75rem 1.5rem;border-radius:100px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;';
+  const bg = type === 'error' ? 'var(--error)' : 'var(--gold)';
+  t.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:' + bg + ';color:var(--navy);padding:.75rem 1.5rem;border-radius:100px;font-size:13px;font-weight:600;z-index:999;white-space:nowrap;';
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
+}
+
+async function requestWithdrawal(id, btn) {
+  const reason = prompt('Please provide a reason for withdrawing this listing:\n(e.g. Property sold, No longer renting, Found tenant privately)');
+  if (!reason || !reason.trim()) return;
+
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    const res = await fetch(API_URL + '/api/properties/' + id + '/request-withdrawal', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: reason.trim() })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('Withdrawal request submitted! Admin will review shortly.');
+      loadDashboard();
+    } else {
+      showToast(data.message || 'Failed to submit request.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Request Withdrawal';
+    }
+  } catch (err) {
+    showToast('Network error. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Request Withdrawal';
+  }
 }
 
 function renderListings(listings) {
@@ -636,8 +674,9 @@ function renderListings(listings) {
   c.innerHTML = listings.map(l => {
     const img = l.images && l.images.length > 0 ? l.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=60';
     const sc = 'status-' + l.status;
-    const st = l.status === 'live' ? '● Live' : l.status === 'pending' ? '⏳ Pending' : l.status === 'inspection_scheduled' ? '📅 Inspection' : l.status === 'rented' ? '🏠 Rented' : l.status === 'rejected' ? '❌ Rejected' : l.status;
+    const st = l.status === 'live' ? '● Live' : l.status === 'pending' ? '⏳ Pending' : l.status === 'inspection_scheduled' ? '📅 Inspection' : l.status === 'rented' ? '🏠 Rented' : l.status === 'rejected' ? '❌ Rejected' : l.status === 'withdrawal_requested' ? '⏳ Withdrawal Pending' : l.status === 'withdrawn' ? '🗑️ Withdrawn' : l.status;
     const rentedBtn = l.status === 'live' ? `<button onclick="markAsRented('${l._id}', this)" style="background:rgba(46,204,113,0.1);color:var(--success);border:1px solid rgba(46,204,113,0.25);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;">Mark as Rented</button>` : '';
+    const withdrawBtn = l.status === 'live' ? `<button onclick="requestWithdrawal('${l._id}', this)" style="background:rgba(224,82,82,0.08);color:var(--error);border:1px solid rgba(224,82,82,0.2);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;">Request Withdrawal</button>` : '';
     return `<div class="listing-item">
       <div class="listing-thumb"><img src="${img}" alt="${l.title}" loading="lazy"/></div>
       <div class="listing-info">
@@ -647,6 +686,8 @@ function renderListings(listings) {
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
         ${rentedBtn}
+        ${withdrawBtn}
+        <button onclick="window.location='domivault-edit-listing.html?id=${l._id}'" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap;">✏️ Edit</button>
       </div>
     </div>
     ${renderTracker(l)}
