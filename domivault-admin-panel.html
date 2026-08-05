@@ -256,6 +256,11 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
       </div>
       <hr class="section-divider"/>
       <div class="section">
+        <div class="section-head"><div class="section-label" style="color:var(--error);">Withdrawal requests <span id="withdrawalCount" style="color:var(--error);"></span></div></div>
+        <div id="withdrawalListingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div></div>
+      </div>
+      <hr class="section-divider"/>
+      <div class="section">
         <div class="section-head"><div class="section-label">Live listings</div></div>
         <div id="liveListingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div></div>
       </div>
@@ -311,6 +316,49 @@ body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-
     </div>
 
   </main>
+</div>
+
+<!-- LISTING PREVIEW MODAL -->
+<div class="modal-overlay" id="listingPreviewModal" style="align-items:center;">
+  <div class="modal" style="max-width:600px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+      <div class="modal-title" id="previewTitle">Listing Details</div>
+      <button onclick="closePreview()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.2rem;">✕</button>
+    </div>
+
+    <!-- Image gallery -->
+    <div id="previewImages" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:1.25rem;padding-bottom:4px;"></div>
+
+    <!-- Details -->
+    <div id="previewDetails"></div>
+
+    <!-- Actions -->
+    <div id="previewActions" style="display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap;"></div>
+  </div>
+</div>
+
+<!-- INSPECTION SCHEDULING MODAL -->
+<div class="modal-overlay" id="inspectionModal">
+  <div class="modal">
+    <div class="modal-title">Schedule inspection</div>
+    <div class="modal-sub">Set a date and time for the physical inspection of this property.</div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspection date <span style="color:var(--gold);">*</span></label>
+      <input type="date" id="inspectionDate" class="modal-textarea" style="min-height:auto;padding:.75rem 1rem;resize:none;" />
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspection time <span style="color:var(--gold);">*</span></label>
+      <input type="time" id="inspectionTime" class="modal-textarea" style="min-height:auto;padding:.75rem 1rem;resize:none;" />
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspector note (optional)</label>
+      <textarea id="inspectionNote" class="modal-textarea" placeholder="e.g. Our inspector will call 30 mins before arrival..." rows="2"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeInspectionModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" style="background:var(--gold);color:var(--navy);" onclick="confirmInspection()">Approve & Schedule</button>
+    </div>
+  </div>
 </div>
 
 <!-- REJECT MODAL -->
@@ -482,6 +530,7 @@ function renderListingCard(p) {
       <div class="qc-row"><span class="qc-row-label">Submitted</span><span class="qc-row-value">${getTimeAgo(p.createdAt)}</span></div>
     </div>
     <div class="qc-actions">
+      <button class="qc-btn qc-btn-view" onclick="openPreview(currentListings['${p._id}'])">👁 View details</button>
       ${!isLive && !isScheduled ? `<button class="qc-btn qc-btn-approve" onclick="approveListing('${p._id}', this)">✓ Approve</button>` : ''}
       ${isScheduled ? `<button class="qc-btn qc-btn-inspect" onclick="markInspected('${p._id}', this)">✓ Mark as Live</button>` : ''}
       ${isLive ? '<span class="status-pill status-live">● Live</span>' : ''}
@@ -491,6 +540,8 @@ function renderListingCard(p) {
 }
 
 // ── LOAD LISTINGS ──
+let currentListings = {};
+
 async function loadListings() {
   const token = getToken();
   if (!token) return;
@@ -498,14 +549,22 @@ async function loadListings() {
     const res = await fetch(API_URL + '/api/admin/properties', { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await res.json();
     if (!Array.isArray(data)) return;
+    // Store all listings by ID for preview
+    data.forEach(function(p) { currentListings[p._id] = p; });
 
     const pending = data.filter(p => p.status === 'pending' || p.status === 'inspection_scheduled');
+    const withdrawals = data.filter(p => p.status === 'withdrawal_requested');
     const live = data.filter(p => p.status === 'live');
 
     document.getElementById('pendingCount').textContent = '(' + pending.length + ')';
     document.getElementById('pendingListingsContainer').innerHTML = pending.length
       ? pending.map(p => renderListingCard(p)).join('')
       : '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No pending listings.</div>';
+
+    document.getElementById('withdrawalCount').textContent = withdrawals.length > 0 ? '(' + withdrawals.length + ')' : '';
+    document.getElementById('withdrawalListingsContainer').innerHTML = withdrawals.length
+      ? withdrawals.map(p => renderWithdrawalCard(p)).join('')
+      : '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No withdrawal requests.</div>';
 
     document.getElementById('liveListingsContainer').innerHTML = live.length
       ? live.map(p => renderListingCard(p)).join('')
@@ -514,22 +573,119 @@ async function loadListings() {
   } catch (err) { console.error('Load listings failed:', err); }
 }
 
-// ── APPROVE LISTING ──
-async function approveListing(id, btn) {
+function renderWithdrawalCard(p) {
+  const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
+  const requestedAt = p.withdrawalRequestedAt ? new Date(p.withdrawalRequestedAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'}) : 'Recently';
+  return `<div class="queue-card" id="listing-${p._id}" style="border-color:rgba(224,82,82,0.25);">
+    <div class="qc-listing-preview">
+      <div class="qc-listing-img"><img src="${img}" alt="${p.title}"/></div>
+      <div>
+        <div class="qc-listing-name">${p.title}</div>
+        <div class="qc-listing-meta">📍 ${p.location.area}, Lagos · Requested ${requestedAt}</div>
+      </div>
+      <div class="qc-listing-price">&#8358;${p.price.toLocaleString('en-NG')}/yr</div>
+    </div>
+    <div class="qc-details">
+      <div class="qc-row"><span class="qc-row-label">Reason</span><span class="qc-row-value" style="color:var(--error);">${p.withdrawalReason || 'No reason provided'}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Landlord</span><span class="qc-row-value">${p.landlord && p.landlord.name ? p.landlord.name : 'Unknown'}</span></div>
+    </div>
+    <div class="qc-actions">
+      <button class="qc-btn qc-btn-approve" onclick="approveWithdrawal('${p._id}', this)">✓ Approve withdrawal</button>
+      <button class="qc-btn qc-btn-reject" onclick="declineWithdrawal('${p._id}', this)">✕ Decline — keep live</button>
+    </div>
+  </div>`;
+}
+
+async function approveWithdrawal(id, btn) {
   const token = getToken();
   if (!token) return;
   btn.disabled = true; btn.textContent = 'Approving...';
   try {
-    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/approve', {
+    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/approve-withdrawal', {
       method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
     });
+    if (res.ok) { showToast('Withdrawal approved. Listing removed.'); loadListings(); loadOverview(); }
+    else { btn.disabled = false; btn.textContent = '✓ Approve withdrawal'; }
+  } catch (err) { btn.disabled = false; btn.textContent = '✓ Approve withdrawal'; }
+}
+
+async function declineWithdrawal(id, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true; btn.textContent = 'Declining...';
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/decline-withdrawal', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) { showToast('Withdrawal declined. Listing remains live.'); loadListings(); }
+    else { btn.disabled = false; btn.textContent = '✕ Decline — keep live'; }
+  } catch (err) { btn.disabled = false; btn.textContent = '✕ Decline — keep live'; }
+}
+
+// ── APPROVE LISTING ──
+let pendingApprovalId = null;
+let pendingApprovalBtn = null;
+
+function approveListing(id, btn) {
+  pendingApprovalId = id;
+  pendingApprovalBtn = btn;
+  // Set default date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('inspectionDate').value = tomorrow.toISOString().split('T')[0];
+  document.getElementById('inspectionTime').value = '10:00';
+  document.getElementById('inspectionNote').value = '';
+  document.getElementById('inspectionModal').classList.add('active');
+}
+
+function closeInspectionModal() {
+  document.getElementById('inspectionModal').classList.remove('active');
+  if (pendingApprovalBtn) {
+    pendingApprovalBtn.disabled = false;
+    pendingApprovalBtn.textContent = '✓ Approve';
+  }
+  pendingApprovalId = null;
+  pendingApprovalBtn = null;
+}
+
+async function confirmInspection() {
+  const token = getToken();
+  if (!token || !pendingApprovalId) return;
+
+  const date = document.getElementById('inspectionDate').value;
+  const time = document.getElementById('inspectionTime').value;
+  const note = document.getElementById('inspectionNote').value;
+
+  if (!date || !time) {
+    showToast('Please select a date and time.', 'error');
+    return;
+  }
+
+  const confirmBtn = document.querySelector('#inspectionModal .modal-btn-confirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Scheduling...';
+
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + pendingApprovalId + '/approve', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inspectionDate: date, inspectionTime: time, inspectionNote: note })
+    });
     if (res.ok) {
-      showToast('Listing approved! Inspection scheduled.');
+      document.getElementById('inspectionModal').classList.remove('active');
+      showToast('Listing approved! Inspection scheduled for ' + new Date(date).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'}) + ' at ' + time);
       loadListings(); loadOverview();
     } else {
-      btn.disabled = false; btn.textContent = '✓ Approve';
+      showToast('Failed to approve. Please try again.', 'error');
     }
-  } catch (err) { btn.disabled = false; btn.textContent = '✓ Approve'; }
+  } catch (err) {
+    showToast('Network error.', 'error');
+  }
+
+  confirmBtn.disabled = false;
+  confirmBtn.textContent = 'Approve & Schedule';
+  pendingApprovalId = null;
+  pendingApprovalBtn = null;
 }
 
 // ── MARK INSPECTED ──
@@ -840,6 +996,80 @@ setPage = function(btn, page) {
   _origSetPage(btn, page);
   updateBnav(page);
 };
+
+// ── LISTING PREVIEW ──
+function openPreview(p) {
+  const modal = document.getElementById('listingPreviewModal');
+  const title = document.getElementById('previewTitle');
+  const images = document.getElementById('previewImages');
+  const details = document.getElementById('previewDetails');
+  const actions = document.getElementById('previewActions');
+
+  title.textContent = p.title;
+
+  // Images
+  if (p.images && p.images.length > 0) {
+    images.innerHTML = p.images.map(function(img) {
+      return '<img src="' + img + '" style="width:180px;height:120px;object-fit:cover;border-radius:8px;flex-shrink:0;" />';
+    }).join('');
+  } else {
+    images.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:1rem;">No photos uploaded</div>';
+  }
+
+  // Details
+  const joined = new Date(p.createdAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'});
+  details.innerHTML = `
+    <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        ${row('Price', '&#8358;' + Number(p.price).toLocaleString('en-NG') + '/yr')}
+        ${row('Type', p.type)}
+        ${row('Bedrooms', p.bedrooms)}
+        ${row('Bathrooms', p.bathrooms)}
+        ${row('Furnishing', p.furnishing)}
+        ${row('Size', p.size ? p.size + ' m²' : 'Not specified')}
+        ${row('Address', p.location ? p.location.address : '—')}
+        ${row('Area', p.location ? p.location.area + ', Lagos' : '—')}
+        ${row('Submitted', joined)}
+        ${row('Status', p.status)}
+      </div>
+    </div>
+    <div style="margin-bottom:.75rem;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Description</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.7;">${p.description || 'No description'}</div>
+    </div>
+    ${p.amenities && p.amenities.length > 0 ? '<div><div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Amenities</div><div style="font-size:12px;color:rgba(255,255,255,0.5);">' + p.amenities.join(' · ') + '</div></div>' : ''}
+  `;
+
+  // Action buttons based on status
+  if (p.status === 'pending') {
+    actions.innerHTML = `
+      <button class="qc-btn qc-btn-approve" onclick="closePreview();approveListing('${p._id}', this)">✓ Approve</button>
+      <button class="qc-btn qc-btn-reject" onclick="closePreview();openRejectModal('listing','${p._id}')">✕ Reject</button>
+    `;
+  } else if (p.status === 'inspection_scheduled') {
+    actions.innerHTML = `<button class="qc-btn qc-btn-inspect" onclick="closePreview();markInspected('${p._id}', this)">✓ Mark as Live</button>`;
+  } else if (p.status === 'withdrawal_requested') {
+    actions.innerHTML = `
+      <button class="qc-btn qc-btn-approve" onclick="closePreview();approveWithdrawal('${p._id}', this)">✓ Approve withdrawal</button>
+      <button class="qc-btn qc-btn-reject" onclick="closePreview();declineWithdrawal('${p._id}', this)">✕ Decline</button>
+    `;
+  } else {
+    actions.innerHTML = '<span style="font-size:12px;color:rgba(255,255,255,0.3);">No actions available for this listing.</span>';
+  }
+
+  modal.classList.add('active');
+}
+
+function row(label, value) {
+  return '<div style="padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+    '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:2px;">' + label + '</div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">' + value + '</div>' +
+    '</div>';
+}
+
+function closePreview() {
+  document.getElementById('listingPreviewModal').classList.remove('active');
+}
 
 // Initialize
 loadOverview();
