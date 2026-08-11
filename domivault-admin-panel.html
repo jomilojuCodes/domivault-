@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel — Domivault</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0a1628;--navy-mid:#132040;--navy-light:#1c2f52;--gold:#BA7517;--gold-light:#EF9F27;--stone:#888780;--white:#fff;--success:#2ecc71;--error:#e05252;--serif:'Cormorant Garamond',serif;--sans:'DM Sans',sans-serif;--r:12px;--rs:8px;--t:.25s ease;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--navy);color:var(--white);overflow-x:hidden;}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 5%;background:rgba(10,22,40,.96);backdrop-filter:blur(14px);border-bottom:1px solid rgba(186,117,23,.15);}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-logo svg{width:26px;height:30px;flex-shrink:0;}
+.tb-wordmark{font-family:var(--serif);font-size:1.25rem;font-weight:700;color:var(--white);}
+.tb-wordmark span{color:var(--gold);}
+.tb-badge{font-size:11px;padding:2px 9px;border-radius:100px;border:1px solid rgba(186,117,23,.3);background:rgba(186,117,23,.08);color:var(--gold-light);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.iBtn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--white);position:relative;}
+.iBtn svg{width:17px;height:17px;}
+.nBadge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+.tb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--navy);cursor:pointer;border:2px solid rgba(186,117,23,.3);}
+.app-shell{display:flex;}
+.sidebar{width:230px;flex-shrink:0;background:var(--navy-mid);border-right:1px solid rgba(186,117,23,.12);padding:1.25rem .85rem;position:sticky;top:65px;height:calc(100vh - 65px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:.75rem 1rem .4rem;}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-radius:var(--rs);background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-family:var(--sans);font-size:13px;transition:all .2s;text-align:left;width:100%;position:relative;}
+.sb-btn:hover{background:rgba(255,255,255,.05);color:var(--white);}
+.sb-btn.active{background:rgba(186,117,23,.1);color:var(--gold);font-weight:500;}
+.sb-btn svg{width:17px;height:17px;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;}
+.sb-badge.red{background:var(--error);color:white;}
+.sb-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:.75rem 0;}
+.content{flex:1;min-width:0;padding:1.75rem 3%;max-width:1200px;}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;}
+.page-title{font-family:var(--serif);font-size:clamp(1.5rem,4vw,2rem);font-weight:700;margin-bottom:.3rem;}
+.page-sub{font-size:13px;color:rgba(255,255,255,.4);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.75rem;}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:border-color var(--t);}
+.stat-card:hover{border-color:rgba(186,117,23,.3);}
+.stat-card.gold{border-color:rgba(186,117,23,.3);background:rgba(186,117,23,.05);}
+.stat-card.alert{border-color:rgba(224,82,82,.25);background:rgba(224,82,82,.04);}
+.stat-num{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px;}
+.stat-card.alert .stat-num{color:var(--error);}
+.stat-label{font-size:12px;color:rgba(255,255,255,.4);}
+.stat-trend{font-size:11px;color:var(--success);margin-top:4px;}
+.section{margin-bottom:2rem;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+.section-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;}
+.section-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin-bottom:2rem;}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;}
+.tab{font-size:12px;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.06);border:1px solid transparent;color:rgba(255,255,255,.45);cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.tab.active{background:rgba(186,117,23,.15);color:var(--gold-light);border-color:rgba(186,117,23,.3);}
+.tab-badge{background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:5px;}
+.search-bar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);padding:.6rem .9rem;max-width:320px;}
+.search-bar svg{width:15px;height:15px;color:rgba(255,255,255,.3);flex-shrink:0;}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--white);font-size:13px;font-family:var(--sans);}
+.search-bar input::placeholder{color:rgba(255,255,255,.25);}
+.queue-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.25rem;margin-bottom:10px;transition:border-color var(--t);}
+.queue-card:hover{border-color:rgba(186,117,23,.2);}
+.qc-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1rem;}
+.qc-avatar{width:46px;height:46px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--navy-light));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--navy);}
+.qc-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.qc-sub{font-size:11px;color:rgba(255,255,255,.35);}
+.qc-time{font-size:11px;color:rgba(255,255,255,.3);margin-left:auto;flex-shrink:0;}
+.qc-status{margin-left:auto;flex-shrink:0;}
+.status-pill{font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.status-pending{background:rgba(186,117,23,.12);color:var(--gold-light);border:1px solid rgba(186,117,23,.25);}
+.status-approved{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.status-rejected{background:rgba(224,82,82,.12);color:var(--error);border:1px solid rgba(224,82,82,.25);}
+.status-live{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.status-scheduled{background:rgba(24,95,165,.15);color:#5DA8E8;border:1px solid rgba(24,95,165,.3);}
+.status-active{background:rgba(46,204,113,.1);color:var(--success);border:1px solid rgba(46,204,113,.2);}
+.status-suspended{background:rgba(224,82,82,.1);color:var(--error);border:1px solid rgba(224,82,82,.2);}
+.qc-docs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.qc-doc{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--rs);padding:.65rem .85rem;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;transition:border-color var(--t);}
+.qc-doc:hover{border-color:rgba(186,117,23,.3);}
+.qc-doc-icon{font-size:1.1rem;flex-shrink:0;}
+.qc-doc-name{flex:1;}
+.qc-doc-view{font-size:11px;color:var(--gold);}
+.qc-details{background:rgba(255,255,255,.02);border-radius:var(--rs);padding:.85rem 1rem;margin-bottom:1rem;}
+.qc-row{display:flex;justify-content:space-between;padding:.4rem 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.qc-row:last-child{border-bottom:none;}
+.qc-row-label{color:rgba(255,255,255,.35);}
+.qc-row-value{color:rgba(255,255,255,.8);font-weight:500;}
+.qc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.qc-btn{padding:.6rem 1.25rem;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all var(--t);border:none;}
+.qc-btn-approve{background:rgba(46,204,113,.12);color:var(--success);border:1px solid rgba(46,204,113,.25);}
+.qc-btn-approve:hover{background:rgba(46,204,113,.2);}
+.qc-btn-inspect{background:rgba(186,117,23,.12);color:var(--gold-light);border:1px solid rgba(186,117,23,.25);}
+.qc-btn-inspect:hover{background:rgba(186,117,23,.2);}
+.qc-btn-reject{background:rgba(224,82,82,.1);color:var(--error);border:1px solid rgba(224,82,82,.2);}
+.qc-btn-reject:hover{background:rgba(224,82,82,.18);}
+.qc-btn-view{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
+.qc-btn-view:hover{background:rgba(255,255,255,.1);color:var(--white);}
+.qc-listing-preview{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--rs);padding:.65rem .85rem;margin-bottom:1rem;}
+.qc-listing-img{width:48px;height:48px;border-radius:6px;overflow:hidden;flex-shrink:0;}
+.qc-listing-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.85);}
+.qc-listing-name{font-size:13px;font-weight:500;margin-bottom:2px;}
+.qc-listing-meta{font-size:11px;color:rgba(255,255,255,.35);}
+.qc-listing-price{font-size:12px;color:var(--gold);font-weight:600;margin-left:auto;}
+.users-table-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);overflow:hidden;overflow-x:auto;}
+.users-table{width:100%;border-collapse:collapse;min-width:680px;}
+.users-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.35);padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);}
+.users-table td{padding:.85rem 1rem;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.7);}
+.users-table tr:last-child td{border-bottom:none;}
+.users-table tr:hover td{background:rgba(255,255,255,.02);}
+.user-cell{display:flex;align-items:center;gap:10px;}
+.user-avatar-sm{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);background:linear-gradient(135deg,var(--gold),var(--navy-light));font-family:var(--serif);}
+.user-name{font-weight:500;color:var(--white);font-size:13px;}
+.user-email{font-size:11px;color:rgba(255,255,255,.3);}
+.user-action-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:6px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .2s;}
+.user-action-btn:hover{background:rgba(255,255,255,.1);color:var(--white);}
+.user-action-btn.danger{color:var(--error);border-color:rgba(224,82,82,.2);}
+.user-action-btn.danger:hover{background:rgba(224,82,82,.1);}
+.user-action-btn.verify{color:var(--gold);border-color:rgba(186,117,23,.3);}
+.chart-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:1.25rem;}
+.chart-wrap{position:relative;height:240px;}
+.chart-row{display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem;}
+@media(max-width:900px){.chart-row{grid-template-columns:1fr;}}
+.area-stat{display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.area-stat:last-child{border-bottom:none;}
+.area-stat-name{color:rgba(255,255,255,.6);}
+.area-stat-bar-wrap{flex:1;margin:0 1rem;}
+.area-stat-bar-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.area-stat-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;}
+.area-stat-num{color:var(--gold);font-weight:600;min-width:32px;text-align:right;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.75);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--navy-mid);border:1px solid rgba(186,117,23,.25);border-radius:var(--r);padding:1.5rem;max-width:420px;width:100%;}
+.modal-title{font-family:var(--serif);font-size:1.3rem;font-weight:700;margin-bottom:.5rem;}
+.modal-sub{font-size:13px;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:1.25rem;}
+.modal-textarea{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--rs);color:var(--white);font-family:var(--sans);font-size:.9rem;outline:none;resize:vertical;min-height:90px;margin-bottom:1.25rem;}
+.modal-textarea:focus{border-color:var(--gold);}
+.modal-actions{display:flex;gap:.75rem;}
+.modal-btn{flex:1;padding:.8rem;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);border:none;transition:all .2s;}
+.modal-btn-cancel{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);}
+.modal-btn-confirm{background:var(--error);color:white;}
+.page{display:none;}
+.page.active{display:block;}
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .content{padding:1.5rem 5% 80px;}
+  .admin-bottom-nav{display:flex!important;}
+}
+.admin-bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  justify-content:space-around;
+  padding:0.7rem 0 1rem;
+  background:rgba(10,22,40,0.97);
+  backdrop-filter:blur(14px);
+  border-top:1px solid rgba(186,117,23,0.15);
+}
+.admin-bnav-btn{
+  background:none;border:none;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;color:rgba(255,255,255,0.3);
+  font-family:var(--sans);transition:color 0.2s;
+}
+.admin-bnav-btn.active{color:var(--gold);}
+.admin-bnav-btn svg{width:20px;height:20px;}
+.admin-bnav-btn span{font-size:10px;font-weight:500;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">
+      <svg viewBox="0 0 34 38" fill="none">
+        <polygon points="17,1 33,12 33,37 1,37 1,12" fill="white"/>
+        <circle cx="17" cy="25" r="8" fill="none" stroke="#BA7517" stroke-width="2.1"/>
+        <circle cx="17" cy="25" r="3" fill="#BA7517"/>
+        <line x1="17" y1="17" x2="17" y2="20" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="30" x2="17" y2="33" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="9" y1="25" x2="12" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="22" y1="25" x2="25" y2="25" stroke="#BA7517" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="1" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="17" y1="1" x2="33" y2="12" stroke="#BA7517" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="tb-wordmark">Domi<span>vault</span></div>
+    <div class="tb-badge">Admin</div>
+  </div>
+  <div class="tb-right">
+    
+    <div class="tb-avatar" id="adminAvatar">A</div>
+  </div>
+</nav>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sb-section-label">Main</div>
+    <button class="sb-btn active" onclick="setPage(this,'overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+    <div class="sb-section-label">Review queues</div>
+    <button class="sb-btn" onclick="setPage(this,'listings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Listings
+      <span class="sb-badge" id="pendingBadge">0</span>
+    </button>
+    <button class="sb-btn" onclick="setPage(this,'verifications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Verifications
+      <span class="sb-badge red" id="verificationsBadge" style="display:none;">0</span>
+    </button>
+    <div class="sb-section-label">Platform</div>
+    <button class="sb-btn" onclick="setPage(this,'users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </button>
+    <button class="sb-btn" onclick="setPage(this,'reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </button>
+    <hr class="sb-divider"/>
+    <button class="sb-btn" onclick="handleLogout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log out
+    </button>
+  </aside>
+
+  <main class="content">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="page-head"><div><div class="page-title">Overview</div><div class="page-sub">Welcome back — here's what needs your attention</div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card alert" onclick="setPage(null,'listings')"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending listings</div></div>
+        <div class="stat-card gold"><div class="stat-num" id="statLive">0</div><div class="stat-label">Live listings</div></div>
+        <div class="stat-card"><div class="stat-num" id="statUsers">0</div><div class="stat-label">Total users</div></div>
+        <div class="stat-card"><div class="stat-num" id="statLandlords">0</div><div class="stat-label">Landlords</div></div>
+      </div>
+      <hr class="section-divider"/>
+      <div class="section">
+        <div class="section-head"><div class="section-label">Pending listings</div><button class="tab" onclick="setPage(null,'listings')">View all →</button></div>
+        <div id="overviewPendingContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="page" id="page-listings">
+      <div class="page-head">
+        <div><div class="page-title">Listing approvals</div><div class="page-sub">Review and approve submitted listings</div></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><div class="section-label">Pending review <span id="pendingCount" style="color:var(--gold);"></span></div></div>
+        <div id="pendingListingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading listings...</div></div>
+      </div>
+      <hr class="section-divider"/>
+      <div class="section">
+        <div class="section-head"><div class="section-label" style="color:var(--error);">Withdrawal requests <span id="withdrawalCount" style="color:var(--error);"></span></div></div>
+        <div id="withdrawalListingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div></div>
+      </div>
+      <hr class="section-divider"/>
+      <div class="section">
+        <div class="section-head"><div class="section-label">Live listings</div></div>
+        <div id="liveListingsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- VERIFICATIONS -->
+    <div class="page" id="page-verifications">
+      <div class="page-head"><div><div class="page-title">Landlord verifications</div><div class="page-sub">Review pending verification submissions</div></div></div>
+      <div class="section">
+        <div id="verificationsContainer"><div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading verifications...</div></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="page-head">
+        <div><div class="page-title">User management</div><div class="page-sub">Manage tenant and landlord accounts</div></div>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="userSearch" placeholder="Search by name..." oninput="filterUsers(this.value)"/>
+        </div>
+      </div>
+      <div class="section">
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead><tr><th>User</th><th>Role</th><th>Joined</th><th>Status</th><th>Verified</th><th>Actions</th></tr></thead>
+            <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);">Loading users...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="page-head"><div><div class="page-title">Reports & analytics</div><div class="page-sub">Platform-wide performance metrics</div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card gold"><div class="stat-num" id="repUsers">0</div><div class="stat-label">Total users</div></div>
+        <div class="stat-card"><div class="stat-num" id="repLive">0</div><div class="stat-label">Live listings</div></div>
+        <div class="stat-card"><div class="stat-num" id="repLandlords">0</div><div class="stat-label">Landlords</div></div>
+        <div class="stat-card"><div class="stat-num" id="repTenants">0</div><div class="stat-label">Tenants</div></div>
+      </div>
+      <hr class="section-divider"/>
+      <div class="chart-row">
+        <div class="section">
+          <div class="section-head"><div class="section-label">User growth — last 8 weeks</div></div>
+          <div class="chart-card"><div class="chart-wrap"><canvas id="growthChart"></canvas></div></div>
+        </div>
+        <div class="section">
+          <div class="section-head"><div class="section-label">User breakdown</div></div>
+          <div class="chart-card"><div class="chart-wrap"><canvas id="userPieChart"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- LISTING PREVIEW MODAL -->
+<div class="modal-overlay" id="listingPreviewModal" style="align-items:center;">
+  <div class="modal" style="max-width:600px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+      <div class="modal-title" id="previewTitle">Listing Details</div>
+      <button onclick="closePreview()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.2rem;">✕</button>
+    </div>
+
+    <!-- Image gallery -->
+    <div id="previewImages" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:1.25rem;padding-bottom:4px;"></div>
+
+    <!-- Details -->
+    <div id="previewDetails"></div>
+
+    <!-- Actions -->
+    <div id="previewActions" style="display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap;"></div>
+  </div>
+</div>
+
+<!-- INSPECTION SCHEDULING MODAL -->
+<div class="modal-overlay" id="inspectionModal">
+  <div class="modal">
+    <div class="modal-title">Schedule inspection</div>
+    <div class="modal-sub">Set a date and time for the physical inspection of this property.</div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspection date <span style="color:var(--gold);">*</span></label>
+      <input type="date" id="inspectionDate" class="modal-textarea" style="min-height:auto;padding:.75rem 1rem;resize:none;" />
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspection time <span style="color:var(--gold);">*</span></label>
+      <input type="time" id="inspectionTime" class="modal-textarea" style="min-height:auto;padding:.75rem 1rem;resize:none;" />
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.4rem;">Inspector note (optional)</label>
+      <textarea id="inspectionNote" class="modal-textarea" placeholder="e.g. Our inspector will call 30 mins before arrival..." rows="2"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeInspectionModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" style="background:var(--gold);color:var(--navy);" onclick="confirmInspection()">Approve & Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <div class="modal-title">Reject submission</div>
+    <div class="modal-sub">Provide a reason for rejection so the user can resubmit with corrections.</div>
+    <textarea class="modal-textarea" id="rejectReason" placeholder="e.g. Photos are unclear, please re-upload higher quality images..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeRejectModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  try {
+    var u = localStorage.getItem('dv_user');
+    if (u) {
+      var user = JSON.parse(u);
+      var av = document.getElementById('adminAvatar');
+      if (av) av.textContent = user.name.charAt(0).toUpperCase();
+    }
+  } catch(e) {}
+})();
+
+const API_URL = 'https://domivault-backend.onrender.com';
+function getToken() { return localStorage.getItem('dv_token'); }
+function getUser() { const u = localStorage.getItem('dv_user'); return u ? JSON.parse(u) : null; }
+
+let allUsers = [];
+
+function handleLogout() {
+  if (confirm('Log out of admin panel?')) {
+    localStorage.removeItem('dv_token');
+    localStorage.removeItem('dv_user');
+    window.location = 'domivault-with-images.html';
+  }
+}
+
+function setPage(btn, page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (page === 'reports') {
+    const token = getToken();
+    fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function(r) { return r.json(); })
+      .then(function(stats) {
+        window._domivaultStats = stats;
+        var repUsers = document.getElementById('repUsers');
+        var repLandlords = document.getElementById('repLandlords');
+        var repTenants = document.getElementById('repTenants');
+        var repLive = document.getElementById('repLive');
+        if (repUsers) repUsers.textContent = stats.totalUsers !== undefined ? stats.totalUsers : 0;
+        if (repLandlords) repLandlords.textContent = stats.totalLandlords !== undefined ? stats.totalLandlords : 0;
+        if (repTenants) repTenants.textContent = stats.totalTenants !== undefined ? stats.totalTenants : 0;
+        if (repLive) repLive.textContent = stats.liveListings !== undefined ? stats.liveListings : 0;
+        setTimeout(buildReportCharts, 100);
+      })
+      .catch(function(err) { console.error('Stats load failed:', err); });
+  }
+  if (page === 'listings') loadListings();
+  if (page === 'users') loadUsers();
+  if (page === 'verifications') loadVerifications();
+}
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  const bg = type === 'error' ? 'var(--error)' : 'var(--gold)';
+  toast.textContent = msg;
+  toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:${bg};color:var(--navy);padding:0.75rem 1.5rem;border-radius:100px;font-size:13px;font-weight:600;z-index:999;animation:fadeIn 0.3s ease;white-space:nowrap;`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function getTimeAgo(dateStr) {
+  const date = new Date(dateStr), now = new Date();
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+// ── LOAD ALL DATA ON PAGE LOAD ──
+async function loadOverview() {
+  const token = getToken();
+  if (!token) { window.location = 'domivault-complete-onboarding.html'; return; }
+
+  const user = getUser();
+  if (user) document.getElementById('adminAvatar').textContent = user.name.charAt(0).toUpperCase();
+
+  try {
+    // Load real stats
+    const [statsRes, propRes, userRes] = await Promise.all([
+      fetch(API_URL + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } }),
+      fetch(API_URL + '/api/admin/properties', { headers: { 'Authorization': 'Bearer ' + token } }),
+      fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } })
+    ]);
+
+    const stats = await statsRes.json();
+    const properties = await propRes.json();
+    const users = await userRes.json();
+    allUsers = Array.isArray(users) ? users : [];
+
+    // Update stats from real data
+    if (stats) {
+      document.getElementById('statUsers').textContent = stats.totalUsers || 0;
+      document.getElementById('statLandlords').textContent = stats.totalLandlords || 0;
+      document.getElementById('statLive').textContent = stats.liveListings || 0;
+      document.getElementById('statPending').textContent = stats.pendingListings || 0;
+      document.getElementById('pendingBadge').textContent = stats.pendingListings || 0;
+
+      // Store stats for charts
+      window._domivaultStats = stats;
+    }
+
+    if (Array.isArray(properties)) {
+      const pending = properties.filter(p => p.status === 'pending');
+      const container = document.getElementById('overviewPendingContainer');
+      if (pending.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No pending listings.</div>';
+      } else {
+        container.innerHTML = pending.slice(0, 3).map(p => renderListingCard(p)).join('');
+      }
+    }
+
+    // Count pending verifications and update badge
+    if (Array.isArray(users)) {
+      const pendingVerifs = users.filter(u => u.role === 'landlord' && !u.isVerified && u.verificationStatus === 'pending_review');
+      const badge = document.getElementById('verificationsBadge');
+      if (badge) {
+        if (pendingVerifs.length > 0) {
+          badge.textContent = pendingVerifs.length;
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+  } catch (err) {
+    console.error('Overview load failed:', err);
+  }
+}
+
+// ── RENDER LISTING CARD ──
+function renderListingCard(p) {
+  const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
+  const isLive = p.status === 'live';
+  const isScheduled = p.status === 'inspection_scheduled';
+  return `<div class="queue-card" id="listing-${p._id}">
+    <div class="qc-listing-preview">
+      <div class="qc-listing-img"><img src="${img}" alt="${p.title}"/></div>
+      <div>
+        <div class="qc-listing-name">${p.title}</div>
+        <div class="qc-listing-meta">📍 ${p.location.area}, Lagos · ${p.bedrooms} bed / ${p.bathrooms} bath</div>
+      </div>
+      <div class="qc-listing-price">&#8358;${p.price.toLocaleString('en-NG')}/yr</div>
+    </div>
+    <div class="qc-details">
+      <div class="qc-row"><span class="qc-row-label">Type</span><span class="qc-row-value">${p.type} · ${p.furnishing}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Address</span><span class="qc-row-value">${p.location.address}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Amenities</span><span class="qc-row-value">${p.amenities && p.amenities.length ? p.amenities.join(', ') : 'None listed'}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Status</span><span class="qc-row-value">${p.status}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Submitted</span><span class="qc-row-value">${getTimeAgo(p.createdAt)}</span></div>
+    </div>
+    <div class="qc-actions">
+      <button class="qc-btn qc-btn-view" onclick="openPreview(currentListings['${p._id}'])">👁 View details</button>
+      ${!isLive && !isScheduled ? `<button class="qc-btn qc-btn-approve" onclick="approveListing('${p._id}', this)">✓ Approve</button>` : ''}
+      ${isScheduled ? `<button class="qc-btn qc-btn-inspect" onclick="markInspected('${p._id}', this)">✓ Mark as Live</button>` : ''}
+      ${isLive ? '<span class="status-pill status-live">● Live</span>' : ''}
+      ${!isLive ? `<button class="qc-btn qc-btn-reject" onclick="openRejectModal('listing','${p._id}')">✕ Reject</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// ── LOAD LISTINGS ──
+let currentListings = {};
+
+async function loadListings() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    // Store all listings by ID for preview
+    data.forEach(function(p) { currentListings[p._id] = p; });
+
+    const pending = data.filter(p => p.status === 'pending' || p.status === 'inspection_scheduled');
+    const withdrawals = data.filter(p => p.status === 'withdrawal_requested');
+    const live = data.filter(p => p.status === 'live');
+
+    document.getElementById('pendingCount').textContent = '(' + pending.length + ')';
+    document.getElementById('pendingListingsContainer').innerHTML = pending.length
+      ? pending.map(p => renderListingCard(p)).join('')
+      : '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No pending listings.</div>';
+
+    document.getElementById('withdrawalCount').textContent = withdrawals.length > 0 ? '(' + withdrawals.length + ')' : '';
+    document.getElementById('withdrawalListingsContainer').innerHTML = withdrawals.length
+      ? withdrawals.map(p => renderWithdrawalCard(p)).join('')
+      : '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No withdrawal requests.</div>';
+
+    document.getElementById('liveListingsContainer').innerHTML = live.length
+      ? live.map(p => renderListingCard(p)).join('')
+      : '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No live listings yet.</div>';
+
+  } catch (err) { console.error('Load listings failed:', err); }
+}
+
+function renderWithdrawalCard(p) {
+  const img = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&q=70';
+  const requestedAt = p.withdrawalRequestedAt ? new Date(p.withdrawalRequestedAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'}) : 'Recently';
+  return `<div class="queue-card" id="listing-${p._id}" style="border-color:rgba(224,82,82,0.25);">
+    <div class="qc-listing-preview">
+      <div class="qc-listing-img"><img src="${img}" alt="${p.title}"/></div>
+      <div>
+        <div class="qc-listing-name">${p.title}</div>
+        <div class="qc-listing-meta">📍 ${p.location.area}, Lagos · Requested ${requestedAt}</div>
+      </div>
+      <div class="qc-listing-price">&#8358;${p.price.toLocaleString('en-NG')}/yr</div>
+    </div>
+    <div class="qc-details">
+      <div class="qc-row"><span class="qc-row-label">Reason</span><span class="qc-row-value" style="color:var(--error);">${p.withdrawalReason || 'No reason provided'}</span></div>
+      <div class="qc-row"><span class="qc-row-label">Landlord</span><span class="qc-row-value">${p.landlord && p.landlord.name ? p.landlord.name : 'Unknown'}</span></div>
+    </div>
+    <div class="qc-actions">
+      <button class="qc-btn qc-btn-approve" onclick="approveWithdrawal('${p._id}', this)">✓ Approve withdrawal</button>
+      <button class="qc-btn qc-btn-reject" onclick="declineWithdrawal('${p._id}', this)">✕ Decline — keep live</button>
+    </div>
+  </div>`;
+}
+
+async function approveWithdrawal(id, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true; btn.textContent = 'Approving...';
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/approve-withdrawal', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) { showToast('Withdrawal approved. Listing removed.'); loadListings(); loadOverview(); }
+    else { btn.disabled = false; btn.textContent = '✓ Approve withdrawal'; }
+  } catch (err) { btn.disabled = false; btn.textContent = '✓ Approve withdrawal'; }
+}
+
+async function declineWithdrawal(id, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true; btn.textContent = 'Declining...';
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/decline-withdrawal', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) { showToast('Withdrawal declined. Listing remains live.'); loadListings(); }
+    else { btn.disabled = false; btn.textContent = '✕ Decline — keep live'; }
+  } catch (err) { btn.disabled = false; btn.textContent = '✕ Decline — keep live'; }
+}
+
+// ── APPROVE LISTING ──
+let pendingApprovalId = null;
+let pendingApprovalBtn = null;
+
+function approveListing(id, btn) {
+  pendingApprovalId = id;
+  pendingApprovalBtn = btn;
+  // Set default date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('inspectionDate').value = tomorrow.toISOString().split('T')[0];
+  document.getElementById('inspectionTime').value = '10:00';
+  document.getElementById('inspectionNote').value = '';
+  document.getElementById('inspectionModal').classList.add('active');
+}
+
+function closeInspectionModal() {
+  document.getElementById('inspectionModal').classList.remove('active');
+  if (pendingApprovalBtn) {
+    pendingApprovalBtn.disabled = false;
+    pendingApprovalBtn.textContent = '✓ Approve';
+  }
+  pendingApprovalId = null;
+  pendingApprovalBtn = null;
+}
+
+async function confirmInspection() {
+  const token = getToken();
+  if (!token || !pendingApprovalId) return;
+
+  const date = document.getElementById('inspectionDate').value;
+  const time = document.getElementById('inspectionTime').value;
+  const note = document.getElementById('inspectionNote').value;
+
+  if (!date || !time) {
+    showToast('Please select a date and time.', 'error');
+    return;
+  }
+
+  const confirmBtn = document.querySelector('#inspectionModal .modal-btn-confirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Scheduling...';
+
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + pendingApprovalId + '/approve', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inspectionDate: date, inspectionTime: time, inspectionNote: note })
+    });
+    if (res.ok) {
+      document.getElementById('inspectionModal').classList.remove('active');
+      showToast('Listing approved! Inspection scheduled for ' + new Date(date).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'}) + ' at ' + time);
+      loadListings(); loadOverview();
+    } else {
+      showToast('Failed to approve. Please try again.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error.', 'error');
+  }
+
+  confirmBtn.disabled = false;
+  confirmBtn.textContent = 'Approve & Schedule';
+  pendingApprovalId = null;
+  pendingApprovalBtn = null;
+}
+
+// ── MARK INSPECTED ──
+async function markInspected(id, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true; btn.textContent = 'Marking live...';
+  try {
+    const res = await fetch(API_URL + '/api/admin/properties/' + id + '/inspect', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+      showToast('Property is now LIVE on Domivault!');
+      loadListings(); loadOverview();
+    } else { btn.disabled = false; btn.textContent = '✓ Mark as Live'; }
+  } catch (err) { btn.disabled = false; btn.textContent = '✓ Mark as Live'; }
+}
+
+// ── REJECT ──
+let rejectTarget = null, rejectId = null;
+function openRejectModal(type, id) { rejectTarget = type; rejectId = id; document.getElementById('rejectModal').classList.add('active'); }
+function closeRejectModal() { document.getElementById('rejectModal').classList.remove('active'); document.getElementById('rejectReason').value = ''; }
+async function confirmReject() {
+  const token = getToken();
+  if (!token) return;
+  const reason = document.getElementById('rejectReason').value;
+  closeRejectModal();
+
+  if (rejectTarget === 'listing' && rejectId) {
+    try {
+      await fetch(API_URL + '/api/admin/properties/' + rejectId + '/reject', {
+        method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+      });
+      showToast('Listing rejected.', 'error');
+      loadListings(); loadOverview();
+    } catch (err) { console.error('Reject listing failed:', err); }
+  }
+
+  if (rejectTarget === 'verification' && rejectId) {
+    try {
+      await fetch(API_URL + '/api/admin/users/' + rejectId + '/reject-verification', {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || 'Your documents did not meet our requirements. Please resubmit.' })
+      });
+      showToast('Verification rejected. Landlord has been notified.', 'error');
+      loadVerifications();
+    } catch (err) { console.error('Reject verification failed:', err); }
+  }
+}
+
+// ── LOAD USERS ──
+async function loadUsers() {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const res = await fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+    const users = await res.json();
+    allUsers = Array.isArray(users) ? users : [];
+    renderUsersTable(allUsers);
+  } catch (err) { console.error('Load users failed:', err); }
+}
+
+function renderUsersTable(users) {
+  const tbody = document.getElementById('usersTableBody');
+  // Filter out admin accounts
+  users = users.filter(function(u) { return u.role !== 'admin'; });
+  if (!users.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,0.3);">No users found.</td></tr>'; return; }
+  tbody.innerHTML = users.map(u => {
+    const init = u.name.charAt(0).toUpperCase();
+    const joined = new Date(u.createdAt).toLocaleDateString('en-NG', {month:'short', year:'numeric'});
+    const statusClass = u.isSuspended ? 'status-suspended' : 'status-active';
+    const statusText = u.isSuspended ? 'Suspended' : 'Active';
+    const verifyBtn = u.role === 'landlord' && !u.isVerified
+      ? `<button class="user-action-btn verify" onclick="verifyUser('${u._id}', this)">Verify</button>`
+      : u.isVerified ? '<span style="color:var(--success);font-size:11px;">✓ Verified</span>' : '';
+    const suspendBtn = `<button class="user-action-btn ${u.isSuspended ? '' : 'danger'}" onclick="toggleSuspend('${u._id}', ${u.isSuspended}, this)">${u.isSuspended ? 'Reinstate' : 'Suspend'}</button>`;
+    return `<tr id="user-${u._id}">
+      <td><div class="user-cell"><div class="user-avatar-sm">${init}</div><div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div></div></td>
+      <td>${u.role}</td>
+      <td>${joined}</td>
+      <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+      <td>${verifyBtn}</td>
+      <td style="display:flex;gap:4px;">${suspendBtn}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(query) {
+  const filtered = allUsers.filter(u => u.name.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()));
+  renderUsersTable(filtered);
+}
+
+async function verifyUser(id, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true; btn.textContent = 'Verifying...';
+  try {
+    const res = await fetch(API_URL + '/api/admin/users/' + id + '/verify', {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) { showToast('Landlord verified!'); loadUsers(); }
+    else { btn.disabled = false; btn.textContent = 'Verify'; }
+  } catch (err) { btn.disabled = false; btn.textContent = 'Verify'; }
+}
+
+async function toggleSuspend(id, isSuspended, btn) {
+  const token = getToken();
+  if (!token) return;
+  btn.disabled = true;
+  try {
+    const endpoint = isSuspended ? '/api/admin/users/' + id + '/verify' : '/api/admin/users/' + id + '/suspend';
+    await fetch(API_URL + endpoint, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + token } });
+    showToast(isSuspended ? 'User reinstated.' : 'User suspended.');
+    loadUsers();
+  } catch (err) { btn.disabled = false; }
+}
+
+// ── VERIFICATIONS ──
+async function loadVerifications() {
+  const token = getToken();
+  if (!token) return;
+  const container = document.getElementById('verificationsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">Loading...</div>';
+
+  try {
+    const res = await fetch(API_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+    const users = await res.json();
+    if (!Array.isArray(users)) return;
+
+    // Show ALL unverified landlords
+    const unverified = users.filter(u => u.role === 'landlord' && !u.isVerified);
+    const verified = users.filter(u => u.role === 'landlord' && u.isVerified);
+
+    if (unverified.length === 0 && verified.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,0.3);font-size:13px;">No landlords registered yet.</div>';
+      return;
+    }
+
+    let html = '';
+
+    // Unverified landlords first
+    if (unverified.length > 0) {
+      html += '<div style="font-size:11px;font-weight:600;color:var(--error);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem;">Pending verification (' + unverified.length + ')</div>';
+      html += unverified.map(u => renderVerifCard(u, false)).join('');
+    } else {
+      html += '<div style="text-align:center;padding:1.5rem;background:rgba(46,204,113,0.05);border:1px solid rgba(46,204,113,0.15);border-radius:12px;color:var(--success);font-size:13px;margin-bottom:1rem;">✅ All landlords are verified!</div>';
+    }
+
+    // Verified landlords
+    if (verified.length > 0) {
+      html += '<div style="font-size:11px;font-weight:600;color:var(--success);text-transform:uppercase;letter-spacing:0.08em;margin:1.5rem 0 0.75rem;">Verified landlords (' + verified.length + ')</div>';
+      html += verified.map(u => renderVerifCard(u, true)).join('');
+    }
+
+    container.innerHTML = html;
+  } catch (err) {
+    console.error('Load verifications failed:', err);
+    container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--error);font-size:13px;">Failed to load. Please try again.</div>';
+  }
+}
+
+function renderVerifCard(u, isVerified) {
+  const joined = new Date(u.createdAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'});
+  const statusColor = isVerified ? 'var(--success)' : 'var(--gold-light)';
+  const statusText = isVerified ? '✅ Verified' : '⏳ Pending';
+  const borderColor = isVerified ? 'rgba(46,204,113,0.15)' : 'rgba(186,117,23,0.25)';
+
+  return `<div class="queue-card" id="verif-${u._id}" style="border-color:${borderColor};margin-bottom:12px;">
+    <div class="qc-header">
+      <div class="qc-avatar" style="background:linear-gradient(135deg,${isVerified ? '#0F6E56' : '#BA7517'},#132040);">${u.name.charAt(0)}</div>
+      <div style="flex:1;">
+        <div class="qc-name">${u.name}</div>
+        <div class="qc-sub">${u.email} · ${u.phone || 'No phone'}</div>
+        <div style="font-size:11px;margin-top:3px;color:${statusColor};">${statusText}</div>
+      </div>
+      <div class="qc-time">Joined ${joined}</div>
+    </div>
+    <div class="qc-details">
+      <div class="qc-row">
+        <span class="qc-row-label">NIN</span>
+        <span class="qc-row-value" style="color:${u.nin ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">${u.nin || '❌ Not submitted'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">CAC Number</span>
+        <span class="qc-row-value" style="color:${u.cacNumber ? 'rgba(255,255,255,0.8)' : 'var(--error)'};">${u.cacNumber || '❌ Not submitted'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">Selfie / Face</span>
+        <span class="qc-row-value">${u.selfieUrl ? '<a href="' + u.selfieUrl + '" target="_blank" style="color:var(--gold);">📷 View selfie →</a>' : '<span style="color:var(--error);">❌ Not submitted</span>'}</span>
+      </div>
+      <div class="qc-row">
+        <span class="qc-row-label">Account status</span>
+        <span class="qc-row-value" style="color:${u.isSuspended ? 'var(--error)' : 'var(--success)'};">${u.isSuspended ? '🔴 Suspended' : '🟢 Active'}</span>
+      </div>
+    </div>
+    ${!isVerified ? `<div class="qc-actions">
+      <button class="qc-btn qc-btn-approve" onclick="verifyUser('${u._id}', this)">✓ Verify landlord</button>
+      <button class="qc-btn qc-btn-reject" onclick="openRejectModal('verification','${u._id}')">✕ Reject</button>
+    </div>` : `<div class="qc-actions">
+      <span class="status-pill status-approved" style="padding:6px 14px;">✅ Verified</span>
+      <button class="qc-btn qc-btn-reject" onclick="toggleSuspend('${u._id}', ${u.isSuspended}, this)">${u.isSuspended ? '🔓 Reinstate' : '🔴 Suspend'}</button>
+    </div>`}
+  </div>`;
+}
+
+// ── CHARTS ──
+let growthChartInstance = null;
+let pieChartInstance = null;
+
+function buildReportCharts() {
+  const stats = window._domivaultStats || {};
+
+  // Update report stats with real data
+  document.getElementById('repUsers').textContent = stats.totalUsers || allUsers.length;
+  document.getElementById('repLandlords').textContent = stats.totalLandlords || allUsers.filter(u => u.role === 'landlord').length;
+  document.getElementById('repTenants').textContent = stats.totalTenants || allUsers.filter(u => u.role === 'tenant').length;
+  document.getElementById('repLive').textContent = stats.liveListings || 0;
+
+  // Use real weekly signup data
+  const labels = stats.labels || ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'];
+  const growthData = stats.cumulativeUsers || [0,0,0,0,0,0,0,stats.totalUsers || 0];
+
+  if (growthChartInstance) { growthChartInstance.destroy(); growthChartInstance = null; }
+  growthChartInstance = new Chart(document.getElementById('growthChart'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{ 
+        label: 'Total users',
+        data: growthData, 
+        borderColor: '#BA7517', 
+        backgroundColor: 'rgba(186,117,23,0.08)', 
+        tension: 0.4, pointRadius: 4, pointBackgroundColor: '#BA7517', 
+        fill: true, borderWidth: 2 
+      }]
+    },
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(10,22,40,0.95)', borderColor: 'rgba(186,117,23,0.3)', borderWidth: 1 } }, 
+      scales: { 
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 } } }, 
+        y: { 
+          grid: { color: 'rgba(255,255,255,0.04)' }, 
+          ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 11 }, stepSize: 1, precision: 0 }, 
+          beginAtZero: true,
+          min: 0,
+          suggestedMax: Math.max(...growthData) + 1
+        } 
+      } 
+    }
+  });
+
+  const landlords = stats.totalLandlords || 0;
+  const tenants = stats.totalTenants || 0;
+  // Build pie data — always show both segments, use 0.5 placeholder if zero so chart renders
+  const hasUsers = tenants + landlords > 0;
+  const pieLabels = ['Tenants (' + tenants + ')','Landlords (' + landlords + ')'];
+  const pieData = hasUsers ? [
+    tenants > 0 ? tenants : 0.001,
+    landlords > 0 ? landlords : 0.001
+  ] : [1, 1];
+  const pieColors = ['#BA7517','#185FA5'];
+  if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+  pieChartInstance = new Chart(document.getElementById('userPieChart'), {
+    type: 'doughnut',
+    data: { 
+      labels: pieLabels, 
+      datasets: [{ 
+        data: pieData, 
+        backgroundColor: pieColors, 
+        borderColor: '#0a1628', 
+        borderWidth: 3 
+      }] 
+    },
+    options: { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { 
+        legend: { 
+          position: 'bottom', 
+          labels: { color: 'rgba(255,255,255,0.6)', font: { size: 12 }, padding: 16 } 
+        },
+        tooltip: { 
+          callbacks: { 
+            label: function(ctx) { 
+              var real = ctx.dataIndex === 0 ? tenants : landlords;
+              return ctx.label.split(' ')[0] + ': ' + real;
+            } 
+          } 
+        }
+      } 
+    }
+  });
+}
+
+// ── UPDATE MOBILE BOTTOM NAV ──
+function updateBnav(page) {
+  document.querySelectorAll('.admin-bnav-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  var active = document.getElementById('bnav-' + page);
+  if (active) active.classList.add('active');
+}
+
+// Override setPage to also update bnav
+var _origSetPage = setPage;
+setPage = function(btn, page) {
+  _origSetPage(btn, page);
+  updateBnav(page);
+};
+
+// ── LISTING PREVIEW ──
+function openPreview(p) {
+  const modal = document.getElementById('listingPreviewModal');
+  const title = document.getElementById('previewTitle');
+  const images = document.getElementById('previewImages');
+  const details = document.getElementById('previewDetails');
+  const actions = document.getElementById('previewActions');
+
+  title.textContent = p.title;
+
+  // Images
+  if (p.images && p.images.length > 0) {
+    images.innerHTML = p.images.map(function(img) {
+      return '<img src="' + img + '" style="width:180px;height:120px;object-fit:cover;border-radius:8px;flex-shrink:0;" />';
+    }).join('');
+  } else {
+    images.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:13px;padding:1rem;">No photos uploaded</div>';
+  }
+
+  // Details
+  const joined = new Date(p.createdAt).toLocaleDateString('en-NG', {day:'numeric', month:'short', year:'numeric'});
+  details.innerHTML = `
+    <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+        ${row('Price', '&#8358;' + Number(p.price).toLocaleString('en-NG') + '/yr')}
+        ${row('Type', p.type)}
+        ${row('Bedrooms', p.bedrooms)}
+        ${row('Bathrooms', p.bathrooms)}
+        ${row('Furnishing', p.furnishing)}
+        ${row('Size', p.size ? p.size + ' m²' : 'Not specified')}
+        ${row('Address', p.location ? p.location.address : '—')}
+        ${row('Area', p.location ? p.location.area + ', Lagos' : '—')}
+        ${row('Submitted', joined)}
+        ${row('Status', p.status)}
+      </div>
+    </div>
+    <div style="margin-bottom:.75rem;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Description</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.7;">${p.description || 'No description'}</div>
+    </div>
+    ${p.amenities && p.amenities.length > 0 ? '<div><div style="font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">Amenities</div><div style="font-size:12px;color:rgba(255,255,255,0.5);">' + p.amenities.join(' · ') + '</div></div>' : ''}
+  `;
+
+  // Action buttons based on status
+  if (p.status === 'pending') {
+    actions.innerHTML = `
+      <button class="qc-btn qc-btn-approve" onclick="closePreview();approveListing('${p._id}', this)">✓ Approve</button>
+      <button class="qc-btn qc-btn-reject" onclick="closePreview();openRejectModal('listing','${p._id}')">✕ Reject</button>
+    `;
+  } else if (p.status === 'inspection_scheduled') {
+    actions.innerHTML = `<button class="qc-btn qc-btn-inspect" onclick="closePreview();markInspected('${p._id}', this)">✓ Mark as Live</button>`;
+  } else if (p.status === 'withdrawal_requested') {
+    actions.innerHTML = `
+      <button class="qc-btn qc-btn-approve" onclick="closePreview();approveWithdrawal('${p._id}', this)">✓ Approve withdrawal</button>
+      <button class="qc-btn qc-btn-reject" onclick="closePreview();declineWithdrawal('${p._id}', this)">✕ Decline</button>
+    `;
+  } else {
+    actions.innerHTML = '<span style="font-size:12px;color:rgba(255,255,255,0.3);">No actions available for this listing.</span>';
+  }
+
+  modal.classList.add('active');
+}
+
+function row(label, value) {
+  return '<div style="padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+    '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:2px;">' + label + '</div>' +
+    '<div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;">' + value + '</div>' +
+    '</div>';
+}
+
+function closePreview() {
+  document.getElementById('listingPreviewModal').classList.remove('active');
+}
+
+// Initialize
+loadOverview();
+</script>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="admin-bottom-nav">
+  <button class="admin-bnav-btn active" id="bnav-overview" onclick="setPage(this,'overview');updateBnav('overview')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span>Overview</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-listings" onclick="setPage(this,'listings');updateBnav('listings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <span>Listings</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-users" onclick="setPage(this,'users');updateBnav('users')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Users</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-verifications" onclick="setPage(this,'verifications');updateBnav('verifications')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>Verify</span>
+  </button>
+  <button class="admin-bnav-btn" id="bnav-reports" onclick="setPage(this,'reports');updateBnav('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Reports</span>
+  </button>
+</nav>
+</body>
+</html>
